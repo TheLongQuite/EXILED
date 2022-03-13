@@ -939,7 +939,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Spawn(ev.Target, item, ev.Target);
+                Spawn(ev.Player, item, ev.Player);
             }
         }
 
@@ -959,7 +959,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnProperties().Item1, item, ev.Player));
+                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player));
             }
         }
 

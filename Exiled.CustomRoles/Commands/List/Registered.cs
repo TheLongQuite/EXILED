@@ -37,26 +37,26 @@ namespace Exiled.CustomRoles.Commands.List
         public string[] Aliases { get; } = { "r" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Gets a list of registered custom roles.";
+        public string Description { get; } = "Список всех кастомных ролей.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.list.registered"))
             {
-                response = "Permission Denied, required: customroles.list.registered";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (CustomRole.Registered.Count == 0)
             {
-                response = "There are no custom roles currently on this server.";
+                response = "На сервере нет кастомных ролей.";
                 return false;
             }
 
             StringBuilder builder = StringBuilderPool.Shared.Rent().AppendLine();
 
-            builder.Append("[Registered custom roles (").Append(CustomRole.Registered.Count).AppendLine(")]");
+            builder.Append("[Кастомные роли (").Append(CustomRole.Registered.Count).AppendLine(")]");
 
             foreach (CustomRole role in CustomRole.Registered.OrderBy(r => r.Id))
                 builder.Append('[').Append(role.Id).Append(". ").Append(role.Name).Append(" (").Append(role.Role).Append(')').AppendLine("]");

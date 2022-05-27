@@ -38,27 +38,27 @@ namespace Exiled.CustomRoles.Commands
         public string[] Aliases { get; } = { "i" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Gets more information about the specified custom role.";
+        public string Description { get; } = "Информация про кастомную роль.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.info"))
             {
-                response = "Permission Denied, required: customroles.info";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (arguments.Count < 1)
             {
-                response = "info [Custom role name/Custom role ID]";
+                response = "info [Название/ID кастомной роли]";
                 return false;
             }
 
             if (!(int.TryParse(arguments.At(0), out int id) && CustomRole.TryGet(id, out CustomRole role)) &&
                 !CustomRole.TryGet(arguments.At(0), out role))
             {
-                response = $"{arguments.At(0)} is not a valid custom role.";
+                response = $"{arguments.At(0)} не идентификатор кастомной роли.";
                 return false;
             }
 
@@ -68,7 +68,7 @@ namespace Exiled.CustomRoles.Commands
                 .Append("</color> <color=#05C4E8>(").Append(role.Id).Append(")</color>")
                 .Append("- ").AppendLine(role.Description)
                 .AppendLine(role.Role.ToString())
-                .Append("- Health: ").AppendLine(role.MaxHealth.ToString()).AppendLine();
+                .Append("- Здоровье: ").AppendLine(role.MaxHealth.ToString()).AppendLine();
 
             response = StringBuilderPool.Shared.ToStringReturn(builder);
             return true;

@@ -47,7 +47,7 @@ namespace Exiled.CustomItems.Commands
         /// <inheritdoc/>
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            response = "Invalid subcommand! Available: give, spawn, info, list";
+            response = "Возможные команды: give, spawn, info, list";
             return false;
         }
     }

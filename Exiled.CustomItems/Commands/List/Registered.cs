@@ -37,32 +37,26 @@ namespace Exiled.CustomItems.Commands.List
         public string[] Aliases { get; } = { "r", "reg" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Gets a list of registered custom items.";
+        public string Description { get; } = "Получает все зарегистрированные кастомные предметы.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.list.registered"))
             {
-                response = "Permission Denied, required: customitems.list.registered";
-                return false;
-            }
-
-            if (arguments.Count != 0)
-            {
-                response = "list registered";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (CustomItem.Registered.Count == 0)
             {
-                response = "There are no custom items currently on this server.";
+                response = "На сервере нет кастомных предметов.";
                 return false;
             }
 
             StringBuilder message = StringBuilderPool.Shared.Rent().AppendLine();
 
-            message.Append("[Registered custom items (").Append(CustomItem.Registered.Count).AppendLine(")]");
+            message.Append("[Кастомные предметы (").Append(CustomItem.Registered.Count).AppendLine(")]");
 
             foreach (CustomItem customItem in CustomItem.Registered.OrderBy(item => item.Id))
                 message.Append('[').Append(customItem.Id).Append(". ").Append(customItem.Name).Append(" (").Append(customItem.Type).Append(')').AppendLine("]");

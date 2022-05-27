@@ -39,27 +39,27 @@ namespace Exiled.CustomItems.Commands
         public string[] Aliases { get; } = { "i" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Gets more information about the specified custom item.";
+        public string Description { get; } = "Дает информацию о кастомном предмете.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.info"))
             {
-                response = "Permission Denied, required: customitems.info";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (arguments.Count < 1)
             {
-                response = "info [Custom item name/Custom item ID]";
+                response = "info [Название/ID кастомного предмета]";
                 return false;
             }
 
             if (!(int.TryParse(arguments.At(0), out int id) && CustomItem.TryGet(id, out CustomItem item)) &&
                 !CustomItem.TryGet(arguments.At(0), out item))
             {
-                response = $"{arguments.At(0)} is not a valid custom item.";
+                response = $"{arguments.At(0)} не найден.";
                 return false;
             }
 
@@ -68,14 +68,14 @@ namespace Exiled.CustomItems.Commands
             message.Append("<color=#E6AC00>-</color> <color=#00D639>").Append(item.Name).Append("</color> <color=#05C4EB>(").Append(item.Id).AppendLine(")</color>")
                 .Append("- ").AppendLine(item.Description)
                 .AppendLine(item.Type.ToString())
-                .Append("- Spawn Limit: ").AppendLine(item.SpawnProperties.Limit.ToString()).AppendLine()
-                .Append("[Spawn Locations (").Append(item.SpawnProperties.DynamicSpawnPoints.Count + item.SpawnProperties.StaticSpawnPoints.Count).AppendLine(")]");
+                .Append("- Лимит спавна: ").AppendLine(item.SpawnProperties.Limit.ToString()).AppendLine()
+                .Append("[Локации (").Append(item.SpawnProperties.DynamicSpawnPoints.Count + item.SpawnProperties.StaticSpawnPoints.Count).AppendLine(")]");
 
             foreach (DynamicSpawnPoint spawnPoint in item.SpawnProperties.DynamicSpawnPoints)
-                message.Append(spawnPoint.Name).Append(' ').Append(spawnPoint.Position).Append(" Chance: ").Append(spawnPoint.Chance).AppendLine("%");
+                message.Append(spawnPoint.Name).Append(' ').Append(spawnPoint.Position).Append(" Шанс: ").Append(spawnPoint.Chance).AppendLine("%");
 
             foreach (StaticSpawnPoint spawnPoint in item.SpawnProperties.StaticSpawnPoints)
-                message.Append(spawnPoint.Name).Append(' ').Append(spawnPoint.Position).Append(" Chance: ").Append(spawnPoint.Chance).AppendLine("%");
+                message.Append(spawnPoint.Name).Append(' ').Append(spawnPoint.Position).Append(" Шанс: ").Append(spawnPoint.Chance).AppendLine("%");
 
             response = StringBuilderPool.Shared.ToStringReturn(message);
             return true;

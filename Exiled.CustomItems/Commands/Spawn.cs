@@ -40,20 +40,20 @@ namespace Exiled.CustomItems.Commands
         public string[] Aliases { get; } = { "sp" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Spawn an item at the specified Spawn Location, coordinates, or at the designated player's feet.";
+        public string Description { get; } = "Спавнит кастомный предмет.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.spawn"))
             {
-                response = "Permission Denied, required: customitems.spawn";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (arguments.Count < 2)
             {
-                response = "spawn [Custom item name] [Location name]\nspawn [Custom item name] [Nickname/PlayerID/UserID]\nspawn [Custom item name] [X] [Y] [Z]";
+                response = "spawn [Название/ID кастомного предмета] [Никнейм/SteamID игока]\nspawn [Название/ID кастомного предмета] [X] [Y] [Z]";
                 return false;
             }
 
@@ -65,15 +65,11 @@ namespace Exiled.CustomItems.Commands
 
             Vector3 position;
 
-            if (Enum.TryParse(arguments.At(1), out SpawnLocationType location))
-            {
-                position = location.GetPosition();
-            }
-            else if (Player.Get(arguments.At(1)) is Player player)
+            if (Player.Get(arguments.At(1)) is Player player)
             {
                 if (player.IsDead)
                 {
-                    response = $"Cannot spawn custom items under dead players!";
+                    response = $"Игрок мертв!";
                     return false;
                 }
 
@@ -83,7 +79,7 @@ namespace Exiled.CustomItems.Commands
             {
                 if (!float.TryParse(arguments.At(1), out float x) || !float.TryParse(arguments.At(2), out float y) || !float.TryParse(arguments.At(3), out float z))
                 {
-                    response = "Invalid coordinates selected.";
+                    response = "Невозможно получить координату (попробуй писать через , а не .)";
                     return false;
                 }
 
@@ -91,13 +87,13 @@ namespace Exiled.CustomItems.Commands
             }
             else
             {
-                response = $"Unable to find spawn location: {arguments.At(1)}.";
+                response = $"Невозможно найти локацию для спавна.";
                 return false;
             }
 
             item.Spawn(position, null);
 
-            response = $"{item.Name} ({item.Type}) has been spawned at {position}.";
+            response = $"{item.Name} ({item.Type}) заспавнился на позиции {position}.";
             return true;
         }
     }

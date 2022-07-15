@@ -85,7 +85,7 @@ namespace Exiled.CustomItems.API.Features
         public abstract SpawnProperties SpawnProperties { get; set; }
 
         /// <summary>
-        /// Gets or sets the scale of the item.
+        /// Gets or sets the scale of the item's pickup.
         /// </summary>
         public virtual Vector3 Scale { get; set; } = Vector3.one;
 
@@ -926,7 +926,8 @@ namespace Exiled.CustomItems.API.Features
 
                 ev.Player.RemoveItem(item);
 
-                Spawn(ev.Player, item, ev.Player);
+                Pickup pickup = Spawn(ev.Player, item, ev.Player);
+                pickup.Scale = Scale;
             }
         }
 
@@ -946,7 +947,8 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Spawn(ev.Player, item, ev.Player);
+                Pickup pickup = Spawn(ev.Target, item, ev.Target);
+                pickup.Scale = Scale;
             }
         }
 
@@ -966,7 +968,11 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player));
+                Timing.CallDelayed(1.5f, () =>
+                {
+                    Pickup pickup = Spawn(ev.NewRole.GetRandomSpawnProperties().Item1, item, ev.Player);
+                    pickup.Scale = Scale;
+                });
             }
         }
 
@@ -986,7 +992,8 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Spawn(ev.Target, item, ev.Target);
+                Pickup pickup = Spawn(ev.Target, item, ev.Target);
+                pickup.Scale = Scale;
             }
         }
 

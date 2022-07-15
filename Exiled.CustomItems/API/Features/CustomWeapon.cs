@@ -62,6 +62,11 @@ namespace Exiled.CustomItems.API.Features
         public virtual byte ClipSize { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating how many ammo will be spent per shot.
+        /// </summary>
+        public virtual byte AmmoUsage { get; set; } = 1;
+
+        /// <summary>
         /// Gets or sets a value indicating whether or not to allow friendly fire with this weapon on FF-enabled servers.
         /// </summary>
         public virtual bool FriendlyFire { get; set; }
@@ -269,15 +274,21 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalShooting(ShootingEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem))
+            if (!Check(ev.Player))
                 return;
+
+            Firearm firearm = (Firearm)ev.Shooter.CurrentItem;
+            if (firearm.Ammo < AmmoUsage - 1)
+                ev.IsAllowed = false;
+            else
+                firearm.Ammo -= (byte)(AmmoUsage - 1);
 
             OnShooting(ev);
         }
 
         private void OnInternalShot(ShotEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem))
+            if (!Check(ev.Player))
                 return;
 
             OnShot(ev);

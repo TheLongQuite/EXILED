@@ -919,8 +919,7 @@ namespace Exiled.CustomItems.API.Features
 
                 ev.Player.RemoveItem(item);
 
-                Pickup pickup = Spawn(ev.Player, item, ev.Player);
-                pickup.Scale = Scale;
+                Spawn(ev.Player, item, ev.Player);
             }
         }
 
@@ -940,8 +939,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Pickup pickup = Spawn(ev.Player, item, ev.Player);
-                pickup.Scale = Scale;
+                Spawn(ev.Target, item, ev.Target);
             }
         }
 
@@ -961,11 +959,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Timing.CallDelayed(1.5f, () =>
-                {
-                    Pickup pickup = Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player);
-                    pickup.Scale = Scale;
-                });
+                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnProperties().Item1, item, ev.Player));
             }
         }
 
@@ -985,8 +979,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Pickup pickup = Spawn(ev.Target, item, ev.Target);
-                pickup.Scale = Scale;
+                Spawn(ev.Target, item, ev.Target);
             }
         }
 
@@ -1015,8 +1008,6 @@ namespace Exiled.CustomItems.API.Features
             }
 
             Pickup pickup = Spawn(ev.Player, ev.Item, ev.Player);
-            pickup.Scale = Scale;
-
             if (pickup.Base.Rb is not null && ev.IsThrown)
             {
                 Vector3 vector = (ev.Player.Velocity / 3f) + (ev.Player.ReferenceHub.PlayerCameraReference.forward * 6f * (Mathf.Clamp01(Mathf.InverseLerp(7f, 0.1f, pickup.Base.Rb.mass)) + 0.3f));

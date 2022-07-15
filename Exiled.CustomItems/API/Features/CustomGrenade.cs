@@ -91,7 +91,6 @@ namespace Exiled.CustomItems.API.Features
 
             ThrownProjectile thrownProjectile = UnityEngine.Object.Instantiate(throwable.Base.Projectile, position, throwable.Owner.CameraTransform.rotation);
             Transform transform = thrownProjectile.transform;
-
             GameObject gameObject = thrownProjectile.gameObject;
             PickupSyncInfo newInfo = new()
             {

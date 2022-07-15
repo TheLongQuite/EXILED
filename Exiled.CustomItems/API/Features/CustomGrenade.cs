@@ -92,6 +92,7 @@ namespace Exiled.CustomItems.API.Features
             ThrownProjectile thrownProjectile = UnityEngine.Object.Instantiate(throwable.Base.Projectile, position, throwable.Owner.CameraTransform.rotation);
             Transform transform = thrownProjectile.transform;
 
+            GameObject gameObject = thrownProjectile.gameObject;
             PickupSyncInfo newInfo = new()
             {
                 ItemId = throwable.Type,
@@ -107,9 +108,8 @@ namespace Exiled.CustomItems.API.Features
 
             thrownProjectile.NetworkInfo = newInfo;
             thrownProjectile.PreviousOwner = new Footprint(throwable.Owner.ReferenceHub);
-
-            NetworkServer.Spawn(thrownProjectile.gameObject);
-
+            gameObject.transform.localScale = Scale;
+            NetworkServer.Spawn(gameObject);
             thrownProjectile.InfoReceived(default, newInfo);
 
             if (thrownProjectile.TryGetComponent(out Rigidbody component))
@@ -127,7 +127,7 @@ namespace Exiled.CustomItems.API.Features
             Tracked.Add(thrownProjectile);
 
             if (ExplodeOnCollision)
-                thrownProjectile.gameObject.AddComponent<Exiled.API.Features.Components.CollisionHandler>().Init(player.GameObject, (EffectGrenade)thrownProjectile);
+                gameObject.AddComponent<Exiled.API.Features.Components.CollisionHandler>().Init(player.GameObject, (EffectGrenade)thrownProjectile);
 
             return Pickup.Get(thrownProjectile);
         }

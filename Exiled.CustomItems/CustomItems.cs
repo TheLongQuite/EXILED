@@ -20,7 +20,6 @@ namespace Exiled.CustomItems
     public class CustomItems : Plugin<Config>
     {
         private RoundHandler roundHandler;
-        private PlayerHandler playerHandler;
         private Harmony harmony;
 
         /// <summary>
@@ -33,13 +32,10 @@ namespace Exiled.CustomItems
         {
             Instance = this;
             roundHandler = new RoundHandler();
-            playerHandler = new PlayerHandler();
 
             Exiled.Events.Handlers.Server.RoundStarted += roundHandler.OnRoundStarted;
 
-            Exiled.Events.Handlers.Player.ChangingRole += playerHandler.OnChangingRole;
-
-            harmony = new Harmony($"com.{nameof(CustomItems)}.ExiledTeam-{DateTime.Now.Ticks}");
+            harmony = new Harmony($"com.{nameof(CustomItems)}.flx-{DateTime.Now.Ticks}");
             harmony.PatchAll();
 
             base.OnEnabled();
@@ -49,8 +45,6 @@ namespace Exiled.CustomItems
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Server.RoundStarted -= roundHandler.OnRoundStarted;
-
-            Exiled.Events.Handlers.Player.ChangingRole -= playerHandler.OnChangingRole;
 
             harmony.UnpatchAll();
 

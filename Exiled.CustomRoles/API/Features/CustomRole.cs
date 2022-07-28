@@ -702,7 +702,6 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
-            Exiled.Events.Handlers.Player.Dying += OnInternalDying;
         }
 
         /// <summary>
@@ -715,7 +714,6 @@ namespace Exiled.CustomRoles.API.Features
 
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
-            Exiled.Events.Handlers.Player.Dying -= OnInternalDying;
         }
 
         /// <summary>
@@ -744,15 +742,6 @@ namespace Exiled.CustomRoles.API.Features
         {
             if (Check(ev.Player) && (((ev.NewRole == RoleTypeId.Spectator) && !KeepRoleOnDeath) || ((ev.NewRole != RoleTypeId.Spectator) && (ev.NewRole != Role))))
                 RemoveRole(ev.Player);
-        }
-
-        private void OnInternalDying(DyingEventArgs ev)
-        {
-            if (Check(ev.Player))
-            {
-                CustomRoles.Instance.StopRagdollPlayers.Add(ev.Player);
-                _ = new Ragdoll(new RagdollData(ev.Player.ReferenceHub, ev.DamageHandler, Role, ev.Player.Position, Quaternion.Euler(ev.Player.Rotation), ev.Player.DisplayNickname, NetworkTime.time), true);
-            }
         }
     }
 }

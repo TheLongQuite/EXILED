@@ -927,8 +927,6 @@ namespace Exiled.CustomItems.API.Features
                 ev.Player.RemoveItem(item);
 
                 Spawn(ev.Player, item, ev.Player);
-
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
             }
         }
 
@@ -949,8 +947,6 @@ namespace Exiled.CustomItems.API.Features
                 TrackedSerials.Remove(item.Serial);
 
                 Spawn(ev.Player, item, ev.Player);
-
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
             }
         }
 
@@ -970,9 +966,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, null));
-
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
+                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player));
             }
         }
 
@@ -1002,46 +996,6 @@ namespace Exiled.CustomItems.API.Features
                 return;
 
             OnDropping(ev);
-
-            if (!ev.IsAllowed)
-                return;
-
-            ev.IsAllowed = false;
-
-#if DEBUG
-            Log.Debug($"{ev.Player.Nickname} is dropping a {Name} ({ev.Item.Serial})");
-#endif
-            TrackedSerials.Remove(ev.Item.Serial);
-
-            ev.Player.RemoveItem(ev.Item);
-
-            if (ev.Player.Inventory.UserInventory.Items.ContainsKey(ev.Item.Serial))
-            {
-                ev.Player.Inventory.UserInventory.Items.Remove(ev.Item.Serial);
-                ev.Player.Inventory.SendItemsNextFrame = true;
-            }
-
-            Pickup pickup = Spawn(ev.Player, ev.Item, ev.Player);
-
-            if (pickup.Base.Rb is not null && ev.IsThrown)
-            {
-                Vector3 vector = (ev.Player.Velocity / 3f) + (ev.Player.ReferenceHub.PlayerCameraReference.forward * 6f * (Mathf.Clamp01(Mathf.InverseLerp(7f, 0.1f, pickup.Base.Rb.mass)) + 0.3f));
-
-                vector.x = Mathf.Max(Mathf.Abs(ev.Player.Velocity.x), Mathf.Abs(vector.x)) * (vector.x < 0f ? -1 : 1);
-                vector.y = Mathf.Max(Mathf.Abs(ev.Player.Velocity.y), Mathf.Abs(vector.y)) * (vector.y < 0f ? -1 : 1);
-                vector.z = Mathf.Max(Mathf.Abs(ev.Player.Velocity.z), Mathf.Abs(vector.z)) * (vector.z < 0f ? -1 : 1);
-
-                pickup.Base.Rb.position = ev.Player.ReferenceHub.PlayerCameraReference.position;
-                pickup.Base.Rb.velocity = vector;
-                pickup.Base.Rb.angularVelocity = Vector3.Lerp(ev.Item.Base.ThrowSettings.RandomTorqueA, ev.Item.Base.ThrowSettings.RandomTorqueB, UnityEngine.Random.value);
-
-                float magnitude = pickup.Base.Rb.angularVelocity.magnitude;
-
-                if (magnitude > pickup.Base.Rb.maxAngularVelocity)
-                {
-                    pickup.Base.Rb.maxAngularVelocity = magnitude;
-                }
-            }
         }
 
         private void OnInternalPickingUp(PickingUpItemEventArgs ev)
@@ -1054,9 +1008,6 @@ namespace Exiled.CustomItems.API.Features
             if (!ev.IsAllowed)
                 return;
 
-            if (!TrackedSerials.Contains(ev.Pickup.Serial))
-                TrackedSerials.Add(ev.Pickup.Serial);
-
             Timing.CallDelayed(0.05f, () => OnAcquired(ev.Player));
         }
 
@@ -1064,14 +1015,7 @@ namespace Exiled.CustomItems.API.Features
         {
             if (!Check(ev.NewItem))
             {
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_displayName));
                 return;
-            }
-
-            if (ShouldMessageOnGban)
-            {
-                foreach (Player player in Player.Get(RoleTypeId.Spectator))
-                    Timing.CallDelayed(0.5f, () => player.SendFakeSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_displayName), $"{ev.Player.Nickname} (CustomItem: {Name})"));
             }
 
             OnChanging(ev);

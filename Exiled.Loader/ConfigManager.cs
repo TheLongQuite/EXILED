@@ -272,12 +272,6 @@ namespace Exiled.Loader
             ServerStatic.SharedGroupsMembersConfig = GameCore.ConfigSharing.Paths[5] is null ? null : new YamlConfig(GameCore.ConfigSharing.Paths[5] + "shared_groups_members.txt");
             ServerStatic.PermissionsHandler = new PermissionsHandler(ref ServerStatic.RolesConfig, ref ServerStatic.SharedGroupsConfig, ref ServerStatic.SharedGroupsMembersConfig);
             ServerStatic.GetPermissionsHandler().RefreshPermissions();
-
-            foreach (Player player in Player.List)
-            {
-                player.ReferenceHub.serverRoles.SetGroup(null, false);
-                player.ReferenceHub.serverRoles.RefreshPermissions();
-            }
         }
     }
 }

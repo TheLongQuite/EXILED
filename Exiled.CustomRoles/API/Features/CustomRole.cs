@@ -395,7 +395,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player"/> to add the role to.</param>
         public virtual void AddRole(Player player)
         {
-            Vector3 oldPos = player.Position;
+            Vector3 oldPos = player.IsAlive ? player.Position : Vector3.zero;
 
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
 
@@ -411,7 +411,8 @@ namespace Exiled.CustomRoles.API.Features
                     Log.Debug($"{nameof(AddRole)}: Found {pos} to spawn {player.Nickname}");
 
                     // If the spawn pos isn't 0,0,0, We add vector3.up * 1.5 here to ensure they do not spawn inside the ground and get stuck.
-                    player.Position = oldPos;
+                    if(oldPos != Vector3.zero)
+                        player.Position = oldPos;
                     if (pos != Vector3.zero)
                     {
                         Log.Debug($"{nameof(AddRole)}: Setting {player.Nickname} position..");

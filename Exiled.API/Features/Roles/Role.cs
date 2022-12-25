@@ -8,6 +8,7 @@
 namespace Exiled.API.Features.Roles
 {
     using System;
+
     using Enums;
     using Exiled.API.Features.Spawn;
     using Extensions;

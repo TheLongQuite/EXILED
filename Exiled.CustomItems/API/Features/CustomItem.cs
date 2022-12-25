@@ -111,12 +111,6 @@ namespace Exiled.CustomItems.API.Features
         public HashSet<int> TrackedSerials { get; } = new();
 
         /// <summary>
-        /// Gets a value indicating whether or not this item causes things to happen that may be considered hacks, and thus be shown to global moderators as being present in a player's inventory when they gban them.
-        /// </summary>
-        [YamlIgnore]
-        public virtual bool ShouldMessageOnGban { get; } = false;
-
-        /// <summary>
         /// Gets a <see cref="CustomItem"/> with a specific ID.
         /// </summary>
         /// <param name="id">The <see cref="CustomItem"/> ID.</param>
@@ -947,7 +941,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Pickup pickup = Spawn(ev.Target, item, ev.Target);
+                Pickup pickup = Spawn(ev.Player, item, ev.Player);
                 pickup.Scale = Scale;
             }
         }
@@ -970,7 +964,7 @@ namespace Exiled.CustomItems.API.Features
 
                 Timing.CallDelayed(1.5f, () =>
                 {
-                    Pickup pickup = Spawn(ev.NewRole.GetRandomSpawnProperties().Item1, item, ev.Player);
+                    Pickup pickup = Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player);
                     pickup.Scale = Scale;
                 });
             }
@@ -1003,6 +997,7 @@ namespace Exiled.CustomItems.API.Features
                 return;
 
             OnDropping(ev);
+            ev.Item.Scale
         }
 
         private void OnInternalPickingUp(PickingUpItemEventArgs ev)

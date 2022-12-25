@@ -277,7 +277,7 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(ev.Player))
                 return;
 
-            Firearm firearm = (Firearm)ev.Shooter.CurrentItem;
+            Firearm firearm = (Firearm)ev.Player.CurrentItem;
             if (firearm.Ammo < AmmoUsage - 1)
                 ev.IsAllowed = false;
             else

@@ -34,7 +34,6 @@ namespace Exiled.CustomItems.API.Features
     using MEC;
 
     using NorthwoodLib.Pools;
-    using PlayerRoles;
     using UnityEngine;
 
     using YamlDotNet.Serialization;

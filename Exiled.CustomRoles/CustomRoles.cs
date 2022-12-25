@@ -7,12 +7,9 @@
 
 namespace Exiled.CustomRoles
 {
-    using System.Collections.Generic;
-
     using Exiled.API.Features;
     using Exiled.CustomRoles.API.Features;
     using Exiled.CustomRoles.API.Features.Parsers;
-    using Exiled.CustomRoles.Events;
     using Exiled.Loader;
     using Exiled.Loader.Features.Configs.CustomConverters;
 

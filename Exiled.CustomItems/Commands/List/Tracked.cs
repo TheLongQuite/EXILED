@@ -40,20 +40,14 @@ namespace Exiled.CustomItems.Commands.List
         public string[] Aliases { get; } = { "ii", "inside", "inv", "inventories" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Gets a list of custom items actually inside of players' inventories.";
+        public string Description { get; } = "Получает все предметы которые лежат в инвенторях игроков.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.list.insideinventories") && sender is PlayerCommandSender playerSender && !playerSender.ServerRoles.RaEverywhere)
             {
-                response = "Permission Denied, required: customitems.list.insideinventories";
-                return false;
-            }
-
-            if (arguments.Count != 0)
-            {
-                response = "list insideinventories";
+                response = "Не хватает прав!";
                 return false;
             }
 
@@ -79,14 +73,14 @@ namespace Exiled.CustomItems.Commands.List
                     message.Append(insideInventory).Append(". ");
 
                     if (owner is null)
-                        message.AppendLine("Nobody");
+                        message.AppendLine("Никто");
                     else
                         message.Append(owner.Nickname).Append(" (").Append(owner.UserId).Append(") (").Append(owner.Id).Append(") [").Append(owner.Role).AppendLine("]");
                 }
             }
 
             if (message.Length == 0)
-                message.Append("There are no custom items inside inventories.");
+                message.Append("Кастомные предметы не найдены.");
             else
                 message.Insert(0, Environment.NewLine + "[Custom items inside inventories (" + count + ")]" + Environment.NewLine);
 

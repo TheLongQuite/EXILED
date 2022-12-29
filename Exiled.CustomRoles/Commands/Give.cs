@@ -49,19 +49,19 @@ namespace Exiled.CustomRoles.Commands
         {
             if (!sender.CheckPermission("customroles.give"))
             {
-                response = "Permission Denied, required: customroles.give";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (arguments.Count == 0)
             {
-                response = "give <Custom role name/Custom role ID> [Nickname/PlayerID/UserID/all/*]";
+                response = "give <Название/ID кастомной роли> [Никнейм/ID/SteamID игрока или all/*]";
                 return false;
             }
 
             if (!CustomRole.TryGet(arguments.At(0), out CustomRole role))
             {
-                response = $"Custom role {arguments.At(0)} not found!";
+                response = $"Кастомная роль {arguments.At(0)} не найдена!";
                 return false;
             }
 
@@ -72,11 +72,11 @@ namespace Exiled.CustomRoles.Commands
                     Player player = Player.Get(playerCommandSender);
 
                     role.AddRole(player);
-                    response = $"{role.Name} given to {player.Nickname}.";
+                    response = $"Кастомная роль {role.Name} дана игроку {player.Nickname}.";
                     return true;
                 }
 
-                response = "Failed to provide a valid player.";
+                response = "Игрок не найден.";
                 return false;
             }
 
@@ -91,18 +91,18 @@ namespace Exiled.CustomRoles.Commands
                     foreach (Player player in players)
                         role.AddRole(player);
 
-                    response = $"Custom role {role.Name} given to all players.";
+                    response = $"Кастомная роль {role.Name} Дана всем игрокам.";
                     ListPool<Player>.Shared.Return(players);
                     return true;
                 default:
                     if (Player.Get(identifier) is not Player ply)
                     {
-                        response = $"Unable to find a player: {identifier}";
+                        response = $"Игрок {identifier} не найден";
                         return false;
                     }
 
                     role.AddRole(ply);
-                    response = $"{role.Name} given to {ply.Nickname}.";
+                    response = $"Кастомная роль {role.Name} дана игроку {ply.Nickname}.";
                     return true;
             }
         }

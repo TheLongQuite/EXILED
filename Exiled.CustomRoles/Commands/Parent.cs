@@ -46,7 +46,7 @@ namespace Exiled.CustomRoles.Commands
         /// <inheritdoc/>
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            response = "Invalid subcommand! Available: give, info, list";
+            response = "Доступные команды: give, info, list";
             return false;
         }
     }

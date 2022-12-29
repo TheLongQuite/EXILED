@@ -34,7 +34,6 @@ namespace Exiled.CustomItems.API.Features
     using MEC;
 
     using NorthwoodLib.Pools;
-    using PlayerRoles;
     using UnityEngine;
 
     using YamlDotNet.Serialization;
@@ -85,7 +84,7 @@ namespace Exiled.CustomItems.API.Features
         public abstract SpawnProperties SpawnProperties { get; set; }
 
         /// <summary>
-        /// Gets or sets the scale of the item.
+        /// Gets or sets the scale of the item's pickup.
         /// </summary>
         public virtual Vector3 Scale { get; set; } = Vector3.one;
 
@@ -109,12 +108,6 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         [YamlIgnore]
         public HashSet<int> TrackedSerials { get; } = new();
-
-        /// <summary>
-        /// Gets a value indicating whether or not this item causes things to happen that may be considered hacks, and thus be shown to global moderators as being present in a player's inventory when they gban them.
-        /// </summary>
-        [YamlIgnore]
-        public virtual bool ShouldMessageOnGban { get; } = false;
 
         /// <summary>
         /// Gets a <see cref="CustomItem"/> with a specific ID.
@@ -927,8 +920,6 @@ namespace Exiled.CustomItems.API.Features
                 ev.Player.RemoveItem(item);
 
                 Spawn(ev.Player, item, ev.Player);
-
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
             }
         }
 
@@ -949,8 +940,6 @@ namespace Exiled.CustomItems.API.Features
                 TrackedSerials.Remove(item.Serial);
 
                 Spawn(ev.Player, item, ev.Player);
-
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
             }
         }
 
@@ -970,9 +959,7 @@ namespace Exiled.CustomItems.API.Features
 
                 TrackedSerials.Remove(item.Serial);
 
-                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, null));
-
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
+                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player));
             }
         }
 
@@ -1002,7 +989,6 @@ namespace Exiled.CustomItems.API.Features
                 return;
 
             OnDropping(ev);
-
             if (!ev.IsAllowed)
                 return;
 
@@ -1022,7 +1008,6 @@ namespace Exiled.CustomItems.API.Features
             }
 
             Pickup pickup = Spawn(ev.Player, ev.Item, ev.Player);
-
             if (pickup.Base.Rb is not null && ev.IsThrown)
             {
                 Vector3 vector = (ev.Player.Velocity / 3f) + (ev.Player.ReferenceHub.PlayerCameraReference.forward * 6f * (Mathf.Clamp01(Mathf.InverseLerp(7f, 0.1f, pickup.Base.Rb.mass)) + 0.3f));
@@ -1054,9 +1039,6 @@ namespace Exiled.CustomItems.API.Features
             if (!ev.IsAllowed)
                 return;
 
-            if (!TrackedSerials.Contains(ev.Pickup.Serial))
-                TrackedSerials.Add(ev.Pickup.Serial);
-
             Timing.CallDelayed(0.05f, () => OnAcquired(ev.Player));
         }
 
@@ -1064,14 +1046,7 @@ namespace Exiled.CustomItems.API.Features
         {
             if (!Check(ev.NewItem))
             {
-                MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_displayName));
                 return;
-            }
-
-            if (ShouldMessageOnGban)
-            {
-                foreach (Player player in Player.Get(RoleTypeId.Spectator))
-                    Timing.CallDelayed(0.5f, () => player.SendFakeSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_displayName), $"{ev.Player.Nickname} (CustomItem: {Name})"));
             }
 
             OnChanging(ev);

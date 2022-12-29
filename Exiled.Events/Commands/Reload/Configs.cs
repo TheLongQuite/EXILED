@@ -9,7 +9,6 @@ namespace Exiled.Events.Commands.Reload
 {
     using System;
 
-    using API.Interfaces;
     using CommandSystem;
     using Exiled.Permissions.Extensions;
     using Loader;
@@ -45,12 +44,6 @@ namespace Exiled.Events.Commands.Reload
             bool haveBeenReloaded = ConfigManager.Reload();
 
             Handlers.Server.OnReloadedConfigs();
-
-            foreach (IPlugin<IConfig> plugin in Loader.Plugins)
-            {
-                plugin.OnUnregisteringCommands();
-                plugin.OnRegisteringCommands();
-            }
 
             response = "Plugin configs have been reloaded successfully!";
             return haveBeenReloaded;

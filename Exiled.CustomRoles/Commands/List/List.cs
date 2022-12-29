@@ -33,7 +33,7 @@ namespace Exiled.CustomRoles.Commands.List
         public override string[] Aliases { get; } = { "l" };
 
         /// <inheritdoc/>
-        public override string Description { get; } = "Gets a list of all currently registered custom roles.";
+        public override string Description { get; } = "Списки кастомных ролей.";
 
         /// <inheritdoc/>
         public override void LoadGeneratedCommands()
@@ -44,7 +44,7 @@ namespace Exiled.CustomRoles.Commands.List
         /// <inheritdoc/>
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            response = "Invalid subcommand! Available: registered.";
+            response = "Доступные команды: registered.";
             return false;
         }
     }

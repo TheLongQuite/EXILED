@@ -23,9 +23,6 @@ namespace Exiled.CustomRoles.API.Features
     using Exiled.Loader;
 
     using MEC;
-
-    using Mirror;
-
     using NorthwoodLib.Pools;
     using PlayerRoles;
     using UnityEngine;
@@ -398,7 +395,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player"/> to add the role to.</param>
         public virtual void AddRole(Player player)
         {
-            Vector3 oldPos = player.Position;
+            Vector3 oldPos = player.IsAlive ? player.Position : Vector3.zero;
 
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
 
@@ -414,7 +411,8 @@ namespace Exiled.CustomRoles.API.Features
                     Log.Debug($"{nameof(AddRole)}: Found {pos} to spawn {player.Nickname}");
 
                     // If the spawn pos isn't 0,0,0, We add vector3.up * 1.5 here to ensure they do not spawn inside the ground and get stuck.
-                    player.Position = oldPos;
+                    if(oldPos != Vector3.zero)
+                        player.Position = oldPos;
                     if (pos != Vector3.zero)
                     {
                         Log.Debug($"{nameof(AddRole)}: Setting {player.Nickname} position..");
@@ -702,7 +700,6 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
-            Exiled.Events.Handlers.Player.Dying += OnInternalDying;
         }
 
         /// <summary>
@@ -715,7 +712,6 @@ namespace Exiled.CustomRoles.API.Features
 
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
-            Exiled.Events.Handlers.Player.Dying -= OnInternalDying;
         }
 
         /// <summary>
@@ -744,15 +740,6 @@ namespace Exiled.CustomRoles.API.Features
         {
             if (Check(ev.Player) && (((ev.NewRole == RoleTypeId.Spectator) && !KeepRoleOnDeath) || ((ev.NewRole != RoleTypeId.Spectator) && (ev.NewRole != Role))))
                 RemoveRole(ev.Player);
-        }
-
-        private void OnInternalDying(DyingEventArgs ev)
-        {
-            if (Check(ev.Player))
-            {
-                CustomRoles.Instance.StopRagdollPlayers.Add(ev.Player);
-                _ = new Ragdoll(new RagdollData(ev.Player.ReferenceHub, ev.DamageHandler, Role, ev.Player.Position, Quaternion.Euler(ev.Player.Rotation), ev.Player.DisplayNickname, NetworkTime.time), true);
-            }
         }
     }
 }

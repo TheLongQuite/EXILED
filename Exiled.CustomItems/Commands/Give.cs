@@ -40,26 +40,26 @@ namespace Exiled.CustomItems.Commands
         public string[] Aliases { get; } = { "g" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Gives a custom item.";
+        public string Description { get; } = "Дает кастомный предмет.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.give"))
             {
-                response = "Permission Denied, required: customitems.give";
+                response = "Не хватает прав!";
                 return false;
             }
 
             if (arguments.Count == 0)
             {
-                response = "give <Custom item name/Custom item ID> [Nickname/PlayerID/UserID/all/*]";
+                response = "give <Название/ID кастомного предмета> [Никнейм/ID/SteamID игрока или */all для выдачи всем]";
                 return false;
             }
 
             if (!CustomItem.TryGet(arguments.At(0), out CustomItem item))
             {
-                response = $"Custom item {arguments.At(0)} not found!";
+                response = $"Кастомный предмет {arguments.At(0)} не найден!";
                 return false;
             }
 
@@ -71,16 +71,16 @@ namespace Exiled.CustomItems.Commands
 
                     if (!CheckEligible(player))
                     {
-                        response = "You cannot receive custom items!";
+                        response = "Вы не можете получить кастомный предмет!";
                         return false;
                     }
 
                     item.Give(player);
-                    response = $"{item.Name} given to {player.Nickname} ({player.UserId})";
+                    response = $"{item.Name} дан игроку {player.Nickname} ({player.UserId})";
                     return true;
                 }
 
-                response = "Failed to provide a valid player, please follow the syntax.";
+                response = "Игрок не найден.";
                 return false;
             }
 
@@ -94,23 +94,23 @@ namespace Exiled.CustomItems.Commands
                     foreach (Player ply in eligiblePlayers)
                         item.Give(ply);
 
-                    response = $"Custom item {item.Name} given to all players who can receive them ({eligiblePlayers.Count} players)";
+                    response = $"Кастомный предмет {item.Name} дан ({eligiblePlayers.Count} игрокам)";
                     return true;
                 default:
                     if (Player.Get(identifier) is not Player player)
                     {
-                        response = $"Unable to find player: {identifier}.";
+                        response = $"Невозможно найти игрока: {identifier}.";
                         return false;
                     }
 
                     if (!CheckEligible(player))
                     {
-                        response = "Player cannot receive custom items!";
+                        response = "Игрок не можете получить кастомный предмет!";
                         return false;
                     }
 
                     item.Give(player);
-                    response = $"{item.Name} given to {player.Nickname} ({player.UserId})";
+                    response = $"{item.Name} дан игроку {player.Nickname} ({player.UserId})";
                     return true;
             }
         }

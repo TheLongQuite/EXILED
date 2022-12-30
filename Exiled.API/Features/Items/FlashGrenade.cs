@@ -116,13 +116,20 @@ namespace Exiled.API.Features.Items
         /// Clones current <see cref="FlashGrenade"/> object.
         /// </summary>
         /// <returns> New <see cref="FlashGrenade"/> object. </returns>
-        public override Item Clone() => new FlashGrenade()
+        public override Item Clone()
         {
-            BlindCurve = BlindCurve,
-            SurfaceDistanceIntensifier = SurfaceDistanceIntensifier,
-            DeafenCurve = DeafenCurve,
-            FuseTime = FuseTime,
-        };
+            FlashGrenade cloneableItem = new()
+            {
+                MinimalDurationEffect = MinimalDurationEffect,
+                AdditionalBlindedEffect = AdditionalBlindedEffect,
+                SurfaceDistanceIntensifier = SurfaceDistanceIntensifier,
+                FuseTime = FuseTime,
+                Repickable = Repickable,
+                PinPullTime = PinPullTime,
+            };
+
+            return cloneableItem;
+        }
 
         /// <summary>
         /// Returns the FlashGrenade in a human readable format.

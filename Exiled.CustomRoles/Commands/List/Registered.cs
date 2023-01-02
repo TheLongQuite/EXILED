@@ -34,7 +34,7 @@ namespace Exiled.CustomRoles.Commands.List
         public string Command { get; } = "registered";
 
         /// <inheritdoc/>
-        public string[] Aliases { get; } = { "r" };
+        public string[] Aliases { get; } = { "r", "reg" };
 
         /// <inheritdoc/>
         public string Description { get; } = "Список всех кастомных ролей.";

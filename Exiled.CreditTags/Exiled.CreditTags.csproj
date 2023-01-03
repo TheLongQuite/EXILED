@@ -8,19 +8,19 @@
         <BaseProperties>false</BaseProperties>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <NoWarn>$(NoWarn);CS1591;SA1600</NoWarn>
-        <Configurations>Debug;Release;Programs</Configurations>
+        <Configurations>Debug;Release;Installer</Configurations>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
-    <Import Project="../EXILED.props"/>
+    <Import Project="../EXILED.props" />
 
     <ItemGroup>
-        <ProjectReference Include="..\Exiled.API\Exiled.API.csproj"/>
-        <ProjectReference Include="..\Exiled.Events\Exiled.Events.csproj"/>
+        <ProjectReference Include="..\Exiled.API\Exiled.API.csproj" />
+        <ProjectReference Include="..\Exiled.Events\Exiled.Events.csproj" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="StyleCop.Analyzers" Version="$(StyleCopVersion)" IncludeAssets="All" PrivateAssets="All"/>
+        <PackageReference Include="StyleCop.Analyzers" Version="$(StyleCopVersion)" IncludeAssets="All" PrivateAssets="All" />
     </ItemGroup>
 
     <ItemGroup>

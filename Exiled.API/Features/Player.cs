@@ -44,6 +44,10 @@ namespace Exiled.API.Features
     using NorthwoodLib.Pools;
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
+    using PlayerRoles.PlayableScps.Scp079;
+    using PlayerRoles.PlayableScps.Scp106;
+    using PlayerRoles.PlayableScps.Scp173;
+    using PlayerRoles.PlayableScps.Scp939;
     using PlayerRoles.Spectating;
     using PlayerRoles.Voice;
     using PlayerStatsSystem;
@@ -449,9 +453,9 @@ namespace Exiled.API.Features
         /// Gets a <see cref="Roles.Role"/> that is unique to this player and this class. This allows modification of various aspects related to the role solely.
         /// <para>
         /// The type of the Role is different based on the <see cref="RoleTypeId"/> of the player, and casting should be used to modify the role.
-        /// <br /><see cref="RoleTypeId.Spectator"/> = <see cref="Roles.SpectatorRole"/>.
-        /// <br /><see cref="RoleTypeId.Overwatch"/> = <see cref="Roles.OverwatchRole"/>.
-        /// <br /><see cref="RoleTypeId.None"/> = <see cref="Roles.NoneRole"/>.
+        /// <br /><see cref="RoleTypeId.Spectator"/> = <see cref="SpectatorRole"/>.
+        /// <br /><see cref="RoleTypeId.Overwatch"/> = <see cref="OverwatchRole"/>.
+        /// <br /><see cref="RoleTypeId.None"/> = <see cref="NoneRole"/>.
         /// <br /><see cref="RoleTypeId.Scp049"/> = <see cref="Scp049Role"/>.
         /// <br /><see cref="RoleTypeId.Scp0492"/> = <see cref="Scp0492Role"/>.
         /// <br /><see cref="RoleTypeId.Scp079"/> = <see cref="Scp079Role"/>.
@@ -462,14 +466,14 @@ namespace Exiled.API.Features
         /// <br />If not listed above, the type of Role will be <see cref="HumanRole"/>.
         /// </para>
         /// <para>
-        /// If the role object is stored, it may become invalid if the player changes roles. Thus, the <see cref="Roles.Role.IsValid"/> property can be checked. If this property is <see langword="false"/>, the role should be discarded and this property should be used again to get the new Role.
+        /// If the role object is stored, it may become invalid if the player changes roles. Thus, the <see cref="Role.IsValid"/> property can be checked. If this property is <see langword="false"/>, the role should be discarded and this property should be used again to get the new Role.
         /// This role is automatically cached until it changes, and it is recommended to use this property directly rather than storing the property yourself.
         /// </para>
         /// <para>
-        /// Roles and RoleTypeIds can be compared directly. <c>Player.Role == RoleTypeId.Scp079</c> is valid and will return <see langword="true"/> if the player is SCP-079. To set the player's role, see <see cref="Roles.Role.Set(RoleTypeId, SpawnReason)"/>.
+        /// Roles and RoleTypeIds can be compared directly. <c>Player.Role == RoleTypeId.Scp079</c> is valid and will return <see langword="true"/> if the player is SCP-079. To set the player's role, see <see cref="Role.Set(RoleTypeId, SpawnReason)"/>.
         /// </para>
         /// </summary>
-        /// <seealso cref="Roles.Role.Set(RoleTypeId, SpawnReason)"/>
+        /// <seealso cref="Role.Set(RoleTypeId, SpawnReason)"/>
         public Role Role
         {
             get => role ??= Role.Create(RoleManager.CurrentRole);
@@ -964,7 +968,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> which contains all player's preferences.
         /// </summary>
-        public Dictionary<ItemType, AttachmentIdentifier[]> Preferences => Firearm.PlayerPreferences.FirstOrDefault(kvp => kvp.Key == this).Value;
+        public Dictionary<FirearmType, AttachmentIdentifier[]> Preferences => Firearm.PlayerPreferences.FirstOrDefault(kvp => kvp.Key == this).Value;
 
         /// <summary>
         /// Gets the player's <see cref="Footprinting.Footprint"/>.
@@ -1067,7 +1071,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets the <see cref="Player"/> belonging to a specific netId, if any.
         /// </summary>
-        /// <param name="netId">The player's <see cref="Mirror.NetworkIdentity.netId"/>.</param>
+        /// <param name="netId">The player's <see cref="NetworkIdentity.netId"/>.</param>
         /// <returns>The <see cref="Player"/> owning the netId, or <see langword="null"/> if not found.</returns>
         public static Player Get(uint netId) => ReferenceHub.TryGetHubNetID(netId, out ReferenceHub hub) ? Get(hub) : null;
 
@@ -1539,7 +1543,7 @@ namespace Exiled.API.Features
             }
             else
             {
-                throw new InvalidOperationException("You may only reload weapons.");
+                throw new InvalidOperationException("The player's CurrentItem is not a firearm.");
             }
         }
 
@@ -1610,7 +1614,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Removes handcuffs.
+        /// Removes the player's handcuffs.
         /// </summary>
         public void RemoveHandcuffs()
         {
@@ -1639,8 +1643,14 @@ namespace Exiled.API.Features
         /// <summary>
         /// Drops the held item. Will not do anything if the player is not holding an item.
         /// </summary>
-        /// <returns>dropped <see cref="Pickup"/>.</returns>
-        public Pickup DropHeldItem() => DropItem(CurrentItem);
+        /// <seealso cref="CurrentItem"/>
+        public void DropHeldItem()
+        {
+            if (CurrentItem is null)
+                return;
+
+            DropItem(CurrentItem);
+        }
 
         /// <summary>
         /// Indicates whether or not the player has an item.
@@ -1662,6 +1672,8 @@ namespace Exiled.API.Features
         /// <param name="item">The item to search for.</param>
         /// <returns>How many items of that <see cref="ItemType"/> the player has.</returns>
         /// <remarks>For counting ammo, see <see cref="GetAmmo(AmmoType)"/>.</remarks>
+        /// <seealso cref="GetAmmo(AmmoType)"/>
+        /// <seealso cref="CountItem(ItemCategory)"/>
         public int CountItem(ItemType item) => Items.Count(tempItem => tempItem.Type == item);
 
         /// <summary>
@@ -1669,6 +1681,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="grenadeType">The ProjectileType to search for.</param>
         /// <returns>How many items of that <see cref="ProjectileType"/> the player has.</returns>
+        /// <seealso cref="CountItem(ItemType)"/>
         public int CountItem(ProjectileType grenadeType) => Inventory.UserInventory.Items.Count(tempItem => tempItem.Value.ItemTypeId == grenadeType.GetItemType());
 
         /// <summary>
@@ -1676,6 +1689,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="category">The category to search for.</param>
         /// <returns>How many items of that <see cref="ItemCategory"/> the player has.</returns>
+        /// <seealso cref="CountItem(ItemType)"/>
         public int CountItem(ItemCategory category) => category switch
         {
             ItemCategory.Ammo => Inventory.UserInventory.ReserveAmmo.Where(ammo => ammo.Value > 0).Count(),
@@ -1968,7 +1982,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="weaponType">The <see cref="ItemType"/> of the weapon.</param>
         /// <param name="amount">The amount of ammo to be added.</param>
-        public void AddAmmo(ItemType weaponType, ushort amount) => AddAmmo(weaponType.GetWeaponAmmoType(), amount);
+        public void AddAmmo(FirearmType weaponType, ushort amount) => AddAmmo(weaponType.GetWeaponAmmoType(), amount);
 
         /// <summary>
         /// Sets the amount of a specified <see cref="AmmoType">ammo type</see> to the player's inventory.
@@ -1998,10 +2012,10 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets the maximum amount of ammo the player can hold, given the ammo <see cref="AmmoType"/>.
         /// This method factors in the armor the player is wearing, as well as server configuration.
-        /// For the maximum amount of ammo that can be given regardless of worn armor and server configuration, see <see cref="ServerConfigSynchronizer.AmmoLimit"/>.
+        /// For the maximum amount of ammo that can be given regardless of worn armor and server configuration, see <see cref="Ammo.AmmoLimit"/>.
         /// </summary>
         /// <param name="type">The <see cref="AmmoType"/> of the ammo to check.</param>
-        /// <returns>The maximum amount of ammo this player can carry. Guaranteed to be between <c>0</c> and <see cref="ServerConfigSynchronizer.AmmoLimit"/>.</returns>
+        /// <returns>The maximum amount of ammo this player can carry. Guaranteed to be between <c>0</c> and <see cref="Ammo.AmmoLimit"/>.</returns>
         public int GetAmmoLimit(AmmoType type) =>
             InventorySystem.Configs.InventoryLimits.GetAmmoLimit(type.GetItemType(), referenceHub);
 
@@ -2014,7 +2028,7 @@ namespace Exiled.API.Features
             InventorySystem.Configs.InventoryLimits.GetCategoryLimit(category, referenceHub);
 
         /// <summary>
-        /// Add an item of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
+        /// Adds an item of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
         /// </summary>
         /// <param name="itemType">The item to be added.</param>
         /// <param name="identifiers">The attachments to be added to the item.</param>
@@ -2027,7 +2041,7 @@ namespace Exiled.API.Features
             {
                 if (identifiers is not null)
                     firearm.AddAttachment(identifiers);
-                else if (Preferences is not null && Preferences.TryGetValue(itemType, out AttachmentIdentifier[] attachments))
+                else if (Preferences is not null && Preferences.TryGetValue(itemType.GetFirearmType(), out AttachmentIdentifier[] attachments))
                     firearm.Base.ApplyAttachmentsCode(attachments.GetAttachmentsCode(), true);
 
                 FirearmStatusFlags flags = FirearmStatusFlags.MagazineInserted;
@@ -2042,7 +2056,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the amount of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
+        /// Adds the amount of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
         /// </summary>
         /// <param name="itemType">The item to be added.</param>
         /// <param name="amount">The amount of items to be added.</param>
@@ -2060,7 +2074,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the amount of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
+        /// Adds the amount of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
         /// </summary>
         /// <param name="itemType">The item to be added.</param>
         /// <param name="amount">The amount of items to be added.</param>
@@ -2082,7 +2096,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the list of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
+        /// Adds the list of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
         /// </summary>
         /// <param name="items">The list of items to be added.</param>
         /// <returns>An <see cref="IEnumerable{Item}"/> containing the items given.</returns>
@@ -2099,7 +2113,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the list of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
+        /// Adds the list of items of the specified type with default durability(ammo/charge) and no mods to the player's inventory.
         /// </summary>
         /// <param name="items">The <see cref="Dictionary{TKey, TValue}"/> of <see cref="ItemType"/> and <see cref="IEnumerable{T}"/> of <see cref="AttachmentIdentifier"/> to be added.</param>
         /// <returns>An <see cref="IEnumerable{Item}"/> containing the items given.</returns>
@@ -2114,7 +2128,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add an item to the player's inventory.
+        /// Adds an item to the player's inventory.
         /// </summary>
         /// <param name="item">The item to be added.</param>
         public void AddItem(Item item)
@@ -2133,7 +2147,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add an item to the player's inventory.
+        /// Adds an item to the player's inventory.
         /// </summary>
         /// <param name="item">The item to be added.</param>
         /// <param name="identifiers">The attachments to be added to the item.</param>
@@ -2179,7 +2193,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add an item to the player's inventory.
+        /// Adds an item to the player's inventory.
         /// </summary>
         /// <param name="itemBase">The item to be added.</param>
         /// <param name="item">The <see cref="Item"/> object of the item.</param>
@@ -2221,7 +2235,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the amount of items to the player's inventory.
+        /// Adds the <paramref name="amount"/> of items to the player's inventory.
         /// </summary>
         /// <param name="item">The item to be added.</param>
         /// <param name="amount">The amount of items to be added.</param>
@@ -2235,7 +2249,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the amount of items to the player's inventory.
+        /// Adds the <paramref name="amount"/> of items to the player's inventory.
         /// </summary>
         /// <param name="firearm">The firearm to be added.</param>
         /// <param name="amount">The amount of items to be added.</param>
@@ -2250,7 +2264,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the list of items to the player's inventory.
+        /// Adds the list of items to the player's inventory.
         /// </summary>
         /// <param name="items">The list of items to be added.</param>
         public void AddItem(IEnumerable<Item> items)
@@ -2260,7 +2274,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Add the list of items to the player's inventory.
+        /// Adds the list of items to the player's inventory.
         /// </summary>
         /// <param name="firearms">The <see cref="Dictionary{TKey, TValue}"/> of <see cref="Firearm"/> and <see cref="IEnumerable{T}"/> of <see cref="AttachmentIdentifier"/> to be added.</param>
         public void AddItem(Dictionary<Firearm, IEnumerable<AttachmentIdentifier>> firearms)
@@ -2342,6 +2356,9 @@ namespace Exiled.API.Features
         /// Clears the player's inventory, including all ammo and items.
         /// </summary>
         /// <param name="destroy">Whether or not to fully destroy the old items.</param>
+        /// <seealso cref="ResetInventory(IEnumerable{Item})"/>
+        /// <seealso cref="ResetInventory(IEnumerable{ItemType})"/>
+        /// <seealso cref="DropItems()"/>
         public void ClearInventory(bool destroy = true)
         {
             while (Items.Count > 0)
@@ -2351,10 +2368,11 @@ namespace Exiled.API.Features
         /// <summary>
         /// Drops all items in the player's inventory, including all ammo and items.
         /// </summary>
+        /// <seealso cref="ClearInventory(bool)"/>
         public void DropItems() => Inventory.ServerDropEverything();
 
         /// <summary>
-        /// Causes the player to throw a grenade.
+        /// Forces the player to throw a grenade.
         /// </summary>
         /// <param name="type">The <see cref="ProjectileType"/> to be thrown.</param>
         /// <param name="fullForce">Whether to throw with full or half force.</param>
@@ -2373,7 +2391,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Throw an item.
+        /// Forcefully throws a <paramref name="throwable"/> item.
         /// </summary>
         /// <param name="throwable">The <see cref="Throwable"/> to be thrown.</param>
         /// <param name="fullForce">Whether to throw with full or half force.</param>
@@ -2384,7 +2402,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Show a hint to the player.
+        /// Shows a hint to the player.
         /// </summary>
         /// <param name="message">The message to be shown.</param>
         /// <param name="duration">The duration the text will be on screen.</param>
@@ -2406,7 +2424,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Sends a HitMarker to the player.
         /// </summary>
-        /// <param name="size">The size of the hitmarker (Do not exceed <see cref="Hitmarker.MaxSize"/>).</param>
+        /// <param name="size">The size of the hitmarker, ranging from <c>0</c> to <c><see cref="Hitmarker.MaxSize"/></c>).</param>
         public void ShowHitMarker(float size = 1f) =>
             Hitmarker.SendHitmarker(Connection, size > Hitmarker.MaxSize ? Hitmarker.MaxSize : size);
 
@@ -2462,6 +2480,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Disables all currently active <see cref="StatusEffectBase">status effects</see>.
         /// </summary>
+        /// <seealso cref="DisableEffects(IEnumerable{EffectType})"/>
         public void DisableAllEffects()
         {
             foreach (StatusEffectBase effect in ReferenceHub.playerEffectsController.AllEffects)
@@ -2472,6 +2491,7 @@ namespace Exiled.API.Features
         /// Disables all currently active <see cref="StatusEffectBase">status effects</see>.
         /// </summary>
         /// <param name="category">A category to filter the disabled effects.</param>
+        /// <seealso cref="DisableAllEffects()"/>
         public void DisableAllEffects(EffectCategory category)
         {
             if (category is EffectCategory.None)
@@ -2709,7 +2729,7 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Reconnects player to the server. Can be used to redirect them to another server on a different port but same IP.
+        /// Reconnects the player to the server. Can be used to redirect them to another server on a different port but same IP.
         /// </summary>
         /// <param name="newPort">New port.</param>
         /// <param name="delay">Player reconnection delay.</param>

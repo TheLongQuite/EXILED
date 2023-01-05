@@ -264,7 +264,7 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalShot(ShotEventArgs ev)
         {
-            if (!Check(ev.Player))
+            if (!Check(ev.Player.CurrentItem))
                 return;
 
             OnShot(ev);

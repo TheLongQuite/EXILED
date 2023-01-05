@@ -1,15 +1,16 @@
-name: Exiled Main CI
+name: Exiled Dev CI
 
 on:
   push:
     branches:
-      - master
+      - dev
   pull_request:
     branches:
-      - master
+      - dev
+  workflow_dispatch:
 
 env:
-  EXILED_REFERENCES_URL: https://www.exiled.host/build_deps/Master.zip
+  EXILED_REFERENCES_URL: https://exiled.host/build_deps/Dev.zip
   EXILED_REFERENCES_PATH: ${{ github.workspace }}/References
 
 jobs:

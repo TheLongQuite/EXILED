@@ -34,6 +34,7 @@ namespace Exiled.CustomItems.API.Features
     using MEC;
 
     using NorthwoodLib.Pools;
+    using PlayerRoles;
     using UnityEngine;
 
     using YamlDotNet.Serialization;
@@ -85,7 +86,7 @@ namespace Exiled.CustomItems.API.Features
         public abstract SpawnProperties SpawnProperties { get; set; }
 
         /// <summary>
-        /// Gets or sets the scale of the item's pickup.
+        /// Gets or sets the scale of the item.
         /// </summary>
         public virtual Vector3 Scale { get; set; } = Vector3.one;
 

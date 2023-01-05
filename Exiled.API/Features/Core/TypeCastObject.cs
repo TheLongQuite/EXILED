@@ -49,9 +49,7 @@ namespace Exiled.API.Features.Core
             return true;
         }
 
-#pragma warning disable CS1574
         /// <inheritdoc cref="Cast{T}"/>
-#pragma warning restore CS1574
         public TObject As<TObject>()
             where TObject : class => Cast<TObject>();
 

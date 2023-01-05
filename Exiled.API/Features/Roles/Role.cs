@@ -8,6 +8,7 @@
 namespace Exiled.API.Features.Roles
 {
     using System;
+    using System.Diagnostics;
 
     using Enums;
 

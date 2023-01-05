@@ -212,8 +212,10 @@ namespace Exiled.API.Extensions
         public static void MessageTranslated(this Player player, string words, string translation, bool makeHold = false, bool makeNoise = true, bool isSubtitles = true)
         {
             StringBuilder annoucement = StringBuilderPool.Shared.Rent();
+
             string[] cassies = words.Split('\n');
             string[] translations = translation.Split('\n');
+
             for (int i = 0; i < cassies.Length; i++)
                 annoucement.Append($"{translations[i]}<size=0> {cassies[i].Replace(' ', ' ')} </size><split>");
 

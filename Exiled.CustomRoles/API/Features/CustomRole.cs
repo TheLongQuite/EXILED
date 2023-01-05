@@ -413,7 +413,7 @@ namespace Exiled.CustomRoles.API.Features
                     // If the spawn pos isn't 0,0,0, We add vector3.up * 1.5 here to ensure they do not spawn inside the ground and get stuck.
                     if(oldPos != Vector3.zero)
                         player.Position = oldPos;
-                    
+
                     if (pos != Vector3.zero)
                     {
                         Log.Debug($"{nameof(AddRole)}: Setting {player.Nickname} position..");

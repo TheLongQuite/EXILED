@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="Scp244Pickup.cs" company="Exiled Team">
+// <copyright file="JailbirdPickup.cs" company="Exiled Team">
 // Copyright (c) Exiled Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
@@ -7,12 +7,13 @@
 
 namespace Exiled.API.Features.Pickups
 {
-    using InventorySystem.Items.Usables.Scp244;
+    using InventorySystem.Items.Jailbird;
+    using UnityEngine;
 
     using BaseJailbirdPickup = InventorySystem.Items.Jailbird.JailbirdPickup;
 
     /// <summary>
-    /// A wrapper class for a SCP-244 pickup.
+    /// A wrapper class for a jailbird pickup.
     /// </summary>
     public class JailbirdPickup : Pickup
     {
@@ -36,21 +37,32 @@ namespace Exiled.API.Features.Pickups
         }
 
         /// <summary>
-        /// Gets the <see cref="Scp244DeployablePickup"/> that this class is encapsulating.
+        /// Gets the <see cref="BaseJailbirdPickup"/> that this class is encapsulating.
         /// </summary>
         public new BaseJailbirdPickup Base { get; }
 
         /// <summary>
-        /// Gets or Sets the saving value of the total damage dealt.
+        /// Gets or sets the total amount of damage dealt with the Jailbird.
         /// </summary>
-        public float TotalMelee
+        public float TotalDamageDealt
         {
             get => Base.TotalMelee;
             set => Base.TotalMelee = value;
         }
 
         /// <summary>
-        /// Gets or Sets the number of charge remaining in the item.
+        /// Gets or sets the amount of damage remaining before the Jailbird breaks.
+        /// </summary>
+        /// <remarks>Modifying this value will directly modify <see cref="TotalDamageDealt"/>.</remarks>
+        /// <seealso cref="TotalDamageDealt"/>
+        public float RemainingDamage
+        {
+            get => JailbirdItem.DamageLimit - TotalDamageDealt;
+            set => TotalDamageDealt = Mathf.Clamp(JailbirdItem.DamageLimit - value, 0, JailbirdItem.DamageLimit);
+        }
+
+        /// <summary>
+        /// Gets or sets the number of times the item has been charged and used.
         /// </summary>
         public int TotalCharges
         {
@@ -59,9 +71,20 @@ namespace Exiled.API.Features.Pickups
         }
 
         /// <summary>
-        /// Returns the Scp244Pickup in a human readable format.
+        /// Gets or sets the amount of charges remaining before the Jailbird breaks.
         /// </summary>
-        /// <returns>A string containing Scp244Pickup related data.</returns>
+        /// <remarks>Modifying this value will directly modify <see cref="TotalCharges"/>.</remarks>
+        /// <seealso cref="TotalCharges"/>
+        public int RemainingCharges
+        {
+            get => JailbirdItem.ChargesLimit - TotalCharges;
+            set => TotalCharges = Mathf.Clamp(JailbirdItem.ChargesLimit - value, 0, JailbirdItem.ChargesLimit);
+        }
+
+        /// <summary>
+        /// Returns the jailbird in a human readable format.
+        /// </summary>
+        /// <returns>A string containing jailbird related data.</returns>
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}*";
     }
 }

@@ -91,7 +91,7 @@ namespace Exiled.API.Extensions
         public static bool IsNegative(this EffectType effect) => IsHarmful(effect) || effect is EffectType.AmnesiaItems
             or EffectType.AmnesiaVision or EffectType.Blinded or EffectType.Burned or EffectType.Concussed or EffectType.Deafened
             or EffectType.Disabled or EffectType.Ensnared or EffectType.Exhausted or EffectType.Flashed or EffectType.SinkHole
-            or EffectType.Stained or EffectType.Visuals173Blink;
+            or EffectType.Stained;
 
         /// <summary>
         /// Returns whether or not the provided <paramref name="effect"/> is a positive effect.

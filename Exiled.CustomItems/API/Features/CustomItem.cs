@@ -912,8 +912,6 @@ namespace Exiled.CustomItems.API.Features
 
                 Spawn(ev.Player, item, ev.Player);
             }
-
-            MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
         }
 
         private void OnInternalOwnerDying(DyingEventArgs ev)
@@ -934,8 +932,6 @@ namespace Exiled.CustomItems.API.Features
 
                 Spawn(ev.Player, item, ev.Player);
             }
-
-            MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
         }
 
         private void OnInternalOwnerEscaping(EscapingEventArgs ev)
@@ -956,8 +952,6 @@ namespace Exiled.CustomItems.API.Features
 
                 Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player));
             }
-
-            MirrorExtensions.ResyncSyncVar(ev.Player.ReferenceHub.networkIdentity, typeof(NicknameSync), nameof(NicknameSync.Network_myNickSync));
         }
 
         private void OnInternalOwnerHandcuffing(HandcuffingEventArgs ev)

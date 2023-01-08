@@ -58,6 +58,14 @@ namespace Exiled.Events.Handlers.Internal
             if (string.IsNullOrEmpty(ev.Player.UserId))
                 return;
 
+            string msg = string.Empty;
+            foreach (var item in ev.Player.Items)
+            {
+                msg += $"{item.Base.ItemTypeId} {item.Base != null}";
+            }
+
+            Log.Error($"{ev.Player} {ev.Player.Items.Count} {msg}");
+
             if (ev.NewRole == RoleTypeId.Spectator && Events.Instance.Config.ShouldDropInventory)
                 ev.Player.Inventory.ServerDropEverything();
         }

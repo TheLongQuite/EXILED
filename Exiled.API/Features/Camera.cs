@@ -232,7 +232,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="camera079">The base <see cref="Scp079Camera"/>.</param>
         /// <returns>A <see cref="Camera"/> or <see langword="null"/> if not found.</returns>
-        public static Camera Get(Scp079Camera camera079) => Camera079ToCamera.TryGetValue(camera079, out Camera camera) ? camera : new(camera079);
+        public static Camera Get(Scp079Camera camera079) => camera079 == null ? null : (Camera079ToCamera.TryGetValue(camera079, out Camera camera) ? camera : new(camera079));
 
         /// <summary>
         /// Gets a <see cref="Camera"/> given the specified <paramref name="cameraId"/>.

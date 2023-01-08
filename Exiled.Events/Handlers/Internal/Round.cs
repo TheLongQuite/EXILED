@@ -64,7 +64,7 @@ namespace Exiled.Events.Handlers.Internal
                 msg += $"{item.Base.ItemTypeId} {item.Base != null}";
             }
 
-            Log.Error($"{ev.Player} {ev.Player.Items.Count} {msg}");
+            Log.Error($"{ev.Player} {ev.Reason} {ev.Player.Items.Count} {msg}");
 
             if (ev.NewRole == RoleTypeId.Spectator && Events.Instance.Config.ShouldDropInventory)
                 ev.Player.Inventory.ServerDropEverything();

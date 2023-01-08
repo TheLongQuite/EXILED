@@ -7,6 +7,8 @@
 
 namespace Exiled.API.Features
 {
+    using System;
+
     using PlayerStatsSystem;
 
     /// <summary>
@@ -15,7 +17,23 @@ namespace Exiled.API.Features
     public class CustomHealthStat : HealthStat
     {
         /// <inheritdoc/>
-        public override float MaxValue => CustomMaxValue == default ? base.MaxValue : CustomMaxValue;
+        public override float MaxValue
+        {
+            get
+            {
+                float hp = 0f;
+                try
+                {
+                    hp = CustomMaxValue == default ? base.MaxValue : CustomMaxValue;
+                }
+                catch (Exception ex)
+                {
+                    Log.Error($"{ex} {Hub?.nicknameSync?.Network_myNickSync}");
+                }
+
+                return hp;
+            }
+        }
 
         /// <summary>
         /// Gets or sets the maximum amount of health the player will have.

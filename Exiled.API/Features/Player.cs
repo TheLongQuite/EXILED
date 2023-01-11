@@ -2699,6 +2699,7 @@ namespace Exiled.API.Features
         /// <param name="type">The <see cref="EffectType"/> to change.</param>
         /// <param name="intensity">The new intensity to use.</param>
         /// <param name="duration">The new duration to add to the effect.</param>
+        [Obsolete("Кринж")]
         public void ChangeEffectIntensity(EffectType type, byte intensity, float duration = 0) =>
             ChangeEffectIntensity(type, intensity);
 
@@ -2721,6 +2722,7 @@ namespace Exiled.API.Features
         /// <param name="effectName">The name of the <see cref="StatusEffectBase"/> to enable.</param>
         /// <param name="intensity">The intensity of the effect.</param>
         /// <param name="duration">The new length of the effect. Defaults to infinite length.</param>
+        [Obsolete("Кринж")]
         public void ChangeEffectIntensity(string effectName, byte intensity, float duration = 0) =>
             ChangeEffectIntensity(effectName, intensity);
 

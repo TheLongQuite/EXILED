@@ -42,18 +42,18 @@ namespace Exiled.Events.Patches.Events.Player
             Label returnTrue = generator.DefineLabel();
             Label returnFalse = generator.DefineLabel();
 
-            int offset = -1;
+            int offset = 1;
             int index = newInstructions.FindLastIndex(
-                instruction => instruction.LoadsField(Field(typeof(PlayerCheckReservedSlotCancellationData), nameof(PlayerCheckReservedSlotCancellationData.HasReservedSlot)))) + offset;
+                instruction => instruction.opcode == OpCodes.Stind_I1) + offset;
 
-            newInstructions[index].WithLabels(continueConditions);
+            newInstructions[index].labels.Add(continueConditions);
 
             newInstructions.InsertRange(
                 index,
                 new[]
                 {
-                    // Grab user-id, copy label from current newInstruction[index] to ensure jumps to the label come to this instr instead
-                    new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
+                    // Grab user-id
+                    new CodeInstruction(OpCodes.Ldarg_0),
 
                     // Grab reserved slot bool
                     new(OpCodes.Ldarg_1),

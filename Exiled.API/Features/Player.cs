@@ -2699,12 +2699,19 @@ namespace Exiled.API.Features
         /// <param name="type">The <see cref="EffectType"/> to change.</param>
         /// <param name="intensity">The new intensity to use.</param>
         /// <param name="duration">The new duration to add to the effect.</param>
-        public void ChangeEffectIntensity(EffectType type, byte intensity, float duration = 0)
+        public void ChangeEffectIntensity(EffectType type, byte intensity, float duration = 0) =>
+            ChangeEffectIntensity(type, intensity);
+
+        /// <summary>
+        /// Changes the intensity of a <see cref="StatusEffectBase"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="EffectType"/> to change.</param>
+        /// <param name="intensity">The new intensity to use.</param>
+        public void ChangeEffectIntensity(EffectType type, byte intensity)
         {
             if (TryGetEffect(type, out StatusEffectBase statusEffect))
             {
                 statusEffect.Intensity = intensity;
-                statusEffect.ServerChangeDuration(duration, true);
             }
         }
 
@@ -2714,10 +2721,18 @@ namespace Exiled.API.Features
         /// <param name="effectName">The name of the <see cref="StatusEffectBase"/> to enable.</param>
         /// <param name="intensity">The intensity of the effect.</param>
         /// <param name="duration">The new length of the effect. Defaults to infinite length.</param>
-        public void ChangeEffectIntensity(string effectName, byte intensity, float duration = 0)
+        public void ChangeEffectIntensity(string effectName, byte intensity, float duration = 0) =>
+            ChangeEffectIntensity(effectName, intensity);
+
+        /// <summary>
+        /// Changes the intensity of a <see cref="StatusEffectBase">status effect</see>.
+        /// </summary>
+        /// <param name="effectName">The name of the <see cref="StatusEffectBase"/> to enable.</param>
+        /// <param name="intensity">The intensity of the effect.</param>
+        public void ChangeEffectIntensity(string effectName, byte intensity)
         {
             if (Enum.TryParse(effectName, out EffectType type))
-                ChangeEffectIntensity(type, intensity, duration);
+                ChangeEffectIntensity(type, intensity);
         }
 
         /// <summary>

@@ -486,7 +486,7 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
-        /// Removes the role from a specific player and FF rules.
+        /// Removes the role from a specific player.
         /// </summary>
         /// <param name="player">The <see cref="Player"/> to remove the role from.</param>
         public virtual void RemoveRoleWhenDisconnect(Player player)

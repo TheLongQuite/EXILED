@@ -137,7 +137,7 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Callvirt, PropertySetter(typeof(API.Features.Player), nameof(API.Features.Player.Role))),
                 });
 
-            offset = 1;
+            offset = -5;
             index = newInstructions.FindIndex(i => i.Calls(Method(typeof(PlayerRoleManager.RoleChanged), nameof(PlayerRoleManager.RoleChanged.Invoke)))) + offset;
 
             newInstructions[index].labels.Add(continueLabel2);
@@ -148,7 +148,7 @@ namespace Exiled.Events.Patches.Events.Player
                 {
                     // if (player == null)
                     //     continue
-                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex),
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).MoveLabelsFrom(newInstructions[index]),
                     new(OpCodes.Brfalse_S, continueLabel2),
 
                     // ev

@@ -486,6 +486,22 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
+        /// Removes the role from a specific player and FF rules.
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> to remove the role from.</param>
+        public virtual void RemoveRoleWhenDisconnect(Player player)
+        {
+            Log.Debug($"{Name}: Removing role from {player.Nickname}");
+            TrackedPlayers.Remove(player);
+            foreach (CustomAbility ability in CustomAbilities)
+            {
+                ability.RemoveAbility(player);
+            }
+
+            RoleRemoved(player);
+        }
+
+        /// <summary>
         /// Tries to add <see cref="RoleTypeId"/> to CustomRole FriendlyFire rules.
         /// </summary>
         /// <param name="roleToAdd"> Role to add. </param>
@@ -741,8 +757,17 @@ namespace Exiled.CustomRoles.API.Features
 
         private void OnInternalChangingRole(ChangingRoleEventArgs ev)
         {
-            if (Check(ev.Player) && ev.Reason != SpawnReason.Destroyed && ((ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath) || (ev.NewRole != RoleTypeId.Spectator && ev.NewRole != Role)))
+            if (Check(ev.Player) &&
+                ((ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath) || (ev.NewRole != RoleTypeId.Spectator && ev.NewRole != Role)))
+            {
+                if (ev.Reason == SpawnReason.Destroyed)
+                {
+                    RemoveRoleWhenDisconnect(ev.Player);
+                    return;
+                }
+
                 RemoveRole(ev.Player);
+            }
         }
     }
 }

@@ -24,7 +24,6 @@ namespace Exiled.CustomRoles.API.Features
     using Exiled.Loader;
 
     using MEC;
-    using NorthwoodLib.Pools;
 
     using PlayerRoles;
 

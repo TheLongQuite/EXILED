@@ -7,7 +7,6 @@
 
 namespace Exiled.Events.Patches.Generic
 {
-#pragma warning disable SA1313
 #pragma warning disable SA1402
 #pragma warning disable SA1649
     using System.Collections.Generic;
@@ -164,32 +163,6 @@ namespace Exiled.Events.Patches.Generic
                     Log.Debug($"{item})");
 #endif
             });
-        }
-    }
-
-    /// <summary>
-    /// Patches <see cref="Inventory.DestroyItemInstance"/>.
-    /// </summary>
-    [HarmonyPatch(typeof(Inventory), nameof(Inventory.DestroyItemInstance))]
-    internal static class DebugCheck
-    {
-        private static bool Prefix(Inventory __instance, ushort targetInstance, ItemPickupBase pickup, ref ItemBase foundItem)
-        {
-            if (!__instance.UserInventory.Items.TryGetValue(targetInstance, out foundItem))
-                return false;
-
-            if (foundItem == null)
-            {
-                Log.Error($"item is null: {foundItem.ItemTypeId} {foundItem.ItemSerial} {foundItem.Owner.nicknameSync.MyNick}");
-                foundItem.OnRemoved(pickup);
-                return false;
-            }
-
-            foundItem.OnRemoved(pickup);
-            if (__instance.CurInstance == foundItem)
-                __instance.CurInstance = null;
-            UnityEngine.Object.Destroy(foundItem.gameObject);
-            return false;
         }
     }
 }

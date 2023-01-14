@@ -13,6 +13,7 @@ namespace Exiled.Events.Handlers.Internal
 
     using API.Features;
     using API.Features.Items;
+    using API.Features.Pools;
     using API.Structs;
 
     using Exiled.API.Enums;
@@ -27,8 +28,6 @@ namespace Exiled.Events.Handlers.Internal
     using MapGeneration.Distributors;
 
     using MEC;
-
-    using NorthwoodLib.Pools;
 
     using PlayerRoles.PlayableScps.Scp079.Cameras;
 
@@ -63,10 +62,7 @@ namespace Exiled.Events.Handlers.Internal
 
         private static void GenerateCache()
         {
-            Warhead.SitePanel = Object.FindObjectOfType<AlphaWarheadNukesitePanel>();
             Warhead.OutsitePanel = Object.FindObjectOfType<AlphaWarheadOutsitePanel>();
-
-            Server.Broadcast = ReferenceHub.HostHub.GetComponent<Broadcast>();
 
             GenerateCamera();
             GenerateTeslaGates();
@@ -87,7 +83,7 @@ namespace Exiled.Events.Handlers.Internal
         private static void GenerateRooms()
         {
             // Get bulk of rooms with sorted.
-            List<RoomIdentifier> roomIdentifiers = ListPool<RoomIdentifier>.Shared.Rent(RoomIdentifier.AllRoomIdentifiers);
+            List<RoomIdentifier> roomIdentifiers = ListPool<RoomIdentifier>.Pool.Get(RoomIdentifier.AllRoomIdentifiers);
 
             // If no rooms were found, it means a plugin is trying to access this before the map is created.
             if (roomIdentifiers.Count == 0)
@@ -96,7 +92,7 @@ namespace Exiled.Events.Handlers.Internal
             foreach (RoomIdentifier roomIdentifier in roomIdentifiers)
                 Room.RoomIdentifierToRoom.Add(roomIdentifier, Room.CreateComponent(roomIdentifier.gameObject));
 
-            ListPool<RoomIdentifier>.Shared.Return(roomIdentifiers);
+            ListPool<RoomIdentifier>.Pool.Return(roomIdentifiers);
         }
 
         private static void GenerateWindows()
@@ -139,8 +135,8 @@ namespace Exiled.Events.Handlers.Internal
 
                 Firearm.ItemTypeToFirearmInstance.Add(firearmType, firearm);
 
-                List<AttachmentIdentifier> attachmentIdentifiers = new();
-                HashSet<AttachmentSlot> attachmentsSlots = new();
+                List<AttachmentIdentifier> attachmentIdentifiers = ListPool<AttachmentIdentifier>.Pool.Get();
+                HashSet<AttachmentSlot> attachmentsSlots = HashSetPool<AttachmentSlot>.Pool.Get();
 
                 uint code = 1;
 
@@ -160,6 +156,9 @@ namespace Exiled.Events.Handlers.Internal
 
                 Firearm.BaseCodesValue.Add(firearmType, baseCode);
                 Firearm.AvailableAttachmentsValue.Add(firearmType, attachmentIdentifiers.ToArray());
+
+                ListPool<AttachmentIdentifier>.Pool.Return(attachmentIdentifiers);
+                HashSetPool<AttachmentSlot>.Pool.Return(attachmentsSlots);
             }
         }
     }

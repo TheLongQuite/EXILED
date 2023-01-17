@@ -156,5 +156,10 @@ namespace Exiled.API.Enums
         /// Cause the player more effective for fight.
         /// </summary>
         Scp1853,
+
+        /// <summary>
+        /// Effect give to player after being hurt by SCP-049.
+        /// </summary>
+        CardiacArrest,
     }
 }

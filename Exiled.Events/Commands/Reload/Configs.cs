@@ -48,6 +48,7 @@ namespace Exiled.Events.Commands.Reload
             bool haveBeenReloaded = ConfigManager.Reload();
 
             Handlers.Server.OnReloadedConfigs();
+            API.Features.Log.KnownDebugValues.Clear();
 
             response = "Plugin configs have been reloaded successfully!";
             return haveBeenReloaded;

@@ -242,7 +242,6 @@ namespace Exiled.API.Extensions
         /// <param name="value">Value of send to target.</param>
         public static void SendFakeSyncVar(this Player target, NetworkIdentity behaviorOwner, Type targetType, string propertyName, object value)
         {
-            Log.Info($"Send fake sync vars {target.Nickname} {targetType.Name}::{propertyName}");
             void CustomSyncVarGenerator(NetworkWriter targetWriter)
             {
                 targetWriter.WriteUInt64(SyncVarDirtyBits[propertyName]);

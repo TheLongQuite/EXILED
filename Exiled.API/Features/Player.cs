@@ -2722,7 +2722,7 @@ namespace Exiled.API.Features
                 EnableEffect(effect.Type, effect.Duration, effect.AddDurationIfActive);
 
                 if (effect.Intensity > 0)
-                    ChangeEffectIntensity(effect.Type, effect.Intensity, effect.Duration);
+                    ChangeEffectIntensity(effect.Type, effect.Intensity);
             }
         }
 

@@ -2735,8 +2735,8 @@ namespace Exiled.API.Features
         /// <returns>A <see cref="EffectType"/> that was given to the player.</returns>
         public EffectType ApplyRandomEffect(EffectCategory category = EffectCategory.None, float duration = 0f, bool addDurationIfActive = false)
         {
-            Array effectTypes = Enum.GetValues(typeof(EffectType));
-            IEnumerable<EffectType> validEffects = effectTypes.ToArray<EffectType>().Where(effect => effect.GetCategories().HasFlag(category));
+            EffectType[] effectTypes = (EffectType[])Enum.GetValues(typeof(EffectType));
+            IEnumerable<EffectType> validEffects = effectTypes.Where(effect => effect.GetCategories().HasFlag(category));
             EffectType effectType = validEffects.ElementAt(Random.Range(0, effectTypes.Length));
 
             EnableEffect(effectType, duration, addDurationIfActive);

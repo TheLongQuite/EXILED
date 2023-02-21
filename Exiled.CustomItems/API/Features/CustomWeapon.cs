@@ -206,6 +206,7 @@ namespace Exiled.CustomItems.API.Features
             OnReloading(ev);
 
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: External event ended. {ev.IsAllowed}");
+
             if (!ev.IsAllowed)
             {
                 Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: External event turned is allowed to false, returning.");
@@ -215,7 +216,7 @@ namespace Exiled.CustomItems.API.Features
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: Continuing with internal reload..");
             ev.IsAllowed = false;
 
-            byte remainingClip = ((Firearm)ev.Player.CurrentItem).Ammo;
+            byte remainingClip = ev.Firearm.Ammo;
 
             if (remainingClip >= ClipSize)
                 return;
@@ -240,9 +241,9 @@ namespace Exiled.CustomItems.API.Features
             ev.Player.ReferenceHub.playerEffectsController.GetEffect<CustomPlayerEffects.Invisible>().Intensity = 0;
 
             ev.Player.Ammo[ammoType.GetItemType()] -= amountToReload;
-            ((Firearm)ev.Player.CurrentItem).Ammo = (byte)(((Firearm)ev.Player.CurrentItem).Ammo + amountToReload);
+            ev.Firearm.Ammo = (byte)(ev.Firearm.Ammo + amountToReload);
 
-            Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] reloaded a {Name} ({Id}) [{Type} ({((Firearm)ev.Player.CurrentItem).Ammo}/{ClipSize})]!");
+            Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] reloaded a {Name} ({Id}) [{Type} ({ev.Firearm.Ammo}/{ClipSize})]!");
         }
 
         private void OnInternalShooting(ShootingEventArgs ev)
@@ -315,6 +316,8 @@ namespace Exiled.CustomItems.API.Features
                 Log.Debug($"{Name}: {nameof(OnInternalHurting)}: FF is disabled for this weapon!");
                 return;
             }
+
+            ev.Amount = Damage;
 
             OnHurting(ev);
         }

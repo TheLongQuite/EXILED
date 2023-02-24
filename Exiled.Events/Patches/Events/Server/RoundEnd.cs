@@ -146,7 +146,7 @@ namespace Exiled.Events.Patches.Events.Server
 
                         EndingRoundEventArgs endingRoundEventArgs = new(leadingTeam, newList, shouldRoundEnd);
                         Handlers.Server.OnEndingRound(endingRoundEventArgs);
-                        
+
                         roundSummary._roundEnded = endingRoundEventArgs.IsRoundEnded;
 
                         if (endingRoundEventArgs.IsRoundEnded)

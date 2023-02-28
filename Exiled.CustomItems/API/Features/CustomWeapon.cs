@@ -243,6 +243,8 @@ namespace Exiled.CustomItems.API.Features
             ev.Player.ReferenceHub.playerEffectsController.GetEffect<CustomPlayerEffects.Invisible>().Intensity = 0;
 
             ev.Player.Ammo[ammoType.GetItemType()] -= amountToReload;
+            ev.Player.Inventory.SendAmmoNextFrame = true;
+
             ev.Firearm.Ammo = (byte)(ev.Firearm.Ammo + amountToReload);
 
             Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] reloaded a {Name} ({Id}) [{Type} ({ev.Firearm.Ammo}/{ClipSize})]!");

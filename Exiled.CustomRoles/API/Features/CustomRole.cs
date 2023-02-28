@@ -685,7 +685,7 @@ namespace Exiled.CustomRoles.API.Features
             {
                 foreach ((float chance, Vector3 pos) in SpawnProperties.StaticSpawnPoints)
                 {
-                    int r = Loader.Random.Next(100);
+                    double r = Loader.Random.NextDouble() * 100;
                     if (r <= chance)
                         return pos;
                 }
@@ -695,7 +695,7 @@ namespace Exiled.CustomRoles.API.Features
             {
                 foreach ((float chance, Vector3 pos) in SpawnProperties.DynamicSpawnPoints)
                 {
-                    int r = Loader.Random.Next(100);
+                    double r = Loader.Random.NextDouble() * 100;
                     if (r <= chance)
                         return pos;
                 }
@@ -705,7 +705,7 @@ namespace Exiled.CustomRoles.API.Features
             {
                 foreach ((float chance, Vector3 pos) in SpawnProperties.RoleSpawnPoints)
                 {
-                    int r = Loader.Random.Next(100);
+                    double r = Loader.Random.NextDouble() * 100;
                     if (r <= chance)
                         return pos;
                 }

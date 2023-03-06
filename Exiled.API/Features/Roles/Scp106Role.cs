@@ -7,6 +7,7 @@
 
 namespace Exiled.API.Features.Roles
 {
+    using MEC;
     using PlayerRoles;
     using PlayerRoles.PlayableScps.HumeShield;
     using PlayerRoles.PlayableScps.Scp106;
@@ -176,6 +177,7 @@ namespace Exiled.API.Features.Roles
 
             HuntersAtlasAbility._estimatedCost = cost;
             HuntersAtlasAbility.SetSubmerged(true);
+            Timing.CallDelayed(2f, () => Owner.Position = position);
 
             return true;
         }

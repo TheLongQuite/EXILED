@@ -98,6 +98,11 @@ namespace Exiled.CustomRoles.API.Features
         public virtual SpawnProperties SpawnProperties { get; set; } = new();
 
         /// <summary>
+        /// Gets or sets a value indicating whether players keep their current position when gaining this role.
+        /// </summary>
+        public virtual bool KeepPositionOnSpawn { get; set; }
+
+        /// <summary>
         /// Gets or sets a value indicating whether players keep their current inventory when gaining this role.
         /// </summary>
         public virtual bool KeepInventoryOnSpawn { get; set; }
@@ -175,7 +180,7 @@ namespace Exiled.CustomRoles.API.Features
                 if (type.BaseType != typeof(CustomRole) || type.GetCustomAttribute(typeof(CustomRoleAttribute)) is null)
                     continue;
 
-                foreach (Attribute attribute in type.GetCustomAttributes(typeof(CustomRoleAttribute), true))
+                foreach (Attribute attribute in type.GetCustomAttributes(typeof(CustomRoleAttribute), true).Cast<Attribute>())
                 {
                     CustomRole customRole = null;
 
@@ -229,7 +234,7 @@ namespace Exiled.CustomRoles.API.Features
                     continue;
                 }
 
-                foreach (Attribute attribute in type.GetCustomAttributes(typeof(CustomRoleAttribute), true))
+                foreach (Attribute attribute in type.GetCustomAttributes(typeof(CustomRoleAttribute), true).Cast<Attribute>())
                 {
                     CustomRole customRole = null;
 
@@ -422,29 +427,28 @@ namespace Exiled.CustomRoles.API.Features
                         player.Position = pos + (Vector3.up * 1.5f);
                     }
 
-                    if (!KeepInventoryOnSpawn)
-                    {
-                        Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
-                        player.ClearInventory();
-                    }
+            if (!KeepInventoryOnSpawn)
+            {
+                Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
+                player.ClearInventory();
+            }
 
-                    foreach (string itemName in Inventory)
-                    {
-                        Log.Debug($"{Name}: Adding {itemName} to inventory.");
-                        TryAddItem(player, itemName);
-                    }
+            foreach (string itemName in Inventory)
+            {
+                Log.Debug($"{Name}: Adding {itemName} to inventory.");
+                TryAddItem(player, itemName);
+            }
 
-                    foreach (AmmoType ammo in Ammo.Keys)
-                    {
-                        Log.Debug($"{Name}: Adding {Ammo[ammo]} {ammo} to inventory.");
-                        player.SetAmmo(ammo, Ammo[ammo]);
-                    }
+            foreach (AmmoType ammo in Ammo.Keys)
+            {
+                Log.Debug($"{Name}: Adding {Ammo[ammo]} {ammo} to inventory.");
+                player.SetAmmo(ammo, Ammo[ammo]);
+            }
 
-                    Log.Debug($"{Name}: Setting health values.");
-                    player.Health = MaxHealth;
-                    player.MaxHealth = MaxHealth;
-                    player.Scale = Scale;
-                });
+            Log.Debug($"{Name}: Setting health values.");
+            player.Health = MaxHealth;
+            player.MaxHealth = MaxHealth;
+            player.Scale = Scale;
 
             Log.Debug($"{Name}: Setting player info");
             player.CustomInfo = CustomInfo;
@@ -457,7 +461,6 @@ namespace Exiled.CustomRoles.API.Features
 
             ShowMessage(player);
             RoleAdded(player);
-            TrackedPlayers.Add(player);
             player.UniqueRole = Name;
             player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
         }

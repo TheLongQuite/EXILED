@@ -434,10 +434,10 @@ namespace Exiled.CustomRoles.API.Features
                         TryAddItem(player, itemName);
                     }
 
-                    foreach (AmmoType ammo in Ammo.Keys)
+                    foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
                     {
-                        Log.Debug($"{Name}: Adding {Ammo[ammo]} {ammo} to inventory.");
-                        player.SetAmmo(ammo, Ammo[ammo]);
+                        Log.Debug($"{Name}: Adding {ammo.Value} {ammo.Key} to inventory.");
+                        player.SetAmmo(ammo.Key, ammo.Value);
                     }
 
                     Log.Debug($"{Name}: Setting health values.");

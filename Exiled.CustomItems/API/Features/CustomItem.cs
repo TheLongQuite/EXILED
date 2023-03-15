@@ -935,22 +935,6 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalOwnerEscaping(EscapingEventArgs ev)
         {
-            foreach (Item item in ev.Player.Items.ToList())
-            {
-                if (!Check(item))
-                    continue;
-
-                OnOwnerEscaping(new OwnerEscapingEventArgs(item, ev));
-
-                if (!ev.IsAllowed)
-                    continue;
-
-                ev.Player.RemoveItem(item);
-
-                TrackedSerials.Remove(item.Serial);
-
-                Timing.CallDelayed(1.5f, () => Spawn(ev.NewRole.GetRandomSpawnLocation().Position, item, ev.Player));
-            }
         }
 
         private void OnInternalOwnerHandcuffing(HandcuffingEventArgs ev)

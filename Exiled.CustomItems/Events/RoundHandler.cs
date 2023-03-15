@@ -8,6 +8,7 @@
 namespace Exiled.CustomItems.Events
 {
     using Exiled.CustomItems.API.Features;
+    using Exiled.Events.Handlers;
 
     /// <summary>
     /// Event Handlers for the CustomItem API.
@@ -19,6 +20,15 @@ namespace Exiled.CustomItems.Events
         {
             foreach (CustomItem customItem in CustomItem.Registered)
                 customItem?.SpawnAll();
+        }
+
+        /// <inheritdoc cref="Server.OnWaitingForPlayers"/>
+        public void OnWaitingForPlayers()
+        {
+            foreach (var customItem in CustomItem.Registered)
+            {
+                customItem.TrackedSerials.Clear();
+            }
         }
     }
 }

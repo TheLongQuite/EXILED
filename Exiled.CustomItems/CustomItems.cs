@@ -34,6 +34,7 @@ namespace Exiled.CustomItems
             roundHandler = new RoundHandler();
 
             Exiled.Events.Handlers.Server.RoundStarted += roundHandler.OnRoundStarted;
+            Exiled.Events.Handlers.Server.WaitingForPlayers += roundHandler.OnWaitingForPlayers;
 
             harmony = new Harmony($"com.{nameof(CustomItems)}.flx-{DateTime.Now.Ticks}");
             harmony.PatchAll();
@@ -45,6 +46,7 @@ namespace Exiled.CustomItems
         public override void OnDisabled()
         {
             Exiled.Events.Handlers.Server.RoundStarted -= roundHandler.OnRoundStarted;
+            Exiled.Events.Handlers.Server.WaitingForPlayers -= roundHandler.OnWaitingForPlayers;
 
             harmony.UnpatchAll();
 

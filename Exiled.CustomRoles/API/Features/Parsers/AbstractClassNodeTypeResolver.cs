@@ -7,6 +7,8 @@
 
 namespace Exiled.CustomRoles.API.Features.Parsers
 {
+#pragma warning disable CS8602
+#pragma warning disable CS8604
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
@@ -69,7 +71,7 @@ namespace Exiled.CustomRoles.API.Features.Parsers
             }
             catch (Exception exception)
             {
-                throw new YamlException(start ?? default, reader.Current?.End ?? default, "Failed when resolving abstract type", exception);
+                throw new YamlException(start, reader.Current.End, "Failed when resolving abstract type", exception);
             }
 
             buffer.Reset();

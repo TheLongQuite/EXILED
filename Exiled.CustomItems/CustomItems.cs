@@ -20,8 +20,8 @@ namespace Exiled.CustomItems
     /// </summary>
     public class CustomItems : Plugin<Config>
     {
-        private RoundHandler roundHandler;
-        private Harmony harmony;
+        private RoundHandler roundHandler = null!;
+        private Harmony harmony = null!;
 
         /// <summary>
         /// Gets the static reference to this <see cref="CustomItems"/> class.

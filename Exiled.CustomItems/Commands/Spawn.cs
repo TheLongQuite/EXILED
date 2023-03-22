@@ -72,17 +72,12 @@ namespace Exiled.CustomItems.Commands
                     response = $"Игрок мертв!";
                     return false;
                 }
-                else if (arguments.Count > 3)
-                {
-                    if (!float.TryParse(arguments.At(1), out float x) || !float.TryParse(arguments.At(2), out float y) || !float.TryParse(arguments.At(3), out float z))
-                    {
-                        response = "Invalid coordinates selected.";
-                        return false;
-                    }
 
-                    position = new Vector3(x, y, z);
-                }
-                else
+                position = player.Position;
+            }
+            else if (arguments.Count > 3)
+            {
+                if (!float.TryParse(arguments.At(1), out float x) || !float.TryParse(arguments.At(2), out float y) || !float.TryParse(arguments.At(3), out float z))
                 {
                     response = "Невозможно получить координату (попробуй писать через , а не .)";
                     return false;

@@ -130,16 +130,6 @@ namespace Exiled.CustomRoles.API.Features
         public virtual Dictionary<RoleTypeId, float> CustomRoleFFMultiplier { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets a <see cref="string"/> for the console message given to players when they receive a role.
-        /// </summary>
-        public virtual string ConsoleMessage { get; set; } = $"You have spawned as a custom role!";
-
-        /// <summary>
-        /// Gets or sets a <see cref="string"/> for the ability usage help sent to players in the player console.
-        /// </summary>
-        public virtual string AbilityUsage { get; set; } = "Enter \".special\" in the console to use your ability. If you have multiple abilities, you can use this command to cycle through them, or specify the one to use with \".special ROLENAME AbilityNum\"";
-
-        /// <summary>
         /// Gets a <see cref="CustomRole"/> by ID.
         /// </summary>
         /// <param name="id">The ID of the role to get.</param>
@@ -506,34 +496,10 @@ namespace Exiled.CustomRoles.API.Features
             }
 
             ShowMessage(player);
-            ShowBroadcast(player);
             RoleAdded(player);
             TrackedPlayers.Add(player);
             player.UniqueRole = Name;
             player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
-
-            if (!string.IsNullOrEmpty(ConsoleMessage))
-            {
-                StringBuilder builder = StringBuilderPool.Pool.Get();
-
-                builder.AppendLine(Name);
-                builder.AppendLine(Description);
-                builder.AppendLine();
-                builder.AppendLine(ConsoleMessage);
-
-                if (CustomAbilities?.Count > 0)
-                {
-                    builder.AppendLine(AbilityUsage);
-                    builder.AppendLine("Your custom abilities are:");
-                    for (int i = 1; i < CustomAbilities.Count + 1; i++)
-                        builder.AppendLine($"{i}. {CustomAbilities[i - 1].Name} - {CustomAbilities[i - 1].Description}");
-
-                    builder.AppendLine(
-                        "You can keybind the command for this ability by using \"cmdbind .special KEY\", where KEY is any un-used letter on your keyboard. You can also keybind each specific ability for a role in this way. For ex: \"cmdbind .special g\" or \"cmdbind .special bulldozer 1 g\"");
-                }
-
-                player.SendConsoleMessage(StringBuilderPool.Pool.ToStringReturn(builder), "green");
-            }
         }
 
         /// <summary>
@@ -726,7 +692,7 @@ namespace Exiled.CustomRoles.API.Features
         {
             if (CustomItem.TryGet(itemName, out CustomItem? customItem))
             {
-                customItem?.Give(player, DisplayCustomItemMessages);
+                customItem?.Give(player);
 
                 return true;
             }
@@ -814,12 +780,6 @@ namespace Exiled.CustomRoles.API.Features
         /// </summary>
         /// <param name="player">The <see cref="Player"/> to show the message to.</param>
         protected virtual void ShowMessage(Player player) => player.ShowHint(string.Format(CustomRoles.Instance!.Config.GotRoleHint.Content, Name, Description), CustomRoles.Instance.Config.GotRoleHint.Duration);
-
-        /// <summary>
-        /// Shows the spawn broadcast to the player.
-        /// </summary>
-        /// <param name="player">The <see cref="Player"/> to show the message to.</param>
-        protected virtual void ShowBroadcast(Player player) => player.Broadcast(Broadcast);
 
         /// <summary>
         /// Called after the role has been added to the player.

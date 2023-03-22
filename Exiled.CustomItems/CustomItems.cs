@@ -10,6 +10,7 @@ namespace Exiled.CustomItems
     using System;
 
     using Exiled.API.Features;
+    using Exiled.CustomItems.API.Features;
     using Exiled.CustomItems.Events;
 
     using HarmonyLib;
@@ -25,7 +26,7 @@ namespace Exiled.CustomItems
         /// <summary>
         /// Gets the static reference to this <see cref="CustomItems"/> class.
         /// </summary>
-        public static CustomItems Instance { get; private set; }
+        public static CustomItems? Instance { get; private set; }
 
         /// <inheritdoc />
         public override void OnEnabled()
@@ -48,10 +49,7 @@ namespace Exiled.CustomItems
             Exiled.Events.Handlers.Server.RoundStarted -= roundHandler.OnRoundStarted;
             Exiled.Events.Handlers.Server.WaitingForPlayers -= roundHandler.OnWaitingForPlayers;
 
-            harmony.UnpatchAll();
-
-            harmony = null;
-            roundHandler = null;
+            harmony?.UnpatchAll();
 
             base.OnDisabled();
         }

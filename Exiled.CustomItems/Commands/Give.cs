@@ -57,7 +57,7 @@ namespace Exiled.CustomItems.Commands
                 return false;
             }
 
-            if (!CustomItem.TryGet(arguments.At(0), out CustomItem item))
+            if (!CustomItem.TryGet(arguments.At(0), out CustomItem? item))
             {
                 response = $"Кастомный предмет {arguments.At(0)} не найден!";
                 return false;
@@ -75,8 +75,8 @@ namespace Exiled.CustomItems.Commands
                         return false;
                     }
 
-                    item.Give(player);
-                    response = $"{item.Name} дан игроку {player.Nickname} ({player.UserId})";
+                    item?.Give(player);
+                    response = $"{item?.Name} дан игроку {player.Nickname} ({player.UserId})";
                     return true;
                 }
 
@@ -92,12 +92,12 @@ namespace Exiled.CustomItems.Commands
                 case "all":
                     List<Player> eligiblePlayers = Player.List.Where(CheckEligible).ToList();
                     foreach (Player ply in eligiblePlayers)
-                        item.Give(ply);
+                        item?.Give(ply);
 
-                    response = $"Кастомный предмет {item.Name} дан ({eligiblePlayers.Count} игрокам)";
+                    response = $"Кастомный предмет {item?.Name} дан ({eligiblePlayers.Count} игрокам)";
                     return true;
                 default:
-                    if (Player.Get(identifier) is not Player player)
+                    if (Player.Get(identifier) is not { } player)
                     {
                         response = $"Невозможно найти игрока: {identifier}.";
                         return false;
@@ -109,8 +109,8 @@ namespace Exiled.CustomItems.Commands
                         return false;
                     }
 
-                    item.Give(player);
-                    response = $"{item.Name} дан игроку {player.Nickname} ({player.UserId})";
+                    item?.Give(player);
+                    response = $"{item?.Name} дан игроку {player.Nickname} ({player.UserId})";
                     return true;
             }
         }

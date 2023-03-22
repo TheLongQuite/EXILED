@@ -58,7 +58,7 @@ namespace Exiled.CustomRoles.Commands
                 return false;
             }
 
-            if (!CustomRole.TryGet(arguments.At(0), out CustomRole role))
+            if (!CustomRole.TryGet(arguments.At(0), out CustomRole? role) || role is null)
             {
                 response = $"Кастомная роль {arguments.At(0)} не найдена!";
                 return false;

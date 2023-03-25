@@ -149,7 +149,6 @@ namespace Exiled.Events.Patches.Events.Server
 
                         roundSummary._roundEnded = endingRoundEventArgs.IsRoundEnded;
                         leadingTeam = (RoundSummary.LeadingTeam)endingRoundEventArgs.LeadingTeam;
-                        
                         if (endingRoundEventArgs.IsRoundEnded)
                         {
                             RoundEndCancellationData roundEndCancellationData = EventManager.ExecuteEvent<RoundEndCancellationData>(ServerEventType.RoundEnd, new object[] { leadingTeam });

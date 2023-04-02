@@ -37,8 +37,6 @@ namespace Exiled.CustomRoles.API.Features
     /// </summary>
     public abstract class CustomRole
     {
-        private static Dictionary<Type, CustomRole?> typeLookupTable = new();
-
         private static Dictionary<string, CustomRole?> stringLookupTable = new();
 
         private static Dictionary<uint, CustomRole?> idLookupTable = new();
@@ -152,9 +150,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <returns>The role, or <see langword="null"/> if it doesn't exist.</returns>
         public static CustomRole? Get(Type t)
         {
-            if (!typeLookupTable.ContainsKey(t))
-                typeLookupTable.Add(t, Registered?.FirstOrDefault(r => r.GetType() == t));
-            return typeLookupTable[t];
+            return Registered?.FirstOrDefault(r => r.GetType() == t);
         }
 
         /// <summary>
@@ -435,7 +431,6 @@ namespace Exiled.CustomRoles.API.Features
         public virtual void Init()
         {
             idLookupTable.Add(Id, this);
-            typeLookupTable.Add(GetType(), this);
             stringLookupTable.Add(Name, this);
             SubscribeEvents();
         }
@@ -446,7 +441,6 @@ namespace Exiled.CustomRoles.API.Features
         public virtual void Destroy()
         {
             idLookupTable.Remove(Id);
-            typeLookupTable.Remove(GetType());
             stringLookupTable.Remove(Name);
             UnsubscribeEvents();
         }

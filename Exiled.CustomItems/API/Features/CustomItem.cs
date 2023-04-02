@@ -53,7 +53,6 @@ namespace Exiled.CustomItems.API.Features
     /// </summary>
     public abstract class CustomItem
     {
-        private static Dictionary<Type, CustomItem?> typeLookupTable = new();
         private static Dictionary<string, CustomItem?> stringLookupTable = new();
         private static Dictionary<uint, CustomItem?> idLookupTable = new();
 
@@ -159,9 +158,7 @@ namespace Exiled.CustomItems.API.Features
         /// <returns>The <see cref="CustomItem"/> matching the search, <see langwod="null"/> if not registered.</returns>
         public static CustomItem? Get(Type t)
         {
-            if (!typeLookupTable.ContainsKey(t))
-                typeLookupTable.Add(t, Registered.FirstOrDefault(i => i.GetType() == t));
-            return typeLookupTable[t];
+            return Registered.FirstOrDefault(i => i.GetType() == t);
         }
 
         /// <summary>
@@ -799,7 +796,6 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         public virtual void Init()
         {
-            typeLookupTable.Add(GetType(), this);
             stringLookupTable.Add(Name, this);
             idLookupTable.Add(Id, this);
 

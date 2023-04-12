@@ -50,6 +50,12 @@ namespace Exiled.Events.Commands.Reload
             Handlers.Server.OnReloadedConfigs();
             API.Features.Log.DebugEnabled.Clear();
 
+            foreach (IPlugin<IConfig> plugin in Loader.Plugins)
+            {
+                if (plugin.Config.Debug)
+                    API.Features.Log.DebugEnabled.Add(plugin.Assembly);
+            }
+
             response = "Plugin configs have been reloaded successfully!";
             return haveBeenReloaded;
         }

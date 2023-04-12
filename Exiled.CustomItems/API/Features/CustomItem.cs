@@ -1028,12 +1028,6 @@ namespace Exiled.CustomItems.API.Features
                     continue;
 
                 OnOwnerChangingRole(new OwnerChangingRoleEventArgs(item.Base, ev));
-
-                TrackedSerials.Remove(item.Serial);
-
-                ev.Player.RemoveItem(item);
-
-                Spawn(ev.Player, item, ev.Player);
             }
         }
 
@@ -1045,15 +1039,6 @@ namespace Exiled.CustomItems.API.Features
                     continue;
 
                 OnOwnerDying(new OwnerDyingEventArgs(item, ev));
-
-                if (!ev.IsAllowed)
-                    continue;
-
-                ev.Player.RemoveItem(item);
-
-                TrackedSerials.Remove(item.Serial);
-
-                Spawn(ev.Player, item, ev.Player);
             }
         }
 
@@ -1069,15 +1054,6 @@ namespace Exiled.CustomItems.API.Features
                     continue;
 
                 OnOwnerHandcuffing(new OwnerHandcuffingEventArgs(item, ev));
-
-                if (!ev.IsAllowed)
-                    continue;
-
-                ev.Target.RemoveItem(item);
-
-                TrackedSerials.Remove(item.Serial);
-
-                Spawn(ev.Target, item, ev.Target);
             }
         }
 

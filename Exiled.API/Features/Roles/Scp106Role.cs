@@ -10,7 +10,7 @@ namespace Exiled.API.Features.Roles
     using System.Collections.Generic;
 
     using Exiled.API.Enums;
-    
+
     using MEC;
 
     using PlayerRoles;

@@ -2711,7 +2711,7 @@ namespace Exiled.API.Features
         /// <param name="addDurationIfActive">If the effect is already active, setting to <see langword="true"/> will add this duration onto the effect.</param>
         /// <returns>A bool indicating whether or not the effect was valid and successfully enabled.</returns>
         public bool EnableEffect(StatusEffectBase statusEffect, float duration = 0f, bool addDurationIfActive = false)
-            => EnableEffect(statusEffect.GetType().Name, duration, addDurationIfActive).IsEnabled;
+            => EnableEffect(statusEffect.GetType().Name, duration, addDurationIfActive)?.IsEnabled ?? false;
 
         /// <summary>
         /// Enables a <see cref="StatusEffectBase">status effect</see> on the player.

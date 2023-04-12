@@ -60,50 +60,6 @@ namespace Exiled.CustomItems.API.Features
         public abstract float FuseTime { get; set; }
 
         /// <summary>
-        /// Throw the actual CustomGrenade object.
-        /// </summary>
-        /// <param name="position">The <see cref="Vector3"/>position to throw at.</param>
-        /// <param name="force">The amount of force to throw with.</param>
-        /// <param name="weight">The <see cref="float"/>Weight of the Grenade.</param>
-        /// <param name="fuseTime">The <see cref="float"/>FuseTime of the grenade.</param>
-        /// <param name="grenadeType">The <see cref="ItemType"/>of the grenade to spawn.</param>
-        /// <param name="player">The <see cref="Player"/> to count as the thrower of the grenade.</param>
-        /// <returns>The <see cref="Pickup"/> spawned.</returns>
-        public virtual Pickup Throw(Vector3 position, float force, float weight, float fuseTime = 3f, ItemType grenadeType = ItemType.GrenadeHE, Player? player = null)
-        {
-            if (player is null)
-                player = Server.Host;
-
-            player.Role.Is(out FpcRole fpcRole);
-            var velocity = fpcRole.FirstPersonController.FpcModule.Motor.Velocity;
-
-            Throwable throwable = (Throwable)Item.Create(grenadeType, player);
-
-            ThrownProjectile thrownProjectile = Object.Instantiate(throwable.Base.Projectile, position, throwable.Owner.CameraTransform.rotation);
-            Transform transform = thrownProjectile.transform;
-            PickupSyncInfo newInfo = new()
-            {
-                ItemId = throwable.Type,
-                Locked = !throwable.Base._repickupable,
-                Serial = ItemSerialGenerator.GenerateNext(),
-                Weight = weight,
-                RelativePosition = new RelativePosition(transform.position),
-                RelativeRotation = new LowPrecisionQuaternion(transform.rotation),
-            };
-            if (thrownProjectile is TimeGrenade time)
-                time._fuseTime = fuseTime;
-            thrownProjectile.NetworkInfo = newInfo;
-            thrownProjectile.PreviousOwner = new Footprint(throwable.Owner.ReferenceHub);
-            NetworkServer.Spawn(thrownProjectile.gameObject);
-            thrownProjectile.InfoReceived(default, newInfo);
-            if (thrownProjectile.TryGetComponent(out Rigidbody component))
-                throwable.Base.PropelBody(component, throwable.Base.FullThrowSettings.StartTorque, ThrowableNetworkHandler.GetLimitedVelocity(velocity), force, throwable.Base.FullThrowSettings.UpwardsFactor);
-            thrownProjectile.ServerActivate();
-
-            return Pickup.Get(thrownProjectile);
-        }
-
-        /// <summary>
         /// Checks to see if the grenade is a tracked custom grenade.
         /// </summary>
         /// <param name="grenade">The <see cref="Projectile">grenade</see> to check.</param>

@@ -60,6 +60,19 @@ namespace Exiled.CustomRoles.API.Features
             ShowMessage(player);
             AbilityUsed(player);
             Timing.CallDelayed(Duration, () => EndAbility(player));
+            Timing.CallDelayed(Cooldown, () => RemindAbility(player));
+        }
+
+        /// <summary>
+        /// Reminds if ability is ready.
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> the ability is ready for.</param>
+        public void RemindAbility(Player player)
+        {
+            if (!base.Check(player) || !player.IsConnected || Math.Abs((DateTime.Now - LastUsed[player]).TotalSeconds - Cooldown) > 1f || !CustomRoles.Instance!.Config.AbilityReadyHint.Show)
+                return;
+
+            player.ShowHint(string.Format(CustomRoles.Instance!.Config.AbilityReadyHint.Content, Name, Description), CustomRoles.Instance.Config.AbilityReadyHint.Duration);
         }
 
         /// <summary>

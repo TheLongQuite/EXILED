@@ -381,7 +381,7 @@ namespace Exiled.API.Features
             get => ReferenceHub.nicknameSync.Network_customPlayerInfoString;
             set
             {
-                if (!PlayerCustomInfoRegex.IsMatch(value))
+                if (!string.IsNullOrEmpty(value) && !PlayerCustomInfoRegex.IsMatch(value))
                     Log.Error($"Exiled.API.Features.Player::CustomInfo (Invalid syntax) {value}");
                 InfoArea = string.IsNullOrEmpty(value) ? InfoArea & ~PlayerInfoArea.CustomInfo : InfoArea |= PlayerInfoArea.CustomInfo;
                 ReferenceHub.nicknameSync.Network_customPlayerInfoString = value;

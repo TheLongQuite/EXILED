@@ -161,22 +161,22 @@ namespace Exiled.CustomRoles.API.Features
             return Registered?.FirstOrDefault(r => r.Name == name);
         }
 
+        /// <inheritdoc cref="TryGet(uint,out Exiled.CustomRoles.API.Features.CustomRole?)"/>
+        [Obsolete("Use TryGet(uint) instead", false)]
+        public static bool TryGet(int id, out CustomRole? customRole) => TryGet((uint)id, out customRole);
+
         /// <summary>
         /// Tries to get a <see cref="CustomRole"/> by <inheritdoc cref="Id"/>.
         /// </summary>
         /// <param name="id">The ID of the role to get.</param>
         /// <param name="customRole">The custom role.</param>
         /// <returns>True if the role exists.</returns>
-        [Obsolete("Use TryGet(uint) instead", false)]
-        public static bool TryGet(int id, out CustomRole? customRole)
+        public static bool TryGet(uint id, out CustomRole? customRole)
         {
             customRole = Get(id);
 
             return customRole is not null;
         }
-
-        /// <inheritdoc cref="TryGet(int,out Exiled.CustomRoles.API.Features.CustomRole?)"/>
-        public static bool TryGet(uint id, out CustomRole? customRole) => TryGet(id, out customRole);
 
         /// <summary>
         /// Tries to get a <see cref="CustomRole"/> by name.
@@ -236,7 +236,16 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="skipReflection">Whether or not reflection is skipped (more efficient if you are not using your custom item classes as config objects).</param>
         /// <param name="overrideClass">The class to search properties for, if different from the plugin's config class.</param>
         /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> which contains all registered <see cref="CustomRole"/>'s.</returns>
-        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object?overrideClass = null)
+        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null) => RegisterRoles(skipReflection, overrideClass, true);
+
+        /// <summary>
+        /// Registers all the <see cref="CustomRole"/>'s present in the current assembly.
+        /// </summary>
+        /// <param name="skipReflection">Whether or not reflection is skipped (more efficient if you are not using your custom item classes as config objects).</param>
+        /// <param name="overrideClass">The class to search properties for, if different from the plugin's config class.</param>
+        /// <param name="inheritAttributes">Whether or not inherited attributes should be taken into account for registration.</param>
+        /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> which contains all registered <see cref="CustomRole"/>'s.</returns>
+        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null, bool inheritAttributes = true)
         {
             List<CustomRole> roles = new();
 
@@ -246,14 +255,14 @@ namespace Exiled.CustomRoles.API.Features
 
             foreach (Type type in assembly.GetTypes())
             {
-                if (type.BaseType != typeof(CustomRole) && type.GetCustomAttribute(typeof(CustomRoleAttribute)) is null)
+                if (type.BaseType != typeof(CustomRole) && type.GetCustomAttribute(typeof(CustomRoleAttribute), inheritAttributes) is null)
                 {
-                    Log.Debug($"{type} base: {type.BaseType} -- {type.GetCustomAttribute(typeof(CustomRoleAttribute)) is null}");
+                    Log.Debug($"{type} base: {type.BaseType} -- {type.GetCustomAttribute(typeof(CustomRoleAttribute), inheritAttributes) is null}");
                     continue;
                 }
 
                 Log.Debug("Getting attributed for {type");
-                foreach (Attribute attribute in type.GetCustomAttributes(typeof(CustomRoleAttribute), true).Cast<Attribute>())
+                foreach (Attribute attribute in type.GetCustomAttributes(typeof(CustomRoleAttribute), inheritAttributes).Cast<Attribute>())
                 {
                     CustomRole? customRole = null;
 
@@ -501,8 +510,10 @@ namespace Exiled.CustomRoles.API.Features
             }
 
             Log.Debug($"{Name}: Setting player info");
+
             player.CustomInfo = CustomInfo;
             player.InfoArea &= ~PlayerInfoArea.Role;
+
             if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)

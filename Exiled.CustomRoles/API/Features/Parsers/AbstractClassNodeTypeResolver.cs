@@ -39,7 +39,7 @@ namespace Exiled.CustomRoles.API.Features.Parsers
             typeDiscriminators = discriminators;
         }
 
-        /// <inheritdoc />
+        /// <inheritdoc cref="INodeDeserializer"/>
         public bool Deserialize(IParser reader, Type expectedType, Func<IParser, Type, object?> nestedObjectDeserializer, out object? value)
         {
             if (!reader.Accept<MappingStart>(out MappingStart? mapping))
@@ -71,7 +71,7 @@ namespace Exiled.CustomRoles.API.Features.Parsers
             }
             catch (Exception exception)
             {
-                throw new YamlException(start, reader.Current.End, "Failed when resolving abstract type", exception);
+                throw new YamlException(start ?? new(), reader.Current?.End ?? new(), "Failed when resolving abstract type", exception);
             }
 
             buffer.Reset();

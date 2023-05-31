@@ -847,6 +847,12 @@ namespace Exiled.CustomRoles.API.Features
             }
         }
 
+        private void OnSpawningRagdoll(SpawningRagdollEventArgs ev)
+        {
+            if (Check(ev.Player))
+                ev.Role = Role;
+        }
+
         private void OnDestroying(DestroyingEventArgs ev) => RemoveRole(ev.Player);
     }
 }

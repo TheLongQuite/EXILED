@@ -116,6 +116,11 @@ namespace Exiled.CustomRoles.API.Features
         public virtual bool KeepRoleOnDeath { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether players will receive a message for getting a custom item, when gaining it through the inventory config for this role.
+        /// </summary>
+        public virtual bool DisplayCustomItemMessages { get; set; } = true;
+
+        /// <summary>
         /// Gets or sets a value indicating the <see cref="Player"/>'s size.
         /// </summary>
         public virtual Vector3 Scale { get; set; } = Vector3.one;
@@ -236,7 +241,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="skipReflection">Whether or not reflection is skipped (more efficient if you are not using your custom item classes as config objects).</param>
         /// <param name="overrideClass">The class to search properties for, if different from the plugin's config class.</param>
         /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> which contains all registered <see cref="CustomRole"/>'s.</returns>
-        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null) => RegisterRoles(skipReflection, overrideClass, true);
+        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null) => RegisterRoles(skipReflection, overrideClass, true, Assembly.GetCallingAssembly());
 
         /// <summary>
         /// Registers all the <see cref="CustomRole"/>'s present in the current assembly.
@@ -244,14 +249,15 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="skipReflection">Whether or not reflection is skipped (more efficient if you are not using your custom item classes as config objects).</param>
         /// <param name="overrideClass">The class to search properties for, if different from the plugin's config class.</param>
         /// <param name="inheritAttributes">Whether or not inherited attributes should be taken into account for registration.</param>
+        /// <param name="assembly">Assembly which is calling this method.</param>
         /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> which contains all registered <see cref="CustomRole"/>'s.</returns>
-        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null, bool inheritAttributes = true)
+        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null, bool inheritAttributes = true, Assembly? assembly = null)
         {
             List<CustomRole> roles = new();
 
             Log.Warn("Registering roles...");
 
-            Assembly assembly = Assembly.GetCallingAssembly();
+            assembly ??= Assembly.GetCallingAssembly();
 
             foreach (Type type in assembly.GetTypes())
             {
@@ -266,10 +272,8 @@ namespace Exiled.CustomRoles.API.Features
                 {
                     CustomRole? customRole = null;
 
-                    if (!skipReflection && Server.PluginAssemblies.ContainsKey(assembly))
+                    if (!skipReflection && Server.PluginAssemblies.TryGetValue(assembly, out IPlugin<IConfig> plugin))
                     {
-                        IPlugin<IConfig> plugin = Server.PluginAssemblies[assembly];
-
                         foreach (PropertyInfo property in overrideClass?.GetType().GetProperties() ?? plugin.Config.GetType().GetProperties())
                         {
                             if (property.PropertyType != type)
@@ -292,6 +296,16 @@ namespace Exiled.CustomRoles.API.Features
 
             return roles;
         }
+
+        /// <summary>
+        /// Registers all the <see cref="CustomRole"/>'s present in the current assembly.
+        /// </summary>
+        /// <param name="skipReflection">Whether or not reflection is skipped (more efficient if you are not using your custom item classes as config objects).</param>
+        /// <param name="overrideClass">The class to search properties for, if different from the plugin's config class.</param>
+        /// <param name="inheritAttributes">Whether or not inherited attributes should be taken into account for registration.</param>
+        /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> which contains all registered <see cref="CustomRole"/>'s.</returns>
+        [Obsolete("Use RegisterRoles(bool, object?, bool, Assembly?) instead.")]
+        public static IEnumerable<CustomRole> RegisterRoles(bool skipReflection = false, object? overrideClass = null, bool inheritAttributes = true) => RegisterRoles(skipReflection, overrideClass, inheritAttributes, Assembly.GetCallingAssembly());
 
         /// <summary>
         /// Registers all the <see cref="CustomRole"/>'s present in the current assembly.
@@ -462,23 +476,9 @@ namespace Exiled.CustomRoles.API.Features
                 player.Role.Set(Role, SpawnReason.ForceClass);
 
             Timing.CallDelayed(
-                1.5f,
+                0.25f,
                 () =>
                 {
-                    Vector3 pos = GetSpawnPosition();
-
-                    Log.Debug($"{nameof(AddRole)}: Found {pos} to spawn {player.Nickname}");
-
-                    // If the spawn pos isn't 0,0,0, We add vector3.up * 1.5 here to ensure they do not spawn inside the ground and get stuck.
-                    if(oldPos != Vector3.zero)
-                        player.Position = oldPos;
-
-                    if (pos != Vector3.zero)
-                    {
-                        Log.Debug($"{nameof(AddRole)}: Setting {player.Nickname} position..");
-                        player.Position = pos + (Vector3.up * 1.5f);
-                    }
-
                     if (!KeepInventoryOnSpawn)
                     {
                         Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
@@ -490,18 +490,12 @@ namespace Exiled.CustomRoles.API.Features
                         Log.Debug($"{Name}: Adding {itemName} to inventory.");
                         TryAddItem(player, itemName);
                     }
-
-                    foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
-                    {
-                        Log.Debug($"{Name}: Adding {ammo.Value} {ammo.Key} to inventory.");
-                        player.SetAmmo(ammo.Key, ammo.Value);
-                    }
-
-                    Log.Debug($"{Name}: Setting health values.");
-                    player.Health = MaxHealth;
-                    player.MaxHealth = MaxHealth;
-                    player.Scale = Scale;
                 });
+
+            Log.Debug($"{Name}: Setting health values.");
+            player.Health = MaxHealth;
+            player.MaxHealth = MaxHealth;
+            player.Scale = Scale;
 
             Vector3 position = GetSpawnPosition();
             if (position != Vector3.zero)
@@ -533,6 +527,8 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player"/> to remove the role from.</param>
         public virtual void RemoveRole(Player player)
         {
+            if (!TrackedPlayers.Contains(player))
+                return;
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
             TrackedPlayers.Remove(player);
             player.CustomInfo = string.Empty;
@@ -785,7 +781,10 @@ namespace Exiled.CustomRoles.API.Features
         protected virtual void SubscribeEvents()
         {
             Log.Debug($"{Name}: Loading events.");
+            Exiled.Events.Handlers.Player.ChangingNickname += OnInternalChangingNickname;
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
+            Exiled.Events.Handlers.Player.SpawningRagdoll += OnSpawningRagdoll;
+            Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
         /// <summary>
@@ -797,7 +796,10 @@ namespace Exiled.CustomRoles.API.Features
                 RemoveRole(player);
 
             Log.Debug($"{Name}: Unloading events.");
+            Exiled.Events.Handlers.Player.ChangingNickname -= OnInternalChangingNickname;
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
+            Exiled.Events.Handlers.Player.SpawningRagdoll -= OnSpawningRagdoll;
+            Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
         /// <summary>
@@ -822,6 +824,14 @@ namespace Exiled.CustomRoles.API.Features
         {
         }
 
+        private void OnInternalChangingNickname(ChangingNicknameEventArgs ev)
+        {
+            if (!Check(ev.Player))
+                return;
+
+            ev.Player.CustomInfo = $"{ev.NewName}\n{CustomInfo}";
+        }
+
         private void OnInternalChangingRole(ChangingRoleEventArgs ev)
         {
             if (Check(ev.Player) &&
@@ -836,5 +846,7 @@ namespace Exiled.CustomRoles.API.Features
                 RemoveRole(ev.Player);
             }
         }
+
+        private void OnDestroying(DestroyingEventArgs ev) => RemoveRole(ev.Player);
     }
 }

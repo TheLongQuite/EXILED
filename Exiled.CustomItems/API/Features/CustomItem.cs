@@ -32,9 +32,6 @@ namespace Exiled.CustomItems.API.Features
     using MapGeneration.Distributors;
 
     using MEC;
-
-    using PlayerRoles;
-
     using UnityEngine;
 
     using YamlDotNet.Serialization;

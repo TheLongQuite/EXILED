@@ -11,13 +11,6 @@ namespace Exiled.Events.Handlers
 
     using Extensions;
 
-    using PlayerRoles;
-    using PlayerRoles.FirstPersonControl.Thirdperson;
-
-    using PluginAPI.Core.Attributes;
-    using PluginAPI.Enums;
-    using PluginAPI.Events;
-
     using static Events;
 
 #pragma warning disable IDE0079

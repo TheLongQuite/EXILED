@@ -7,8 +7,6 @@
 
 namespace Exiled.Updater
 {
-    using Mono.Unix;
-
     internal static class LinuxPermission
     {
         internal static void SetFileUserAndGroupReadWriteExecutePermissions(string path)

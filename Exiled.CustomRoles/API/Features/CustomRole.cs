@@ -469,9 +469,23 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
             TrackedPlayers.Add(player);
 
+            Vector3 position = Vector3.zero;
+            bool posAltered = false;
+            if (SpawnProperties.IsAny)
+            {
+                position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
+                posAltered = true;
+            }
+
             if (Role != RoleTypeId.None)
             {
-                player.Role.Set(Role, SpawnReason.ForceClass, KeepInventoryOnSpawn ? RoleSpawnFlags.None : RoleSpawnFlags.AssignInventory);
+                RoleSpawnFlags flags = RoleSpawnFlags.None;
+                if (!posAltered)
+                    flags |= RoleSpawnFlags.UseSpawnpoint;
+                if (!KeepInventoryOnSpawn)
+                    flags |= RoleSpawnFlags.AssignInventory;
+                player.Role.Set(Role, SpawnReason.ForceClass, flags);
+                Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
             }
 
             Timing.CallDelayed(
@@ -524,17 +538,15 @@ namespace Exiled.CustomRoles.API.Features
             player.MaxHealth = MaxHealth;
             player.Scale = Scale;
 
-            Vector3 position = Vector3.zero;
-            if (SpawnProperties.IsAny)
-                position = SpawnProperties.GetRandomPoint();
-            if (position != Vector3.zero)
+            Log.Debug($"{Name}: Setting position to {position}.");
+            if (posAltered)
             {
                 player.Position = position;
             }
 
             Log.Debug($"{Name}: Setting player info");
-            player.CustomInfo = $"{player.CustomName}\n{CustomInfo}";
-            player.InfoArea &= ~(PlayerInfoArea.Role | PlayerInfoArea.Nickname);
+            player.InfoArea = PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.PowerStatus | PlayerInfoArea.UnitName;
+            player.CustomInfo = $"{player.CustomName}\n{Name}";
             if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)

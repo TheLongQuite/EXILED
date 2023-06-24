@@ -151,16 +151,6 @@ namespace Exiled.Events.Patches.Events.Server
                         leadingTeam = (RoundSummary.LeadingTeam)endingRoundEventArgs.LeadingTeam;
                         if (endingRoundEventArgs.IsRoundEnded)
                         {
-                            RoundEndCancellationData roundEndCancellationData = EventManager.ExecuteEvent<RoundEndCancellationData>(ServerEventType.RoundEnd, new object[] { leadingTeam });
-                            while (roundEndCancellationData.IsCancelled)
-                            {
-                                if (roundEndCancellationData.Delay <= 0f)
-                                    break;
-
-                                yield return Timing.WaitForSeconds(roundEndCancellationData.Delay);
-                                roundEndCancellationData = EventManager.ExecuteEvent<RoundEndCancellationData>(new RoundEndEvent(leadingTeam));
-                            }
-
                             if (Statistics.FastestEndedRound.Duration > RoundStart.RoundLength)
                             {
                                 Statistics.FastestEndedRound = new Statistics.FastestRound(leadingTeam, RoundStart.RoundLength, DateTime.Now);

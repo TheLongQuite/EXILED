@@ -764,6 +764,8 @@ namespace Exiled.CustomItems.API.Features
 
                 player.AddItem(item);
 
+                item.Scale = Scale;
+
                 Log.Debug($"{nameof(Give)}: Adding {item.Serial} to tracker.");
                 if (!TrackedSerials.Contains(item.Serial))
                     TrackedSerials.Add(item.Serial);

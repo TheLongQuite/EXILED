@@ -809,7 +809,6 @@ namespace Exiled.CustomItems.API.Features
         {
             UnsubscribeEvents();
 
-            typeLookupTable.Remove(GetType());
             stringLookupTable.Remove(Name);
             idLookupTable.Remove(Id);
         }

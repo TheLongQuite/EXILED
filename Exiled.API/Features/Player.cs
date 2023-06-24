@@ -82,7 +82,7 @@ namespace Exiled.API.Features
 
     using DamageHandlerBase = PlayerStatsSystem.DamageHandlerBase;
     using Firearm = Items.Firearm;
-    using FirearmPickup = Exiled.API.Features.Pickups.FirearmPickup;
+    using FirearmPickup = Pickups.FirearmPickup;
     using HumanRole = Roles.HumanRole;
     using Random = UnityEngine.Random;
 
@@ -91,13 +91,6 @@ namespace Exiled.API.Features
     /// </summary>
     public class Player : IEntity, IPosition // Todo: Convert to IWorldSpace (Rotation Vector3 -> Quaternion)
     {
-        /// <summary>
-        /// Validates custom player info.
-        /// Allows for up to 400 characters that are valid letters, numbers or math symbols in any language (so this includes regular alphabet, Russian alphabet, hiragana, kanji and whatever else you want) or matches a specific set or special characters such as space, etc... and that set includes <![CDATA[<, >]]> and \n
-        ///  - Written by Zabszk (Thanks to Beryl to having sharing it to Exiled).
-        /// </summary>
-        internal static readonly Regex PlayerCustomInfoRegex = new(@"^((?![\[\]])[\p{L}\p{P}\p{Sc}\p{N} ^=+|~`<>\n]){0,400}$", RegexOptions.Compiled);
-
 #pragma warning disable SA1401
         /// <summary>
         /// A list of the player's items.
@@ -156,11 +149,6 @@ namespace Exiled.API.Features
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing cached <see cref="Player"/> and their user ids.
         /// </summary>
         public static Dictionary<string, Player> UserIdsCache { get; } = new(20);
-
-        /// <summary>
-        /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing cached <see cref="Player"/> and their ids.
-        /// </summary>
-        public static Dictionary<int, Player> IdsCache { get; } = new(20);
 
         /// <inheritdoc/>
         public IReadOnlyCollection<EActor> ComponentsInChildren => componentsInChildren;
@@ -1051,7 +1039,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a value indicating whether or not the player is in the pocket dimension.
         /// </summary>
-        public bool IsInPocketDimension => CurrentRoom?.Type == RoomType.Pocket;
+        public bool IsInPocketDimension => CurrentRoom?.Type is RoomType.Pocket;
 
         /// <summary>
         /// Gets or sets a value indicating whether or not the player should use stamina system.
@@ -1071,7 +1059,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a value indicating whether or not the player's inventory is empty.
         /// </summary>
-        public bool IsInventoryEmpty => Items.Count == 0;
+        public bool IsInventoryEmpty => Items.Count is 0;
 
         /// <summary>
         /// Gets a value indicating whether or not the player's inventory is full.
@@ -1116,7 +1104,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a dictionary for storing player objects of connected but not yet verified players.
         /// </summary>
-        internal static ConditionalWeakTable<ReferenceHub, Player> UnverifiedPlayers { get; } = new();
+        internal static ConditionalWeakTable<GameObject, Player> UnverifiedPlayers { get; } = new();
 
         /// <summary>
         /// Converts NwPluginAPI player to EXILED player.
@@ -1159,6 +1147,13 @@ namespace Exiled.API.Features
         /// <param name="sender">The command sender.</param>
         /// <returns>A <see cref="Player"/> or <see langword="null"/> if not found.</returns>
         public static Player Get(CommandSystem.ICommandSender sender) => Get(sender as CommandSender);
+
+        /// <summary>
+        /// Gets the <see cref="Player"/> belonging to the <see cref="Footprinting.Footprint"/>, if any.
+        /// </summary>
+        /// <param name="footprint">The Footprint.</param>
+        /// <returns>A <see cref="Player"/> or <see langword="null"/> if not found.</returns>
+        public static Player Get(Footprint footprint) => Get(footprint.Hub);
 
         /// <summary>
         /// Gets the <see cref="Player"/> belonging to the <see cref="CommandSender"/>, if any.
@@ -1222,8 +1217,10 @@ namespace Exiled.API.Features
             if (gameObject == null)
                 return null;
 
-            Dictionary.TryGetValue(gameObject, out Player player);
+            if (Dictionary.TryGetValue(gameObject, out Player player))
+                return player;
 
+            UnverifiedPlayers.TryGetValue(gameObject, out player);
             return player;
         }
 
@@ -1232,23 +1229,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="id">The player id.</param>
         /// <returns>Returns the player found or <see langword="null"/> if not found.</returns>
-        public static Player Get(int id)
-        {
-            if (IdsCache.TryGetValue(id, out Player player) && player?.ReferenceHub is not null)
-                return player;
-
-            foreach (Player playerFound in Dictionary.Values)
-            {
-                if (playerFound.Id != id)
-                    continue;
-
-                IdsCache[id] = playerFound;
-
-                return playerFound;
-            }
-
-            return null;
-        }
+        public static Player Get(int id) => ReferenceHub.TryGetHub(id, out ReferenceHub referenceHub) ? Get(referenceHub) : null;
 
         /// <summary>
         /// Gets the <see cref="Player"/> by identifier.
@@ -1331,6 +1312,14 @@ namespace Exiled.API.Features
         public static bool TryGet(CommandSystem.ICommandSender sender, out Player player) => (player = Get(sender)) is not null;
 
         /// <summary>
+        /// Try-get a player given a <see cref="Footprinting.Footprint"/>.
+        /// </summary>
+        /// <param name="footprint">The <see cref="Footprinting.Footprint"/>.</param>
+        /// <param name="player">The player that matches the given <see cref="Footprinting.Footprint"/>, or <see langword="null"/> if no player is found.</param>
+        /// <returns>A boolean indicating whether or not a player was found.</returns>
+        public static bool TryGet(Footprint footprint, out Player player) => (player = Get(footprint)) is not null;
+
+        /// <summary>
         /// Try-get a player given a <see cref="CommandSender"/>.
         /// </summary>
         /// <param name="sender">The <see cref="CommandSender"/>.</param>
@@ -1409,16 +1398,7 @@ namespace Exiled.API.Features
         /// <param name="userId">The UserId of the player to add.</param>
         /// <returns><see langword="true"/> if the slot was successfully added, or <see langword="false"/> if the provided UserId already has a reserved slot.</returns>
         /// <seealso cref="GiveReservedSlot()"/>
-        public static bool AddReservedSlot(string userId)
-        {
-            if (!ReservedSlot.HasReservedSlot(userId, out _))
-            {
-                ReservedSlot.Users.Add(userId);
-                return true;
-            }
-
-            return false;
-        }
+        public static bool AddReservedSlot(string userId) => ReservedSlot.Users.Add(userId);
 
         /// <summary>
         /// Reloads the reserved slot list, clearing all reserved slot changes made with add/remove methods and reverting to the reserved slots files.
@@ -1629,9 +1609,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="customRoleFriendlyFireMultiplier"> New rules for CustomeRoleFriendlyFireMultiplier to set to. </param>
         public void TrySetCustomRoleFriendlyFire(Dictionary<string, Dictionary<RoleTypeId, float>> customRoleFriendlyFireMultiplier)
-        {
-            CustomRoleFriendlyFireMultiplier = customRoleFriendlyFireMultiplier;
-        }
+            => CustomRoleFriendlyFireMultiplier = customRoleFriendlyFireMultiplier;
 
         /// <summary>
         /// Sets the <see cref="CustomRoleFriendlyFireMultiplier"/>.
@@ -1659,7 +1637,7 @@ namespace Exiled.API.Features
         /// Forces the player to reload their current weapon.
         /// </summary>
         /// <exception cref="InvalidOperationException">If the item is not a firearm.</exception>
-        public void ReloadWeapon()
+        public void ReloadWeapon() // TODO: Convert to bool instead of Exception
         {
             if (CurrentItem is Firearm firearm)
             {
@@ -1692,14 +1670,14 @@ namespace Exiled.API.Features
         /// <param name="group">The group to be set.</param>
         public void SetRank(string name, UserGroup group)
         {
-            if (ServerStatic.GetPermissionsHandler()._groups.ContainsKey(name))
+            if (ServerStatic.GetPermissionsHandler()._groups.TryGetValue(name, out UserGroup userGroup))
             {
-                ServerStatic.GetPermissionsHandler()._groups[name].BadgeColor = group.BadgeColor;
-                ServerStatic.GetPermissionsHandler()._groups[name].BadgeText = name;
-                ServerStatic.GetPermissionsHandler()._groups[name].HiddenByDefault = !group.Cover;
-                ServerStatic.GetPermissionsHandler()._groups[name].Cover = group.Cover;
+                userGroup.BadgeColor = group.BadgeColor;
+                userGroup.BadgeText = name;
+                userGroup.HiddenByDefault = !group.Cover;
+                userGroup.Cover = group.Cover;
 
-                ReferenceHub.serverRoles.SetGroup(ServerStatic.GetPermissionsHandler()._groups[name], false, false, group.Cover);
+                ReferenceHub.serverRoles.SetGroup(userGroup, false, false, group.Cover);
             }
             else
             {
@@ -1731,10 +1709,7 @@ namespace Exiled.API.Features
         /// <param name="cuffer">The cuffer player.</param>
         public void Handcuff(Player cuffer)
         {
-            if (cuffer?.ReferenceHub == null)
-                return;
-
-            if (!IsCuffed && (Vector3.Distance(Position, cuffer.Position) <= 130f))
+            if (cuffer is not null && !IsCuffed && (cuffer.Position - Position).sqrMagnitude <= DisarmingHandlers.ServerDisarmingDistanceSqrt)
                 Cuffer = cuffer;
         }
 
@@ -1769,7 +1744,7 @@ namespace Exiled.API.Features
         /// Drops the held item. Will not do anything if the player is not holding an item.
         /// </summary>
         /// <seealso cref="CurrentItem"/>
-        public void DropHeldItem()
+        public void DropHeldItem() // TODO: Return Pickup.
         {
             if (CurrentItem is null)
                 return;
@@ -1863,10 +1838,7 @@ namespace Exiled.API.Features
         /// <param name="serial">The <see cref="Item"/> serial to remove.</param>
         /// <param name="destroy">Whether or not to destroy the item.</param>
         /// <returns>A value indicating whether or not the <see cref="Item"/> was removed.</returns>
-        public bool RemoveItem(ushort serial, bool destroy = true)
-        {
-            return RemoveItem(Item.Get(serial), destroy);
-        }
+        public bool RemoveItem(ushort serial, bool destroy = true) => RemoveItem(Item.Get(serial), destroy);
 
         /// <summary>
         /// Removes all <see cref="Item"/>'s that satisfy the condition from the player's inventory.
@@ -2000,14 +1972,14 @@ namespace Exiled.API.Features
         /// Forces the player to use an item.
         /// </summary>
         /// <param name="usableItem">The ItemType to be used.</param>
-        public void UseItem(ItemType usableItem) => UseItem(Item.Create(usableItem));
+        public void UseItem(ItemType usableItem) => UseItem(Item.Create(usableItem)); // TODO: Convert to bool if succesfully done.
 
         /// <summary>
         /// Forces the player to use an item.
         /// </summary>
         /// <param name="item">The item to be used.</param>
         /// <exception cref="ArgumentException">The provided item is not a usable item.</exception>
-        public void UseItem(Item item)
+        public void UseItem(Item item) // TODO: Convert to bool if succesfully done instead of throwing error.
         {
             if (item is not Usable usableItem)
                 throw new ArgumentException($"The provided item [{item.Type}] is not a usable item.", nameof(item));
@@ -2184,7 +2156,7 @@ namespace Exiled.API.Features
         /// <param name="checkMinimals">Whether or not ammo limits will be taken into consideration.</param>
         /// <returns><see langword="true"/> if ammo was dropped; otherwise, <see langword="false"/>.</returns>
         public bool DropAmmo(AmmoType ammoType, ushort amount, bool checkMinimals = false) =>
-            Inventory.ServerDropAmmo(ammoType.GetItemType(), amount, checkMinimals);
+            Inventory.ServerDropAmmo(ammoType.GetItemType(), amount, checkMinimals).Any();
 
         /// <summary>
         /// Gets the maximum amount of ammo the player can hold, given the ammo <see cref="AmmoType"/>.
@@ -2502,16 +2474,8 @@ namespace Exiled.API.Features
         {
             ClearInventory();
 
-            Timing.CallDelayed(
-                0.5f,
-                () =>
-                {
-                    if (newItems.IsEmpty())
-                        return;
-
-                    foreach (ItemType item in newItems)
-                        AddItem(item);
-                });
+            foreach (ItemType item in newItems)
+                AddItem(item);
         }
 
         /// <summary>
@@ -3190,7 +3154,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="time">The times for the cooldown.</param>
         /// <param name="itemType">The itemtypes to choose for being cooldown.</param>
-        public void GetCooldownItem(float time, ItemType itemType)
+        public void GetCooldownItem(float time, ItemType itemType) // TODO: Set not Get
             => UsableItemsController.GetHandler(ReferenceHub).PersonalCooldowns[itemType] = Time.timeSinceLevelLoad + time;
 
         /// <summary>

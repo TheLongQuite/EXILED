@@ -16,7 +16,6 @@
     <Import Project="../EXILED.props" />
 
     <ItemGroup>
-        <PackageReference Include="Mono.Posix" Version="7.1.0-final.1.21458.1" />
         <PackageReference Include="StyleCop.Analyzers" Version="$(StyleCopVersion)" IncludeAssets="All" PrivateAssets="All" />
         <PackageReference Include="SemanticVersioning" Version="$(SemanticVersioningVersion)" />
     </ItemGroup>

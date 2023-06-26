@@ -12,12 +12,11 @@ namespace Exiled.CustomRoles.Commands
     using System.Linq;
 
     using CommandSystem;
-
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
+    using Exiled.CustomRoles.API;
     using Exiled.CustomRoles.API.Features;
     using Exiled.Permissions.Extensions;
-
     using RemoteAdmin;
 
     /// <summary>
@@ -70,7 +69,7 @@ namespace Exiled.CustomRoles.Commands
                 {
                     Player player = Player.Get(playerCommandSender);
 
-                    role.AddRole(player);
+                    TryAddRole(player, role);
                     response = $"Кастомная роль {role.Name} дана игроку {player.Nickname}.";
                     return true;
                 }
@@ -88,9 +87,9 @@ namespace Exiled.CustomRoles.Commands
                     List<Player> players = ListPool<Player>.Pool.Get(Player.List);
 
                     foreach (Player player in players)
-                        role.AddRole(player);
+                        TryAddRole(player, role);
 
-                    response = $"Кастомная роль {role.Name} Дана всем игрокам.";
+                    response = $"Кастомная роль {role.Name} дана всем игрокам.";
                     ListPool<Player>.Pool.Return(players);
                     return true;
                 default:
@@ -100,10 +99,18 @@ namespace Exiled.CustomRoles.Commands
                         return false;
                     }
 
-                    role.AddRole(ply);
+                    TryAddRole(ply, role);
                     response = $"Кастомная роль {role.Name} дана игроку {ply.Nickname}.";
                     return true;
             }
+        }
+
+        private void TryAddRole(Player player, CustomRole customRole)
+        {
+            foreach (var cRole in player.GetCustomRoles())
+                cRole?.RemoveRole(player);
+
+            customRole.AddRole(player);
         }
     }
 }

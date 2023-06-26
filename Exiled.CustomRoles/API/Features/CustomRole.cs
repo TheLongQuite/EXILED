@@ -9,27 +9,22 @@ namespace Exiled.CustomRoles.API.Features
 {
     using System;
     using System.Collections.Generic;
+    using System.ComponentModel;
     using System.Linq;
     using System.Reflection;
-    using System.Text;
 
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features;
     using Exiled.API.Features.Attributes;
     using Exiled.API.Features.Pools;
-    using Exiled.API.Features.Spawn;
     using Exiled.API.Interfaces;
     using Exiled.CustomItems.API.Features;
     using Exiled.Events.EventArgs.Player;
-    using Exiled.Loader;
-
+    using FLXLib.Spawns;
     using MEC;
-
     using PlayerRoles;
-
     using UnityEngine;
-
     using YamlDotNet.Serialization;
 
     /// <summary>
@@ -86,9 +81,12 @@ namespace Exiled.CustomRoles.API.Features
         public virtual List<CustomAbility> CustomAbilities { get; set; } = new();
 
         /// <summary>
-        /// Gets or sets the starting inventory for the role.
+        /// Gets or sets List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal.
         /// </summary>
-        public virtual List<string> Inventory { get; set; } = new();
+        [Description(
+            "List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal. Max slots: 8")]
+        public virtual List<Dictionary<string, byte>> Inventory { get; set; } =
+            new List<Dictionary<string, byte>>();
 
         /// <summary>
         /// Gets or sets the starting ammo for the role.
@@ -98,7 +96,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <summary>
         /// Gets or sets the possible spawn locations for this role.
         /// </summary>
-        public virtual SpawnProperties SpawnProperties { get; set; } = new();
+        public virtual SpawnPositionSettings SpawnProperties { get; set; } = new();
 
         /// <summary>
         /// Gets or sets a value indicating whether players keep their current inventory when gaining this role.
@@ -114,6 +112,11 @@ namespace Exiled.CustomRoles.API.Features
         /// Gets or sets a value indicating whether players keep this role when they die.
         /// </summary>
         public virtual bool KeepRoleOnDeath { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether players will receive a message for getting a custom item, when gaining it through the inventory config for this role.
+        /// </summary>
+        public virtual bool DisplayCustomItemMessages { get; set; } = true;
 
         /// <summary>
         /// Gets or sets a value indicating the <see cref="Player"/>'s size.
@@ -463,66 +466,87 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player"/> to add the role to.</param>
         public virtual void AddRole(Player player)
         {
-            Vector3 oldPos = player.IsAlive ? player.Position : Vector3.zero;
-
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
+            TrackedPlayers.Add(player);
+
+            Vector3 position = Vector3.zero;
+            bool posAltered = false;
+            if (SpawnProperties.IsAny)
+            {
+                position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
+                posAltered = true;
+            }
 
             if (Role != RoleTypeId.None)
-                player.Role.Set(Role, SpawnReason.ForceClass);
+            {
+                RoleSpawnFlags flags = RoleSpawnFlags.None;
+                if (!posAltered)
+                    flags |= RoleSpawnFlags.UseSpawnpoint;
+                if (!KeepInventoryOnSpawn)
+                    flags |= RoleSpawnFlags.AssignInventory;
+                player.Role.Set(Role, SpawnReason.ForceClass, flags);
+                Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
+            }
 
             Timing.CallDelayed(
-                1.5f,
+                0.25f,
                 () =>
                 {
-                    Vector3 pos = GetSpawnPosition();
-
-                    Log.Debug($"{nameof(AddRole)}: Found {pos} to spawn {player.Nickname}");
-
-                    // If the spawn pos isn't 0,0,0, We add vector3.up * 1.5 here to ensure they do not spawn inside the ground and get stuck.
-                    if(oldPos != Vector3.zero)
-                        player.Position = oldPos;
-
-                    if (pos != Vector3.zero)
-                    {
-                        Log.Debug($"{nameof(AddRole)}: Setting {player.Nickname} position..");
-                        player.Position = pos + (Vector3.up * 1.5f);
-                    }
-
                     if (!KeepInventoryOnSpawn)
                     {
                         Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
                         player.ClearInventory();
                     }
 
-                    foreach (string itemName in Inventory)
+                    player.TryGetSessionVariable(MainDatabasePlugin.Modules.PrivilegeModule.ItemBuffKey, out byte itemsBuff);
+                    foreach (var slot in Inventory)
                     {
-                        Log.Debug($"{Name}: Adding {itemName} to inventory.");
-                        TryAddItem(player, itemName);
-                    }
+                        foreach (var item in slot)
+                        {
+                            byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
+                            Log.Debug($"Trying to add item {item.Key} with chance {chance} (buff: {itemsBuff}) to " + player.Nickname);
+                            if (!FLXLib.Extensions.CommonExtensions.ChanceChecker(chance))
+                                continue;
+                            if (CustomItem.TryGet(item.Key, out var customItem))
+                            {
+                                customItem?.Give(player);
+                                Log.Debug($"{Name}: Adding {customItem?.Name} to inventory.");
+                            }
+                            else if (Enum.TryParse(item.Key, out ItemType itemType))
+                            {
+                                player.AddItem(itemType);
+                                Log.Debug($"{Name}: Adding {itemType} to inventory.");
+                            }
+                            else
+                            {
+                                Log.Error($"Error at adding items to custom role. Wrong item: {item.Key}");
+                            }
 
-                    foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
-                    {
-                        Log.Debug($"{Name}: Adding {ammo.Value} {ammo.Key} to inventory.");
-                        player.SetAmmo(ammo.Key, ammo.Value);
+                            break;
+                        }
                     }
-
-                    Log.Debug($"{Name}: Setting health values.");
-                    player.Health = MaxHealth;
-                    player.MaxHealth = MaxHealth;
-                    player.Scale = Scale;
                 });
 
-            Vector3 position = GetSpawnPosition();
-            if (position != Vector3.zero)
+            foreach (var ammo in Ammo)
+            {
+                Log.Debug($"{Name}: Adding {ammo.Value} {ammo} to inventory.");
+                player.SetAmmo(ammo.Key, ammo.Value);
+            }
+
+            Log.Debug($"{Name}: Setting health values.");
+            player.Health = MaxHealth;
+            player.MaxHealth = MaxHealth;
+            player.Scale = Scale;
+
+            Log.Debug($"{Name}: Setting position to {position}.");
+            if (posAltered)
             {
                 player.Position = position;
             }
 
             Log.Debug($"{Name}: Setting player info");
-
-            player.CustomInfo = CustomInfo;
-            player.InfoArea &= ~PlayerInfoArea.Role;
-
+            player.InfoArea = PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.PowerStatus | PlayerInfoArea.UnitName;
+            player.CustomInfo = $"{player.CustomName}\n{Name}";
             if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)
@@ -531,7 +555,6 @@ namespace Exiled.CustomRoles.API.Features
 
             ShowMessage(player);
             RoleAdded(player);
-            TrackedPlayers.Add(player);
             player.UniqueRole = Name;
             player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
         }
@@ -749,54 +772,14 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
-        /// Gets a random <see cref="Vector3"/> from <see cref="SpawnProperties"/>.
-        /// </summary>
-        /// <returns>The chosen spawn location.</returns>
-        protected Vector3 GetSpawnPosition()
-        {
-            if (SpawnProperties is null || SpawnProperties.Count() == 0)
-                return Vector3.zero;
-
-            if (SpawnProperties.StaticSpawnPoints.Count > 0)
-            {
-                foreach ((float chance, Vector3 pos) in SpawnProperties.StaticSpawnPoints)
-                {
-                    double r = Loader.Random.NextDouble() * 100;
-                    if (r <= chance)
-                        return pos;
-                }
-            }
-
-            if (SpawnProperties.DynamicSpawnPoints.Count > 0)
-            {
-                foreach ((float chance, Vector3 pos) in SpawnProperties.DynamicSpawnPoints)
-                {
-                    double r = Loader.Random.NextDouble() * 100;
-                    if (r <= chance)
-                        return pos;
-                }
-            }
-
-            if (SpawnProperties.RoleSpawnPoints.Count > 0)
-            {
-                foreach ((float chance, Vector3 pos) in SpawnProperties.RoleSpawnPoints)
-                {
-                    double r = Loader.Random.NextDouble() * 100;
-                    if (r <= chance)
-                        return pos;
-                }
-            }
-
-            return Vector3.zero;
-        }
-
-        /// <summary>
         /// Called when the role is initialized to setup internal events.
         /// </summary>
         protected virtual void SubscribeEvents()
         {
             Log.Debug($"{Name}: Loading events.");
+            Exiled.Events.Handlers.Player.ChangingNickname += OnInternalChangingNickname;
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
+            Exiled.Events.Handlers.Player.SpawningRagdoll += OnSpawningRagdoll;
             Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
@@ -809,7 +792,9 @@ namespace Exiled.CustomRoles.API.Features
                 RemoveRole(player);
 
             Log.Debug($"{Name}: Unloading events.");
+            Exiled.Events.Handlers.Player.ChangingNickname -= OnInternalChangingNickname;
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
+            Exiled.Events.Handlers.Player.SpawningRagdoll -= OnSpawningRagdoll;
             Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
@@ -835,6 +820,14 @@ namespace Exiled.CustomRoles.API.Features
         {
         }
 
+        private void OnInternalChangingNickname(ChangingNicknameEventArgs ev)
+        {
+            if (!Check(ev.Player))
+                return;
+
+            ev.Player.CustomInfo = $"{ev.NewName}\n{CustomInfo}";
+        }
+
         private void OnInternalChangingRole(ChangingRoleEventArgs ev)
         {
             if (Check(ev.Player) &&
@@ -848,6 +841,12 @@ namespace Exiled.CustomRoles.API.Features
 
                 RemoveRole(ev.Player);
             }
+        }
+
+        private void OnSpawningRagdoll(SpawningRagdollEventArgs ev)
+        {
+            if (Check(ev.Player))
+                ev.Role = Role;
         }
 
         private void OnDestroying(DestroyingEventArgs ev) => RemoveRole(ev.Player);

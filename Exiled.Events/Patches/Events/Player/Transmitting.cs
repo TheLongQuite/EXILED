@@ -15,9 +15,6 @@ namespace Exiled.Events.Patches.Events.Player
     using Exiled.Events.EventArgs.Player;
 
     using HarmonyLib;
-
-    using Mirror;
-
     using PlayerRoles.Voice;
 
     using VoiceChat.Playbacks;

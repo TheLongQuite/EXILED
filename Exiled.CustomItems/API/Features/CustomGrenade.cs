@@ -11,22 +11,10 @@ namespace Exiled.CustomItems.API.Features
 
     using Exiled.API.Extensions;
     using Exiled.API.Features;
-    using Exiled.API.Features.Items;
-    using Exiled.API.Features.Pickups;
     using Exiled.API.Features.Pickups.Projectiles;
-    using Exiled.API.Features.Roles;
     using Exiled.Events.EventArgs.Map;
     using Exiled.Events.EventArgs.Player;
 
-    using Footprinting;
-    using InventorySystem.Items;
-    using InventorySystem.Items.Pickups;
-    using InventorySystem.Items.ThrowableProjectiles;
-    using Mirror;
-    using RelativePositioning;
-    using UnityEngine;
-
-    using Object = UnityEngine.Object;
     using Server = Exiled.API.Features.Server;
 
     /// <summary>

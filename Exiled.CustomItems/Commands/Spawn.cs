@@ -10,9 +10,6 @@ namespace Exiled.CustomItems.Commands
     using System;
 
     using CommandSystem;
-
-    using Exiled.API.Enums;
-    using Exiled.API.Extensions;
     using Exiled.API.Features;
     using Exiled.CustomItems.API.Features;
     using Exiled.Permissions.Extensions;

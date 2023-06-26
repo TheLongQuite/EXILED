@@ -11,8 +11,6 @@ namespace Exiled.Events.Patches.Events.Player
     using System.Reflection.Emit;
 
     using API.Features.Pools;
-
-    using Exiled.API.Enums;
     using Exiled.Events.EventArgs.Player;
 
     using Handlers;

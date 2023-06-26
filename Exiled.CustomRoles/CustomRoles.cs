@@ -10,9 +10,9 @@ namespace Exiled.CustomRoles
     using Exiled.API.Features;
     using Exiled.CustomRoles.API.Features;
     using Exiled.CustomRoles.API.Features.Parsers;
+    using Exiled.CustomRoles.Events;
     using Exiled.Loader;
     using Exiled.Loader.Features.Configs.CustomConverters;
-
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
     using YamlDotNet.Serialization.NodeDeserializers;
@@ -22,6 +22,8 @@ namespace Exiled.CustomRoles
     /// </summary>
     public class CustomRoles : Plugin<Config>
     {
+        private PlayerHandler playerHandler = null!;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="CustomRoles"/> class.
         /// </summary>
@@ -47,12 +49,18 @@ namespace Exiled.CustomRoles
         public override void OnEnabled()
         {
             Instance = this;
+            playerHandler = new PlayerHandler();
+
+            Exiled.Events.Handlers.Player.ChangingRole += playerHandler.OnChangingRole;
+
             base.OnEnabled();
         }
 
         /// <inheritdoc/>
         public override void OnDisabled()
         {
+            Exiled.Events.Handlers.Player.ChangingRole -= playerHandler.OnChangingRole;
+
             Instance = null;
             base.OnDisabled();
         }

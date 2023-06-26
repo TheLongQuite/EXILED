@@ -46,5 +46,11 @@ namespace Exiled.CustomRoles
         /// </summary>
         [Description("The hint that is shown when someone's custom ability is ready.")]
         public Hint AbilityReadyHint { get; private set; } = new("Ability {0} is ready.\n{1}", 5);
+
+        /// <summary>
+        /// Gets or sets customroles nickname display to spectators.
+        /// </summary>
+        [Description("Задержка до синхронизации имён кастомных ролей и наблюдателей.")]
+        public float CustomRolesSpectatorDisplayDelay { get; set; } = 2;
     }
 }

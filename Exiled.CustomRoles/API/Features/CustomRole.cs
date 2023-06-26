@@ -21,6 +21,7 @@ namespace Exiled.CustomRoles.API.Features
     using Exiled.API.Interfaces;
     using Exiled.CustomItems.API.Features;
     using Exiled.Events.EventArgs.Player;
+    using FLXLib.Extensions;
     using FLXLib.Spawns;
     using MEC;
     using PlayerRoles;
@@ -65,6 +66,11 @@ namespace Exiled.CustomRoles.API.Features
         public abstract string CustomInfo { get; set; }
 
         /// <summary>
+        /// Gets or sets the SpectatorText of this role.
+        /// </summary>
+        public abstract string SpectatorText { get; set; }
+
+        /// <summary>
         /// Gets all of the players currently set to this role.
         /// </summary>
         [YamlIgnore]
@@ -83,8 +89,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <summary>
         /// Gets or sets List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal.
         /// </summary>
-        [Description(
-            "List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal. Max slots: 8")]
+        [Description("List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal. Max slots: 8")]
         public virtual List<Dictionary<string, byte>> Inventory { get; set; } =
             new List<Dictionary<string, byte>>();
 
@@ -467,7 +472,6 @@ namespace Exiled.CustomRoles.API.Features
         public virtual void AddRole(Player player)
         {
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
-            TrackedPlayers.Add(player);
 
             Vector3 position = Vector3.zero;
             bool posAltered = false;
@@ -482,54 +486,55 @@ namespace Exiled.CustomRoles.API.Features
                 RoleSpawnFlags flags = RoleSpawnFlags.None;
                 if (!posAltered)
                     flags |= RoleSpawnFlags.UseSpawnpoint;
-                if (!KeepInventoryOnSpawn)
-                    flags |= RoleSpawnFlags.AssignInventory;
                 player.Role.Set(Role, SpawnReason.ForceClass, flags);
                 Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
             }
 
-            Timing.CallDelayed(
-                0.25f,
-                () =>
-                {
-                    if (!KeepInventoryOnSpawn)
+            if (player.IsHuman)
+            {
+                Timing.CallDelayed(
+                    0.25f,
+                    () =>
                     {
-                        Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
-                        player.ClearInventory();
-                    }
-
-                    player.TryGetSessionVariable(MainDatabasePlugin.Modules.PrivilegeModule.ItemBuffKey, out byte itemsBuff);
-                    foreach (var slot in Inventory)
-                    {
-                        foreach (var item in slot)
+                        if (!KeepInventoryOnSpawn)
                         {
-                            byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
-                            Log.Debug($"Trying to add item {item.Key} with chance {chance} (buff: {itemsBuff}) to " + player.Nickname);
-                            if (!FLXLib.Extensions.CommonExtensions.ChanceChecker(chance))
-                                continue;
-                            if (CustomItem.TryGet(item.Key, out var customItem))
-                            {
-                                customItem?.Give(player);
-                                Log.Debug($"{Name}: Adding {customItem?.Name} to inventory.");
-                            }
-                            else if (Enum.TryParse(item.Key, out ItemType itemType))
-                            {
-                                player.AddItem(itemType);
-                                Log.Debug($"{Name}: Adding {itemType} to inventory.");
-                            }
-                            else
-                            {
-                                Log.Error($"Error at adding items to custom role. Wrong item: {item.Key}");
-                            }
-
-                            break;
+                            Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
+                            player.ClearInventory();
                         }
-                    }
-                });
+
+                        player.TryGetSessionVariable(MainDatabasePlugin.Modules.PrivilegeModule.ItemBuffKey, out byte itemsBuff);
+                        foreach (var slot in Inventory)
+                        {
+                            foreach (var item in slot)
+                            {
+                                byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
+                                Log.Debug($"Trying to add item {item.Key} with chance {chance} (buff: {itemsBuff}) to " + player.Nickname);
+                                if (!FLXLib.Extensions.CommonExtensions.ChanceChecker(chance))
+                                    continue;
+                                if (CustomItem.TryGet(item.Key, out var customItem))
+                                {
+                                    customItem?.Give(player, DisplayCustomItemMessages);
+                                    Log.Debug($"{Name}: Adding {customItem?.Name} to inventory.");
+                                }
+                                else if (Enum.TryParse(item.Key, out ItemType itemType))
+                                {
+                                    player.AddItem(itemType);
+                                    Log.Debug($"{Name}: Adding {itemType} to inventory.");
+                                }
+                                else
+                                {
+                                    Log.Error($"Error at adding items to custom role {Name}. Wrong item: {item.Key}");
+                                }
+
+                                break;
+                            }
+                        }
+                    });
+            }
 
             foreach (var ammo in Ammo)
             {
-                Log.Debug($"{Name}: Adding {ammo.Value} {ammo} to inventory.");
+                Log.Debug($"{Name}: Setting {ammo.Value} to {ammo}.");
                 player.SetAmmo(ammo.Key, ammo.Value);
             }
 
@@ -538,26 +543,49 @@ namespace Exiled.CustomRoles.API.Features
             player.MaxHealth = MaxHealth;
             player.Scale = Scale;
 
-            Log.Debug($"{Name}: Setting position to {position}.");
             if (posAltered)
             {
                 player.Position = position;
+                Log.Debug($"{Name}: Setting position to {position}.");
             }
 
             Log.Debug($"{Name}: Setting player info");
             player.InfoArea = PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.PowerStatus | PlayerInfoArea.UnitName;
-            player.CustomInfo = $"{player.CustomName}\n{Name}";
+            player.CustomInfo = $"{player.CustomName}\n{CustomInfo}";
             if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)
                     ability.AddAbility(player);
             }
 
+            TrackedPlayers.Add(player);
             ShowMessage(player);
             RoleAdded(player);
             player.UniqueRole = Name;
             player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
+
+            Timing.CallDelayed(CustomRoles.Instance!.Config.CustomRolesSpectatorDisplayDelay, () =>
+            {
+                foreach (var pl in Player.List)
+                {
+                    if (pl.Role.Type != RoleTypeId.Spectator)
+                        continue;
+                    string text = GetSpectatorText(player);
+                    pl.SetDispayNicknameForTargetOnly(player, text);
+                    Log.Debug($"[Name sync] Sent name '{text}' of {player.Nickname} to {pl.Nickname}");
+                }
+            });
         }
+
+        /// <summary>
+        /// Returns player's nickname for spectators.
+        /// </summary>
+        /// <param name="player">Player to send text.</param>
+        /// <returns>Spectator text of player.</returns>
+        public string GetSpectatorText(Player player) =>
+            string.IsNullOrEmpty(SpectatorText)
+                ? player.CustomName
+                : $"{player.CustomName} | {SpectatorText}";
 
         /// <summary>
         /// Removes the role from a specific player and FF rules.
@@ -570,7 +598,7 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
             TrackedPlayers.Remove(player);
             player.CustomInfo = string.Empty;
-            player.InfoArea |= PlayerInfoArea.Role;
+            player.InfoArea |= PlayerInfoArea.Role | PlayerInfoArea.Nickname;
             player.Scale = Vector3.one;
             if (RemovalKillsPlayer)
                 player.Role.Set(RoleTypeId.Spectator);

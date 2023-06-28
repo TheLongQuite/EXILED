@@ -17,6 +17,7 @@ namespace Exiled.Events.Patches.Events.Player
     using HarmonyLib;
 
     using Interactables.Interobjects.DoorUtils;
+    using UnityEngine;
 
     using static HarmonyLib.AccessTools;
 
@@ -43,7 +44,9 @@ namespace Exiled.Events.Patches.Events.Player
                 new CodeInstruction[]
                 {
                     new(OpCodes.Ldarg_0),
-                    new(OpCodes.Call, Method(typeof(InteractingDoor), nameof(InteractingDoor.CanStateChange))),
+                    new(OpCodes.Ldarg_1),
+                    new(OpCodes.Ldarg_2),
+                    new(OpCodes.Call, Method(typeof(InteractingDoor), nameof(CanStateChange))),
                     new(OpCodes.Brfalse_S, retLabel),
 
                     // InteractingDoorEventArgs ev = new(Player.Get(ply), __instance, false);
@@ -132,9 +135,9 @@ namespace Exiled.Events.Patches.Events.Player
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
 
-        private static bool CanStateChange(DoorVariant variant)
+        private static bool CanStateChange(DoorVariant variant, ReferenceHub ply, byte colliderId)
         {
-            return !(variant.GetExactState() > 0f && variant.GetExactState() < 1f);
+            return variant.AllowInteracting(ply, colliderId);
         }
     }
 }

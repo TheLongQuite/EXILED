@@ -333,8 +333,8 @@ namespace Exiled.API.Features
         /// </summary>
         public string DisplayNickname
         {
-            get => ReferenceHub.nicknameSync.DisplayName;
-            set => ReferenceHub.nicknameSync.DisplayName = value;
+            get => ReferenceHub.nicknameSync.Network_displayName;
+            set => ReferenceHub.nicknameSync.Network_displayName = value;
         }
 
         /// <summary>

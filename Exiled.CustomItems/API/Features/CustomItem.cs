@@ -767,7 +767,7 @@ namespace Exiled.CustomItems.API.Features
                 if (!TrackedSerials.Contains(item.Serial))
                     TrackedSerials.Add(item.Serial);
 
-                Timing.CallDelayed(0.05f, () => OnAcquired(player, displayMessage));
+                Timing.CallDelayed(0.05f, () => OnAcquired(player, item, displayMessage));
             }
             catch (Exception e)
             {
@@ -899,6 +899,7 @@ namespace Exiled.CustomItems.API.Features
             Exiled.Events.Handlers.Player.ChangingItem += OnInternalChanging;
             Exiled.Events.Handlers.Player.Escaping += OnInternalOwnerEscaping;
             Exiled.Events.Handlers.Player.PickingUpItem += OnInternalPickingUp;
+            Exiled.Events.Handlers.Player.ItemAdded += OnInternalItemAdded;
             Exiled.Events.Handlers.Scp914.UpgradingPickup += OnInternalUpgradingPickup;
             Exiled.Events.Handlers.Server.WaitingForPlayers += OnWaitingForPlayers;
             Exiled.Events.Handlers.Player.Handcuffing += OnInternalOwnerHandcuffing;
@@ -916,6 +917,7 @@ namespace Exiled.CustomItems.API.Features
             Exiled.Events.Handlers.Player.ChangingItem -= OnInternalChanging;
             Exiled.Events.Handlers.Player.Escaping -= OnInternalOwnerEscaping;
             Exiled.Events.Handlers.Player.PickingUpItem -= OnInternalPickingUp;
+            Exiled.Events.Handlers.Player.ItemAdded -= OnInternalItemAdded;
             Exiled.Events.Handlers.Scp914.UpgradingPickup -= OnInternalUpgradingPickup;
             Exiled.Events.Handlers.Server.WaitingForPlayers -= OnWaitingForPlayers;
             Exiled.Events.Handlers.Player.Handcuffing -= OnInternalOwnerHandcuffing;
@@ -994,9 +996,13 @@ namespace Exiled.CustomItems.API.Features
         /// Called anytime the item enters a player's inventory by any means.
         /// </summary>
         /// <param name="player">The <see cref="Player"/> acquiring the item.</param>
-        [Obsolete("Use OnAcquired(Player, bool) instead.")]
-        protected virtual void OnAcquired(Player player)
+        /// <param name="item">The <see cref="Item"/> being acquired.</param>
+        /// <param name="displayMessage">Whether or not the Pickup hint should be displayed.</param>
+        protected virtual void OnAcquired(Player player, Item item, bool displayMessage)
         {
+#pragma warning disable CS0618
+            OnAcquired(player, displayMessage);
+#pragma warning restore CS0618
         }
 
         /// <summary>
@@ -1004,13 +1010,11 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         /// <param name="player">The <see cref="Player"/> acquiring the item.</param>
         /// <param name="displayMessage">Whether or not the Pickup hint should be displayed.</param>
+        [Obsolete("Use OnAcquired(Player, Item, bool) instead.")]
         protected virtual void OnAcquired(Player player, bool displayMessage)
         {
             if (displayMessage)
                 ShowPickedUpMessage(player);
-#pragma warning disable CS0618
-            OnAcquired(player);
-#pragma warning restore CS0618
         }
 
         /// <summary>
@@ -1096,8 +1100,14 @@ namespace Exiled.CustomItems.API.Features
 
             if (!ev.IsAllowed)
                 return;
+        }
 
-            Timing.CallDelayed(0.05f, () => OnAcquired(ev.Player, true));
+        private void OnInternalItemAdded(ItemAddedEventArgs ev)
+        {
+            if (!Check(ev.Pickup))
+                return;
+
+            OnAcquired(ev.Player, ev.Item, true);
         }
 
         private void OnInternalChanging(ChangingItemEventArgs ev)
@@ -1117,7 +1127,7 @@ namespace Exiled.CustomItems.API.Features
 
             ev.IsAllowed = false;
 
-            OnUpgrading(new API.EventArgs.UpgradingItemEventArgs(ev.Player, ev.Item.Base, ev.KnobSetting));
+            OnUpgrading(new UpgradingItemEventArgs(ev.Player, ev.Item.Base, ev.KnobSetting));
         }
 
         private void OnInternalUpgradingPickup(UpgradingPickupEventArgs ev)

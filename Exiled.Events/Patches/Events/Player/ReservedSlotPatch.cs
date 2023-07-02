@@ -16,13 +16,9 @@ namespace Exiled.Events.Patches.Events.Player
     using Handlers;
 
     using HarmonyLib;
-
-    using PluginAPI.Enums;
     using PluginAPI.Events;
 
     using static HarmonyLib.AccessTools;
-
-    using Events = Exiled.Events.Events;
 
     /// <summary>
     ///     Patches <see cref="ReservedSlot.HasReservedSlot(string, out bool)" />.

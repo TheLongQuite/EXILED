@@ -17,7 +17,6 @@ namespace Exiled.Events.Patches.Events.Player
     using HarmonyLib;
 
     using InventorySystem.Items.Flashlight;
-    using Utf8Json.Internal.DoubleConversion;
 
     using static HarmonyLib.AccessTools;
 

@@ -8,7 +8,9 @@
 namespace Exiled.Events.Handlers
 {
     using Exiled.Events.EventArgs.Player;
+
     using Extensions;
+
     using PluginAPI.Core.Attributes;
     using PluginAPI.Enums;
     using PluginAPI.Events;

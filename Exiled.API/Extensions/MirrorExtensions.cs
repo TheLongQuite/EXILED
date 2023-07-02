@@ -24,6 +24,7 @@ namespace Exiled.API.Extensions
 
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
+
     using RelativePositioning;
 
     using Respawning;

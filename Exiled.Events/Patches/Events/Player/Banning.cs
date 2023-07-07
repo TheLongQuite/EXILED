@@ -15,6 +15,7 @@ namespace Exiled.Events.Patches.Events.Player
     using CommandSystem;
 
     using Exiled.Events.EventArgs.Player;
+    using Footprinting;
 
     using HarmonyLib;
     using PluginAPI.Events;
@@ -22,26 +23,23 @@ namespace Exiled.Events.Patches.Events.Player
     using Log = API.Features.Log;
 
     /// <summary>
-    ///     Patches <see cref="BanPlayer.BanUser(ReferenceHub, ICommandSender, string, long)" />.
+    ///     Patches <see cref="BanPlayer.BanUser(Footprint, ICommandSender, string, long)" />.
     ///     Adds the <see cref="Handlers.Player.Banning" /> event.
     /// </summary>
-    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.BanUser), typeof(ReferenceHub), typeof(ICommandSender), typeof(string), typeof(long))]
+    [HarmonyPatch(typeof(BanPlayer), nameof(BanPlayer.BanUser), typeof(Footprint), typeof(ICommandSender), typeof(string), typeof(long))]
     internal static class Banning
     {
-        private static bool Prefix(ReferenceHub target, ICommandSender issuer, string reason, long duration, ref bool __result)
+        private static bool Prefix(Footprint target, ICommandSender issuer, string reason, long duration, ref bool __result)
         {
             try
             {
-                if (duration == 0L)
+                if (duration == 0L && target.Hub != null)
                 {
-                    __result = BanPlayer.KickUser(target, issuer, reason);
+                    __result = BanPlayer.KickUser(target.Hub, issuer, reason);
                     return false;
                 }
 
-                if (duration > long.MaxValue)
-                    duration = long.MaxValue;
-
-                if (target.serverRoles.BypassStaff)
+                if (target.BypassStaff)
                 {
                     __result = false;
                     return false;
@@ -49,14 +47,10 @@ namespace Exiled.Events.Patches.Events.Player
 
                 long issuanceTime = TimeBehaviour.CurrentTimestamp();
                 long banExpirationTime = TimeBehaviour.GetBanExpirationTime((uint)duration);
-                string originalName = BanPlayer.ValidateNick(target.nicknameSync.MyNick);
+                string originalName = BanPlayer.ValidateNick(target.Nickname);
                 string message = $"You have been banned. {(!string.IsNullOrEmpty(reason) ? "Reason: " + reason : string.Empty)}";
 
-                Player issuerPlayer = Player.Get(issuer);
-                if (issuerPlayer == null)
-                {
-                    issuerPlayer = Server.Host;
-                }
+                Player issuerPlayer = Player.Get(issuer) ?? Server.Host;
 
                 BanningEventArgs ev = new(Player.Get(target), issuerPlayer, duration, reason, message);
 
@@ -72,32 +66,29 @@ namespace Exiled.Events.Patches.Events.Player
                 reason = ev.Reason;
                 message = ev.FullMessage;
 
-                if (!EventManager.ExecuteEvent(new PlayerBannedEvent(target, ev.Player.ReferenceHub, reason, duration)))
-                {
-                    __result = false;
-                    return false;
-                }
-
                 BanPlayer.ApplyIpBan(target, issuer, reason, duration);
 
-                BanHandler.IssueBan(
+                if (!string.IsNullOrEmpty(target.LogUserID))
+                {
+                    BanHandler.IssueBan(
                     new BanDetails
                     {
                         OriginalName = originalName,
-                        Id = target.characterClassManager.UserId,
+                        Id = target.LogUserID,
                         IssuanceTime = issuanceTime,
                         Expires = banExpirationTime,
                         Reason = reason,
                         Issuer = issuer.LogName,
                     }, BanHandler.BanType.UserId);
+                }
 
-                if (!string.IsNullOrEmpty(target.characterClassManager.UserId2))
+                if (!string.IsNullOrEmpty(target.LogUserID2))
                 {
                     BanHandler.IssueBan(
                         new BanDetails
                         {
                             OriginalName = originalName,
-                            Id = target.characterClassManager.UserId2,
+                            Id = target.LogUserID2,
                             IssuanceTime = issuanceTime,
                             Expires = banExpirationTime,
                             Reason = reason,
@@ -105,7 +96,8 @@ namespace Exiled.Events.Patches.Events.Player
                         }, BanHandler.BanType.UserId);
                 }
 
-                ServerConsole.Disconnect(target.gameObject, message);
+                if (target.Hub != null)
+                    ServerConsole.Disconnect(target.Hub.gameObject, message);
 
                 __result = true;
                 return false;

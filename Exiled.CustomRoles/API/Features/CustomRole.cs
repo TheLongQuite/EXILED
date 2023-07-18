@@ -610,6 +610,17 @@ namespace Exiled.CustomRoles.API.Features
             RoleRemoved(player);
             player.UniqueRole = string.Empty;
             player.TryRemoveCustomeRoleFriendlyFire(Name);
+
+            Timing.CallDelayed(CustomRoles.Instance!.Config.CustomRolesSpectatorDisplayDelay, () =>
+            {
+                foreach (var pl in Player.List)
+                {
+                    if (pl.Role.Type != RoleTypeId.Spectator)
+                        continue;
+                    pl.SetDispayNicknameForTargetOnly(player, player.CustomName);
+                    Log.Debug($"[Name sync] Name reset for {pl.Nickname} of {player.Nickname}.");
+                }
+            });
         }
 
         /// <summary>

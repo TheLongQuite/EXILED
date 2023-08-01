@@ -126,6 +126,8 @@ namespace Exiled.CustomItems.API.Features
         {
             Item item = player.AddItem(Type);
 
+            item.Scale = Scale;
+
             if (item is Firearm firearm)
             {
                 if (!Attachments.IsEmpty())

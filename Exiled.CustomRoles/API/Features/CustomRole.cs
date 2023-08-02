@@ -550,8 +550,8 @@ namespace Exiled.CustomRoles.API.Features
             }
 
             Log.Debug($"{Name}: Setting player info");
-            player.InfoArea = PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.PowerStatus | PlayerInfoArea.UnitName;
-            player.CustomInfo = $"{player.CustomName}\n{CustomInfo}";
+            player.InfoArea &= ~PlayerInfoArea.Role;
+            player.CustomInfo = CustomInfo;
             if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)
@@ -598,7 +598,7 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
             TrackedPlayers.Remove(player);
             player.CustomInfo = string.Empty;
-            player.InfoArea |= PlayerInfoArea.Role | PlayerInfoArea.Nickname;
+            player.InfoArea |= PlayerInfoArea.Role;
             player.Scale = Vector3.one;
             if (RemovalKillsPlayer)
                 player.Role.Set(RoleTypeId.Spectator);
@@ -816,7 +816,6 @@ namespace Exiled.CustomRoles.API.Features
         protected virtual void SubscribeEvents()
         {
             Log.Debug($"{Name}: Loading events.");
-            Exiled.Events.Handlers.Player.ChangingNickname += OnInternalChangingNickname;
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
             Exiled.Events.Handlers.Player.SpawningRagdoll += OnSpawningRagdoll;
             Exiled.Events.Handlers.Player.Destroying += OnDestroying;
@@ -831,7 +830,6 @@ namespace Exiled.CustomRoles.API.Features
                 RemoveRole(player);
 
             Log.Debug($"{Name}: Unloading events.");
-            Exiled.Events.Handlers.Player.ChangingNickname -= OnInternalChangingNickname;
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
             Exiled.Events.Handlers.Player.SpawningRagdoll -= OnSpawningRagdoll;
             Exiled.Events.Handlers.Player.Destroying += OnDestroying;
@@ -857,14 +855,6 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player"/> the role was removed from.</param>
         protected virtual void RoleRemoved(Player player)
         {
-        }
-
-        private void OnInternalChangingNickname(ChangingNicknameEventArgs ev)
-        {
-            if (!Check(ev.Player))
-                return;
-
-            ev.Player.CustomInfo = $"{ev.NewName}\n{CustomInfo}";
         }
 
         private void OnInternalChangingRole(ChangingRoleEventArgs ev)

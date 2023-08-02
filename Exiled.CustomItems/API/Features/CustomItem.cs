@@ -1137,11 +1137,7 @@ namespace Exiled.CustomItems.API.Features
 
             ev.IsAllowed = false;
 
-            Timing.CallDelayed(3.5f, () =>
-            {
-                ev.Pickup.Position = ev.OutputPosition;
-                OnUpgrading(new UpgradingEventArgs(ev.Pickup.Base, ev.OutputPosition, ev.KnobSetting));
-            });
+            OnUpgrading(new UpgradingEventArgs(ev.Pickup.Base, ev.OutputPosition, ev.KnobSetting));
         }
     }
 }

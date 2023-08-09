@@ -602,9 +602,13 @@ namespace Exiled.CustomRoles.API.Features
             player.Scale = Vector3.one;
             if (RemovalKillsPlayer)
                 player.Role.Set(RoleTypeId.Spectator);
-            foreach (CustomAbility ability in CustomAbilities)
+
+            if (CustomAbilities != null)
             {
-                ability.RemoveAbility(player);
+                foreach (CustomAbility ability in CustomAbilities)
+                {
+                    ability.RemoveAbility(player);
+                }
             }
 
             RoleRemoved(player);
@@ -631,9 +635,12 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
             TrackedPlayers.Remove(player);
-            foreach (CustomAbility ability in CustomAbilities)
+            if (CustomAbilities != null)
             {
-                ability.RemoveAbility(player);
+                foreach (CustomAbility ability in CustomAbilities)
+                {
+                    ability.RemoveAbility(player);
+                }
             }
 
             RoleRemoved(player);
@@ -818,7 +825,6 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
             Exiled.Events.Handlers.Player.SpawningRagdoll += OnSpawningRagdoll;
-            Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
         /// <summary>
@@ -832,7 +838,6 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
             Exiled.Events.Handlers.Player.SpawningRagdoll -= OnSpawningRagdoll;
-            Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
         /// <summary>
@@ -877,7 +882,5 @@ namespace Exiled.CustomRoles.API.Features
             if (Check(ev.Player))
                 ev.Role = Role;
         }
-
-        private void OnDestroying(DestroyingEventArgs ev) => RemoveRole(ev.Player);
     }
 }

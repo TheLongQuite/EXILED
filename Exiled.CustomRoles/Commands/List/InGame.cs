@@ -17,16 +17,16 @@ namespace Exiled.CustomRoles.Commands.List
     using NorthwoodLib.Pools;
 
     /// <inheritdoc/>
-    internal sealed class Tracked : ICommand
+    internal sealed class InGame : ICommand
     {
-        private Tracked()
+        private InGame()
         {
         }
 
         /// <summary>
         /// Gets the command instance.
         /// </summary>
-        public static Tracked Instance { get; } = new();
+        public static InGame Instance { get; } = new();
 
         /// <inheritdoc/>
         public string Command { get; } = "ingame";
@@ -35,7 +35,7 @@ namespace Exiled.CustomRoles.Commands.List
         public string[] Aliases { get; } = { "ig", "alife" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Получает все предметы которые лежат в инвенторях игроков.";
+        public string Description { get; } = "Получает все кастомные роли которые сейчас учавствуют в раунде.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

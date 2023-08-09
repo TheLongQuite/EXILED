@@ -39,13 +39,13 @@ namespace Exiled.CustomRoles.Commands.List
         public override void LoadGeneratedCommands()
         {
             RegisterCommand(Registered.Instance);
-            RegisterCommand(Tracked.Instance);
+            RegisterCommand(InGame.Instance);
         }
 
         /// <inheritdoc/>
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            response = "Доступные команды: registered.";
+            response = "Доступные команды: registered, ingame.";
             return false;
         }
     }

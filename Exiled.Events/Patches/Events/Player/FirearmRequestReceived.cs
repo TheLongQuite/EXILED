@@ -19,6 +19,7 @@ namespace Exiled.Events.Patches.Events.Player
 
     using HarmonyLib;
 
+    using InventorySystem.Items;
     using InventorySystem.Items.Firearms.BasicMessages;
     using PluginAPI.Events;
 
@@ -39,26 +40,47 @@ namespace Exiled.Events.Patches.Events.Player
 
             LocalBuilder ev = generator.DeclareLocal(typeof(TogglingWeaponFlashlightEventArgs));
             LocalBuilder player = generator.DeclareLocal(typeof(API.Features.Player));
-
-            int offset = -2;
-            int index = newInstructions.FindIndex(
-                instruction => instruction.opcode == OpCodes.Newobj && (ConstructorInfo)instruction.operand == GetDeclaredConstructors(typeof(PlayerReloadWeaponEvent))[0]) + offset;
+            LocalBuilder firearm = generator.DeclareLocal(typeof(API.Features.Items.Firearm));
 
             Label returnLabel = generator.DefineLabel();
             Label skipAdsLabel = generator.DefineLabel();
+
+            int offset = -1;
+            int index = newInstructions.FindIndex(instruction => instruction.LoadsField(Field(typeof(RequestMessage), nameof(RequestMessage.Request)))) + offset;
+
+            newInstructions.InsertRange(index, new[]
+            {
+                new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
+                new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
+                new(OpCodes.Dup),
+                new(OpCodes.Stloc_S, player.LocalIndex),
+                new(OpCodes.Brfalse_S, returnLabel),
+
+                new CodeInstruction(OpCodes.Ldloc_1),
+                new(OpCodes.Call, Method(typeof(API.Features.Items.Item), nameof(API.Features.Items.Item.Get), new[] { typeof(ItemBase) })),
+                new(OpCodes.Dup),
+                new(OpCodes.Stloc_S, firearm.LocalIndex),
+                new(OpCodes.Brfalse_S, returnLabel),
+            });
+
+            offset = -2;
+            index = newInstructions.FindIndex(
+                instruction => instruction.opcode == OpCodes.Newobj && (ConstructorInfo)instruction.operand == GetDeclaredConstructors(typeof(PlayerReloadWeaponEvent))[0]) + offset;
 
             newInstructions.InsertRange(
                 index,
                 new[]
                 {
-                    // Player.Get(referenceHub)
-                    new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
+                    // player
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).MoveLabelsFrom(newInstructions[index]),
+
+                    // firearm
+                    new(OpCodes.Ldloc_S, firearm.LocalIndex),
 
                     // true
                     new(OpCodes.Ldc_I4_1),
 
-                    // ReloadingWeaponEventArgs ev = new(Player, bool)
+                    // ReloadingWeaponEventArgs ev = new(Player, firearm, bool)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(ReloadingWeaponEventArgs))[0]),
                     new(OpCodes.Dup),
 
@@ -79,14 +101,16 @@ namespace Exiled.Events.Patches.Events.Player
                 index,
                 new[]
                 {
-                    // Player.Get(referenceHub)
-                    new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
+                    // player
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).MoveLabelsFrom(newInstructions[index]),
+
+                    // firearm
+                    new(OpCodes.Ldloc_S, firearm.LocalIndex),
 
                     // true
                     new(OpCodes.Ldc_I4_1),
 
-                    // ReloadingWeaponEventArgs ev = new(Player, bool)
+                    // UnloadingWeaponEventArgs ev = new(Player, firearm, bool)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(UnloadingWeaponEventArgs))[0]),
                     new(OpCodes.Dup),
 
@@ -107,14 +131,16 @@ namespace Exiled.Events.Patches.Events.Player
                 index,
                 new[]
                 {
-                    // Player.Get(referenceHub)
-                    new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
+                    // player
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).MoveLabelsFrom(newInstructions[index]),
+
+                    // firearm
+                    new(OpCodes.Ldloc_S, firearm.LocalIndex),
 
                     // true
                     new(OpCodes.Ldc_I4_1),
 
-                    // DryfiringWeaponEventArgs ev = new(Player, bool)
+                    // DryfiringWeaponEventArgs ev = new(Player, firearm, bool)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(DryfiringWeaponEventArgs))[0]),
                     new(OpCodes.Dup),
 
@@ -135,18 +161,11 @@ namespace Exiled.Events.Patches.Events.Player
                 index,
                 new[]
                 {
-                    // Player player = Player.Get(referenceHub)
-                    //
-                    // if (player == null)
-                    //    goto skipAdsLabel;
-                    new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
-                    new(OpCodes.Dup),
-                    new(OpCodes.Stloc, player.LocalIndex),
-                    new(OpCodes.Brfalse_S, skipAdsLabel),
-
                     // player
-                    new(OpCodes.Ldloc, player.LocalIndex),
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).MoveLabelsFrom(newInstructions[index]),
+
+                    // firearm
+                    new(OpCodes.Ldloc_S, firearm.LocalIndex),
 
                     // true (adsIn)
                     new(OpCodes.Ldc_I4_1),
@@ -154,7 +173,7 @@ namespace Exiled.Events.Patches.Events.Player
                     // false (adsOut)
                     new(OpCodes.Ldc_I4_0),
 
-                    // AimingDownSightEventArgs ev = new(Player, bool, bool)
+                    // AimingDownSightEventArgs ev = new(Player, firearm, bool, bool)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(AimingDownSightEventArgs))[0]),
 
                     // Player.OnAimingDownSight(ev)
@@ -172,9 +191,11 @@ namespace Exiled.Events.Patches.Events.Player
                 index,
                 new[]
                 {
-                    // Player player = Player.Get(referenceHub)
-                    new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
+                    // player
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).MoveLabelsFrom(newInstructions[index]),
+
+                    // firearm
+                    new(OpCodes.Ldloc_S, firearm.LocalIndex),
 
                     // false (adsIn)
                     new(OpCodes.Ldc_I4_0),
@@ -182,7 +203,7 @@ namespace Exiled.Events.Patches.Events.Player
                     // true (adsOut)
                     new(OpCodes.Ldc_I4_1),
 
-                    // AimingDownSightEventArgs ev = new(Player, bool, bool)
+                    // AimingDownSightEventArgs ev = new(Player, firearm, bool, bool)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(AimingDownSightEventArgs))[0]),
 
                     // Player.OnAimingDownSight(ev)
@@ -196,9 +217,11 @@ namespace Exiled.Events.Patches.Events.Player
                 index,
                 new[]
                 {
-                    // Player player = Player.Get(referenceHub)
-                    new CodeInstruction(OpCodes.Ldloc_0),
-                    new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
+                    // player
+                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex),
+
+                    // firearm
+                    new(OpCodes.Ldloc_S, firearm.LocalIndex),
 
                     // !flag
                     new(OpCodes.Ldloc_S, 6),
@@ -208,7 +231,7 @@ namespace Exiled.Events.Patches.Events.Player
                     // true
                     new(OpCodes.Ldc_I4_1),
 
-                    // TogglingWeaponFlashlightEventArgs ev = new(Player, bool, bool)
+                    // TogglingWeaponFlashlightEventArgs ev = new(Player, firearm, bool, bool)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(TogglingWeaponFlashlightEventArgs))[0]),
                     new(OpCodes.Dup),
                     new(OpCodes.Dup),

@@ -23,19 +23,18 @@ namespace Exiled.Events.EventArgs.Player
         /// <param name="player">
         ///     <inheritdoc cref="Player" />
         /// </param>
+        /// <param name="firearm">
+        ///     <inheritdoc cref="Firearm" />
+        /// </param>
         /// <param name="adsIn">
         ///     <inheritdoc cref="AdsIn" />
         /// </param>
         /// <param name="adsOut">
         ///     <inheritdoc cref="AdsOut" />
         /// </param>
-        public AimingDownSightEventArgs(Player player, bool adsIn, bool adsOut)
+        public AimingDownSightEventArgs(Player player, Firearm firearm, bool adsIn, bool adsOut)
         {
-            if (player?.CurrentItem is Firearm firearm)
-                Firearm = firearm;
-            else
-                Firearm = null;
-
+            Firearm = firearm;
             Player = player;
             AdsIn = adsIn;
             AdsOut = adsOut;

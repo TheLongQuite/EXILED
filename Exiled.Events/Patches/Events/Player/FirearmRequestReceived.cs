@@ -13,6 +13,7 @@ namespace Exiled.Events.Patches.Events.Player
 
     using API.Features.Pools;
 
+    using Exiled.API.Features.Items;
     using Exiled.Events.EventArgs.Player;
 
     using Handlers;
@@ -40,13 +41,12 @@ namespace Exiled.Events.Patches.Events.Player
 
             LocalBuilder ev = generator.DeclareLocal(typeof(TogglingWeaponFlashlightEventArgs));
             LocalBuilder player = generator.DeclareLocal(typeof(API.Features.Player));
-            LocalBuilder firearm = generator.DeclareLocal(typeof(API.Features.Items.Firearm));
+            LocalBuilder firearm = generator.DeclareLocal(typeof(Firearm));
 
             Label returnLabel = generator.DefineLabel();
-            Label skipAdsLabel = generator.DefineLabel();
 
             int offset = -1;
-            int index = newInstructions.FindIndex(instruction => instruction.LoadsField(Field(typeof(RequestMessage), nameof(RequestMessage.Request)))) + offset;
+            int index = newInstructions.FindLastIndex(instruction => instruction.LoadsField(Field(typeof(RequestMessage), nameof(RequestMessage.Request)))) + offset;
 
             newInstructions.InsertRange(index, new[]
             {
@@ -58,6 +58,7 @@ namespace Exiled.Events.Patches.Events.Player
 
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new(OpCodes.Call, Method(typeof(API.Features.Items.Item), nameof(API.Features.Items.Item.Get), new[] { typeof(ItemBase) })),
+                new(OpCodes.Castclass, typeof(Firearm)),
                 new(OpCodes.Dup),
                 new(OpCodes.Stloc_S, firearm.LocalIndex),
                 new(OpCodes.Brfalse_S, returnLabel),
@@ -178,9 +179,6 @@ namespace Exiled.Events.Patches.Events.Player
 
                     // Player.OnAimingDownSight(ev)
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnAimingDownSight))),
-
-                    // skipAdsLabel:
-                    new CodeInstruction(OpCodes.Nop).WithLabels(skipAdsLabel),
                 });
 
             offset = -3;

@@ -603,7 +603,7 @@ namespace Exiled.CustomRoles.API.Features
             if (RemovalKillsPlayer)
                 player.Role.Set(RoleTypeId.Spectator);
 
-            if (CustomAbilities != null)
+            if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)
                 {
@@ -635,7 +635,7 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
             TrackedPlayers.Remove(player);
-            if (CustomAbilities != null)
+            if (CustomAbilities is not null)
             {
                 foreach (CustomAbility ability in CustomAbilities)
                 {

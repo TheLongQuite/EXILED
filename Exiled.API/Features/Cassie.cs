@@ -154,27 +154,26 @@ namespace Exiled.API.Features
         /// <param name="isTranslated">Should apply translations or not.</param>
         public static void CustomScpTermination(string scpName, CustomHandlerBase info, bool isTranslated = false)
         {
-            string result = scpName;
-            string translation = scpName;
+            string message = $"SCP {scpName} ";
+            string translation = $"SCP-{scpName.Replace(" ", string.Empty)} ";
             if (info.Is(out MicroHidDamageHandler _))
             {
-                result += " SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM";
+                message += "SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM";
                 translation += "успешно уничтожен Автоматической Системой Охраны.";
             }
             else if (info.Is(out WarheadDamageHandler _))
             {
-                result += " SUCCESSFULLY TERMINATED BY ALPHA WARHEAD";
+                message += "SUCCESSFULLY TERMINATED BY ALPHA WARHEAD";
                 translation += "успешно уничтожен боеголовкой Альфа.";
             }
             else if (info.Is(out UniversalDamageHandler _))
             {
-                result += " LOST IN DECONTAMINATION SEQUENCE";
-                translation += "утерян в процессе обеззараживания.";
+                message += "LOST IN DECONTAMINATION SEQUENCE";
+                translation += " утерян в процессе обеззараживания.";
             }
-            else if (info.BaseIs(out CustomFirearmHandler firearmDamageHandler) &&
-                     firearmDamageHandler.Attacker is Player attacker)
+            else if (info.BaseIs(out CustomFirearmHandler firearmDamageHandler) && firearmDamageHandler.Attacker is Player attacker)
             {
-                result += " CONTAINEDSUCCESSFULLY " + ConvertTeam(attacker.Role.Team, attacker.UnitName);
+                message += "CONTAINEDSUCCESSFULLY " + ConvertTeam(attacker.Role.Team, attacker.UnitName);
                 switch (attacker.Role.Team)
                 {
                     case Team.Scientists:
@@ -204,18 +203,18 @@ namespace Exiled.API.Features
             // result += "To be changed";
             else
             {
-                result += " SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
+                message += "SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";
                 translation += "успешно уничтожен. Причина не указана.";
             }
 
             if (isTranslated)
             {
-                MessageTranslated(result, translation);
+                MessageTranslated(message, translation);
             }
             else
             {
                 float num = AlphaWarheadController.TimeUntilDetonation <= 0f ? 3.5f : 1f;
-                GlitchyMessage(result, UnityEngine.Random.Range(0.1f, 0.14f) * num, UnityEngine.Random.Range(0.07f, 0.08f) * num);
+                GlitchyMessage(message, UnityEngine.Random.Range(0.1f, 0.14f) * num, UnityEngine.Random.Range(0.07f, 0.08f) * num);
             }
         }
 

@@ -50,15 +50,18 @@ namespace Exiled.Events.Patches.Events.Player
             LocalBuilder changingRoleEventArgs = generator.DeclareLocal(typeof(ChangingRoleEventArgs));
             LocalBuilder player = generator.DeclareLocal(typeof(API.Features.Player));
 
+            int offset = -2;
+            int index = newInstructions.FindIndex(i => i.Calls(Method(typeof(PlayerRoleManager), nameof(PlayerRoleManager.GetRoleBase)))) + offset;
+
             newInstructions.InsertRange(
-                0,
+                index,
                 new[]
                 {
                     // player = Player.Get(this._hub)
                     //
                     // if (player == null)
                     //    goto continueLabel;
-                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
                     new(OpCodes.Call, PropertyGetter(typeof(PlayerRoleManager), nameof(PlayerRoleManager.Hub))),
                     new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
                     new(OpCodes.Dup),
@@ -129,8 +132,8 @@ namespace Exiled.Events.Patches.Events.Player
                     new CodeInstruction(OpCodes.Nop).WithLabels(continueLabel),
                 });
 
-            int offset = 1;
-            int index = newInstructions.FindIndex(
+            offset = 1;
+            index = newInstructions.FindIndex(
                 instruction => instruction.Calls(Method(typeof(GameObjectPools.PoolObject), nameof(GameObjectPools.PoolObject.SetupPoolObject)))) + offset;
 
             newInstructions[index].WithLabels(continueLabel1);

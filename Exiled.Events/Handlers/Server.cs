@@ -65,11 +65,6 @@ namespace Exiled.Events.Handlers
         public static event CustomEventHandler<LocalReportingEventArgs> LocalReporting;
 
         /// <summary>
-        /// Invoked before choosing the Team than player will get.
-        /// </summary>
-        public static event CustomEventHandler<ChoosingStartTeamQueueEventArgs> ChoosingStartTeamQueue;
-
-        /// <summary>
         /// Invoked after the "reload configs" command is ran.
         /// </summary>
         public static event CustomEventHandler ReloadedConfigs;
@@ -149,12 +144,6 @@ namespace Exiled.Events.Handlers
         /// </summary>
         /// <param name="ev">The <see cref="LocalReportingEventArgs"/> instance.</param>
         public static void OnLocalReporting(LocalReportingEventArgs ev) => LocalReporting.InvokeSafely(ev);
-
-        /// <summary>
-        /// Called before a <see cref="Player"/>'s custom display name is changed.
-        /// </summary>
-        /// <param name="ev">The <see cref="ChoosingStartTeamQueueEventArgs"/> instance.</param>
-        public static void OnChoosingStartTeam(ChoosingStartTeamQueueEventArgs ev) => ChoosingStartTeamQueue.InvokeSafely(ev);
 
         /// <summary>
         /// Called after the "reload configs" command is ran.

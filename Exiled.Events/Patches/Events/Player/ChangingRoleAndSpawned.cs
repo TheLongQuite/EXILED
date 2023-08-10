@@ -57,7 +57,7 @@ namespace Exiled.Events.Patches.Events.Player
                     // if (reason == Destroyed)
                     //     continue;
                     new CodeInstruction(OpCodes.Ldarg_2),
-                    new(OpCodes.Ldc_I4_S, (byte)RoleChangeReason.Destroyed),
+                    new(OpCodes.Ldc_I4_S, (int)RoleChangeReason.Destroyed),
                     new(OpCodes.Beq_S, continueLabel),
 
                     // player = Player.Get(this._hub)

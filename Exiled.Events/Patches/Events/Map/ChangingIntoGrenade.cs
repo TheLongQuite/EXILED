@@ -127,7 +127,7 @@ namespace Exiled.Events.Patches.Events.Map
                 new(OpCodes.Brfalse_S, skipFuse),
 
                 // var ev = new ChangedIntoGrenadeEventArgs(timedGrenadePickup, thrownProjectile);
-                // Map.OnChangingIntoGrenade(ev);
+                // Map.OnChangedIntoGrenade(ev);
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(ChangedIntoGrenadeEventArgs))[0]),
                 new(OpCodes.Dup),
                 new(OpCodes.Call, Method(typeof(Map), nameof(Map.OnChangedIntoGrenade))),

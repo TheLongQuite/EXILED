@@ -73,6 +73,17 @@ namespace Exiled.API.Features.Items
             set => Base._repickupable = value;
         }
 
+        /// <inheritdoc/>
+        public override Vector3 Scale
+        {
+            get => base.Scale;
+            set
+            {
+                Projectile.Scale = value;
+                base.Scale = value;
+            }
+        }
+
         /// <summary>
         /// Throws the item.
         /// </summary>

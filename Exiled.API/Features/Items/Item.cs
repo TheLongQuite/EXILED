@@ -98,7 +98,7 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets or sets the scale for the item.
         /// </summary>
-        public Vector3 Scale { get; set; } = Vector3.one;
+        public virtual Vector3 Scale { get; set; } = Vector3.one;
 
         /// <summary>
         /// Gets the <see cref="ItemBase"/> of the item.
@@ -291,9 +291,10 @@ namespace Exiled.API.Features.Items
             ItemPickupBase ipb = Object.Instantiate(Base.PickupDropModel, position, rotation);
 
             ipb.Info = new(Type, Weight, ItemSerialGenerator.GenerateNext());
-            ipb.gameObject.transform.localScale = Scale;
 
             Pickup pickup = Pickup.Get(ipb);
+
+            pickup.GetItemInfo(this);
 
             if (spawn)
                 pickup.Spawn();

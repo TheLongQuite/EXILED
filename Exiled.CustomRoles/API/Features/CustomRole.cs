@@ -827,7 +827,6 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
             Exiled.Events.Handlers.Player.SpawningRagdoll += OnSpawningRagdoll;
-            Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
         /// <summary>
@@ -841,7 +840,6 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
             Exiled.Events.Handlers.Player.SpawningRagdoll -= OnSpawningRagdoll;
-            Exiled.Events.Handlers.Player.Destroying += OnDestroying;
         }
 
         /// <summary>
@@ -871,6 +869,12 @@ namespace Exiled.CustomRoles.API.Features
             if (Check(ev.Player) &&
                 ((ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath) || (ev.NewRole != RoleTypeId.Spectator && ev.NewRole != Role)))
             {
+                if (ev.Reason == SpawnReason.Destroyed)
+                {
+                    RemoveRoleWhenDisconnect(ev.Player);
+                    return;
+                }
+
                 RemoveRole(ev.Player);
             }
         }
@@ -880,7 +884,5 @@ namespace Exiled.CustomRoles.API.Features
             if (Check(ev.Player))
                 ev.Role = Role;
         }
-
-        private void OnDestroying(DestroyingEventArgs ev) => RemoveRoleWhenDisconnect(ev.Player);
     }
 }

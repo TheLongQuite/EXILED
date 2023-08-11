@@ -34,11 +34,10 @@ namespace Exiled.Events.Patches.Events.Scp106
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            int offset = 2;
-            int index = newInstructions.FindIndex(x => x.Calls(Method(typeof(Scp106Attack), nameof(Scp106Attack.SendCooldown)))) + offset;
             Label continueLabel = generator.DefineLabel();
 
-            newInstructions[index].labels.Add(continueLabel);
+            int offset = 2;
+            int index = newInstructions.FindIndex(x => x.Calls(Method(typeof(Scp106Attack), nameof(Scp106Attack.SendCooldown)))) + offset;
 
             newInstructions.InsertRange(
                 index,
@@ -70,6 +69,8 @@ namespace Exiled.Events.Patches.Events.Scp106
                     new(OpCodes.Brtrue_S, continueLabel),
 
                     new(OpCodes.Leave, newInstructions[newInstructions.Count - 1].labels.First()),
+
+                    new CodeInstruction(OpCodes.Nop).WithLabels(continueLabel),
                 });
 
             for (int z = 0; z < newInstructions.Count; z++)

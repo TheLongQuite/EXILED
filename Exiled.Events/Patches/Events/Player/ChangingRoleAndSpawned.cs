@@ -54,17 +54,11 @@ namespace Exiled.Events.Patches.Events.Player
                 0,
                 new[]
                 {
-                    // if (reason == Destroyed)
-                    //     continue;
-                    new CodeInstruction(OpCodes.Ldarg_2),
-                    new(OpCodes.Ldc_I4_S, (int)RoleChangeReason.Destroyed),
-                    new(OpCodes.Beq_S, continueLabel),
-
                     // player = Player.Get(this._hub)
                     //
                     // if (player == null)
                     //    goto continueLabel;
-                    new(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldarg_0),
                     new(OpCodes.Call, PropertyGetter(typeof(PlayerRoleManager), nameof(PlayerRoleManager.Hub))),
                     new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
                     new(OpCodes.Dup),

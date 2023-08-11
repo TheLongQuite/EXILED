@@ -36,8 +36,6 @@ namespace Exiled.CustomItems
             Exiled.Events.Handlers.Server.RoundStarted += roundHandler.OnRoundStarted;
             Exiled.Events.Handlers.Server.WaitingForPlayers += roundHandler.OnWaitingForPlayers;
 
-            Exiled.Events.Handlers.Player.ChangingItem += playerHandler.OnChangingItem;
-
             harmony = new Harmony($"com.{nameof(CustomItems)}.ExiledTeam-{DateTime.Now.Ticks}");
             GlobalPatchProcessor.PatchAll(harmony, out int failedPatch);
             if (failedPatch != 0)

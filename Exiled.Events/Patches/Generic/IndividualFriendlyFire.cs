@@ -65,9 +65,9 @@ namespace Exiled.Events.Patches.Generic
             if (Server.FriendlyFire)
                 return false;
 
-            if (attackerHub is null || victimHub is null)
+            if (attackerHub == null || victimHub == null)
             {
-                Log.Debug($"CheckFriendlyFirePlayerRules, Attacker hub null: {attackerHub is null}, Victim hub null: {victimHub is null}");
+                Log.Debug($"CheckFriendlyFirePlayerRules, Attacker hub null: {attackerHub == null}, Victim hub null: {victimHub == null}");
                 return true;
             }
 

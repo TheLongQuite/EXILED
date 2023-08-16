@@ -1124,11 +1124,6 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Gets a dictionary for storing player objects of connected but not yet verified players.
-        /// </summary>
-        internal static ConditionalWeakTable<GameObject, Player> UnverifiedPlayers { get; } = new();
-
-        /// <summary>
         /// Converts NwPluginAPI player to EXILED player.
         /// </summary>
         /// <param name="player">The NwPluginAPI player.</param>
@@ -1242,7 +1237,6 @@ namespace Exiled.API.Features
             if (Dictionary.TryGetValue(gameObject, out Player player))
                 return player;
 
-            UnverifiedPlayers.TryGetValue(gameObject, out player);
             return player;
         }
 

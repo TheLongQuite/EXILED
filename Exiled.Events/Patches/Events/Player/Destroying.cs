@@ -81,13 +81,6 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Callvirt, Method(typeof(Dictionary<GameObject, Player>), nameof(Dictionary<GameObject, Player>.Remove), new[] { typeof(GameObject) })),
                     new(OpCodes.Pop),
 
-                    // Player.UnverifiedPlayers.Remove(this.gameObject)
-                    new(OpCodes.Call, PropertyGetter(typeof(Player), nameof(Player.UnverifiedPlayers))),
-                    new(OpCodes.Ldarg_0),
-                    new(OpCodes.Call, PropertyGetter(typeof(ReferenceHub), nameof(ReferenceHub.gameObject))),
-                    new(OpCodes.Callvirt, Method(typeof(ConditionalWeakTable<ReferenceHub, Player>), nameof(ConditionalWeakTable<ReferenceHub, Player>.Remove), new[] { typeof(ReferenceHub) })),
-                    new(OpCodes.Pop),
-
                     // if (player.UserId == null)
                     //    goto continueLabel;
                     new(OpCodes.Ldloc_S, player.LocalIndex),

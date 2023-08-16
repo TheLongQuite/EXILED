@@ -8,6 +8,7 @@
 namespace Exiled.Events.Patches.Events.Player
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Reflection.Emit;
 
     using API.Features.Pools;
@@ -37,41 +38,21 @@ namespace Exiled.Events.Patches.Events.Player
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            Label ret = generator.DefineLabel();
+            Label cnt = generator.DefineLabel();
 
             LocalBuilder ev = generator.DeclareLocal(typeof(SpawningRagdollEventArgs));
-            LocalBuilder newRagdoll = generator.DeclareLocal(typeof(API.Features.Ragdoll));
 
-            int offset = 1;
-            int index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Ldloc_1) + offset;
-
-            newInstructions.RemoveRange(index, 7);
-
-            index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Ldloc_1);
+            int offset = 0;
+            int index = newInstructions.FindIndex(instruction => instruction.Calls(PropertySetter(typeof(BasicRagdoll), nameof(BasicRagdoll.NetworkInfo)))) + offset;
 
             newInstructions.InsertRange(
                 index,
                 new[]
                 {
-                    // hub
-                    new CodeInstruction(OpCodes.Ldarg_0),
+                    // RagdollInfo loads into stack before il inject
 
                     // handler
-                    new(OpCodes.Ldarg_1),
-
-                    // ragdollRole.transform.localPosition
-                    new(OpCodes.Ldloc_2),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(Transform), nameof(Transform.localPosition))),
-
-                    // ragdollRole.transform.localRotation
-                    new(OpCodes.Ldloc_2),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(Transform), nameof(Transform.localRotation))),
-
-                    // new RagdollInfo(ReferenceHub, DamageHandlerBase, Vector3, Quaternion)
-                    new(OpCodes.Newobj, GetDeclaredConstructors(typeof(RagdollData))[0]),
-
-                    // handler
-                    new(OpCodes.Ldarg_1),
+                    new CodeInstruction(OpCodes.Ldarg_1),
 
                     // true
                     new(OpCodes.Ldc_I4_1),
@@ -85,29 +66,29 @@ namespace Exiled.Events.Patches.Events.Player
                     // Player.OnSpawningRagdoll(ev)
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnSpawningRagdoll))),
 
-                    // if (!ev.IsAllowed)
-                    //    return;
+                    // if (!ev.IsAllowed) {
+                    //     Object.Destroy(gameObject);
+                    //     return null;
+                    // }
                     new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.IsAllowed))),
-                    new(OpCodes.Brfalse_S, ret),
-                });
+                    new(OpCodes.Brtrue_S, cnt),
 
-            // Search the index in which our logic will be injected
-            offset = 0;
-            index = newInstructions.FindIndex(instruction => instruction.Calls(PropertySetter(typeof(BasicRagdoll), nameof(BasicRagdoll.NetworkInfo)))) + offset;
+                    // gameobject loads into stack before il inject
+                    new(OpCodes.Pop),
+                    new(OpCodes.Call, Method(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object) })),
+                    new(OpCodes.Ldnull),
+                    new(OpCodes.Ret),
 
-            newInstructions.InsertRange(
-                index,
-                new CodeInstruction[]
-                {
-                    // ev.Info
-                    new(OpCodes.Ldloc_S, ev.LocalIndex),
+                    // load ragdoll info into stack*/
+                    new CodeInstruction(OpCodes.Ldloc_S, ev.LocalIndex).WithLabels(cnt),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Info))),
                 });
 
-            newInstructions[newInstructions.Count - 1].WithLabels(ret);
-
             for (int z = 0; z < newInstructions.Count; z++)
+            {
+                API.Features.Log.Warn(newInstructions[z]);
                 yield return newInstructions[z];
+            }
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }

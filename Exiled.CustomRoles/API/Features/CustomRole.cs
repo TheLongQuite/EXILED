@@ -826,7 +826,6 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
-            Exiled.Events.Handlers.Player.SpawningRagdoll += OnSpawningRagdoll;
         }
 
         /// <summary>
@@ -839,7 +838,6 @@ namespace Exiled.CustomRoles.API.Features
 
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
-            Exiled.Events.Handlers.Player.SpawningRagdoll -= OnSpawningRagdoll;
         }
 
         /// <summary>
@@ -877,12 +875,6 @@ namespace Exiled.CustomRoles.API.Features
 
                 RemoveRole(ev.Player);
             }
-        }
-
-        private void OnSpawningRagdoll(SpawningRagdollEventArgs ev)
-        {
-            if (Check(ev.Player))
-                ev.Role = Role;
         }
     }
 }

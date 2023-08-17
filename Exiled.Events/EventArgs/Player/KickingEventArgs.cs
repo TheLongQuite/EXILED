@@ -11,6 +11,8 @@ namespace Exiled.Events.EventArgs.Player
 
     using API.Features;
 
+    using CommandSystem;
+
     using Interfaces;
 
     /// <summary>
@@ -19,8 +21,8 @@ namespace Exiled.Events.EventArgs.Player
     public class KickingEventArgs : IPlayerEvent, IDeniableEvent
     {
         private bool isAllowed;
-        private Player issuer;
         private Player target;
+        private ICommandSender sender;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="KickingEventArgs" /> class.
@@ -40,10 +42,12 @@ namespace Exiled.Events.EventArgs.Player
         /// <param name="isAllowed">
         ///     <inheritdoc cref="IsAllowed" />
         /// </param>
-        public KickingEventArgs(Player target, Player issuer, string reason, string fullMessage, bool isAllowed = true)
+        public KickingEventArgs(Player target, ICommandSender issuer, string reason, string fullMessage, bool isAllowed = true)
         {
             Target = target;
-            Player = issuer ?? Server.Host;
+            Sender = issuer;
+
+            Player = Player.Get(issuer) ?? Server.Host;
             Reason = reason;
             FullMessage = fullMessage;
             IsAllowed = isAllowed;
@@ -96,20 +100,25 @@ namespace Exiled.Events.EventArgs.Player
         }
 
         /// <summary>
+        ///     Gets the ban issuer.
+        /// </summary>
+        public Player Player { get; }
+
+        /// <summary>
         ///     Gets or sets the ban issuer.
         /// </summary>
-        public Player Player
+        public ICommandSender Sender
         {
-            get => issuer;
+            get => sender;
             set
             {
-                if (value is null || issuer == value)
+                if (value is null || sender == value)
                     return;
 
-                if (Events.Instance.Config.ShouldLogBans && issuer is not null)
-                    LogBanChange(Assembly.GetCallingAssembly().GetName().Name, $" changed the ban issuer from user {issuer.Nickname} ({issuer.UserId}) to {value.Nickname} ({value.UserId})");
+                if (Events.Instance.Config.ShouldLogBans && sender is not null)
+                    LogBanChange(Assembly.GetCallingAssembly().GetName().Name, $" changed the ban sender from user {sender.LogName} to {value.LogName}");
 
-                issuer = value;
+                sender = value;
             }
         }
 

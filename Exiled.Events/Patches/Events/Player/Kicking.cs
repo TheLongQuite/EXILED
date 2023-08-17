@@ -34,7 +34,7 @@ namespace Exiled.Events.Patches.Events.Player
             {
                 string message = $"You have been kicked. {(!string.IsNullOrEmpty(reason) ? "Reason: " + reason : string.Empty)}";
 
-                KickingEventArgs ev = new(Player.Get(target), Player.Get(issuer), reason, message);
+                KickingEventArgs ev = new(Player.Get(target), issuer, reason, message);
 
                 Handlers.Player.OnKicking(ev);
 

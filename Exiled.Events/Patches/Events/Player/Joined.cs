@@ -24,21 +24,46 @@ namespace Exiled.Events.Patches.Events.Player
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.Start))]
     internal static class Joined
     {
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
-        private static void Postfix(ReferenceHub __instance)
-#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
+        internal static void CallEvent(ReferenceHub hub, out Player player)
         {
             try
             {
+#if DEBUG
+                Log.Debug("Creating new player object");
+#endif
+                player = new Player(hub);
+#if DEBUG
+                Log.Debug($"Object exists {player is not null}");
+                Log.Debug($"Creating player object for {hub.nicknameSync.Network_displayName}");
+#endif
                 if (ReferenceHub.HostHub == null)
                 {
-                    Server.Host = new Player(__instance);
+                    Server.Host = player;
+                }
+                else
+                {
+                    Player.UnverifiedPlayers.Add(hub.gameObject, player);
+
+                    Handlers.Player.OnJoined(new JoinedEventArgs(player));
                 }
             }
             catch (Exception exception)
             {
-                Log.Error($"{nameof(Joined)}: {exception}\n{exception.StackTrace}");
+                Log.Error($"{nameof(CallEvent)}: {exception}\n{exception.StackTrace}");
+                player = null;
             }
+        }
+
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+        private static void Postfix(ReferenceHub __instance)
+#pragma warning restore SA1313 // Parameter names should begin with lower-case letter
+        {
+            if (ReferenceHub.AllHubs.Count - 1 >= CustomNetworkManager.slots)
+            {
+                MultiAdminFeatures.CallEvent(MultiAdminFeatures.EventType.SERVER_FULL);
+            }
+
+            CallEvent(__instance, out _);
         }
     }
 }

@@ -229,12 +229,12 @@ namespace Exiled.CustomItems.API.Features
                 return;
             }
 
-            ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
-
             byte amountToReload = (byte)Math.Min(ClipSize - remainingClip, ev.Player.Ammo[ammoType.GetItemType()]);
 
             if (amountToReload <= 0)
                 return;
+
+            ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
 
             ev.Player.ReferenceHub.playerEffectsController.GetEffect<CustomPlayerEffects.Invisible>().Intensity = 0;
 

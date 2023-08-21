@@ -1097,9 +1097,6 @@ namespace Exiled.CustomItems.API.Features
                 return;
 
             OnPickingUp(ev);
-
-            if (!ev.IsAllowed)
-                return;
         }
 
         private void OnInternalItemAdded(ItemAddedEventArgs ev)

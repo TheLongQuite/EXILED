@@ -98,7 +98,7 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets or sets the scale for the item.
         /// </summary>
-        public Vector3 Scale { get; set; } = Vector3.one;
+        public virtual Vector3 Scale { get; set; } = Vector3.one;
 
         /// <summary>
         /// Gets the <see cref="ItemBase"/> of the item.

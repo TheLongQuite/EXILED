@@ -50,15 +50,21 @@ namespace Exiled.Events.Patches.Events.Player
 
             newInstructions.InsertRange(index, new[]
             {
+                // Player player = Player.Get(hub);
+                // if (player == null)
+                //     return;
                 new CodeInstruction(OpCodes.Ldloc_0).MoveLabelsFrom(newInstructions[index]),
                 new(OpCodes.Call, Method(typeof(API.Features.Player), nameof(API.Features.Player.Get), new[] { typeof(ReferenceHub) })),
                 new(OpCodes.Dup),
                 new(OpCodes.Stloc_S, player.LocalIndex),
                 new(OpCodes.Brfalse_S, returnLabel),
 
+                // Firearm firearm = (Firearm)Item.Get(hub);
+                // if (Firearm == null)
+                //     return;
                 new CodeInstruction(OpCodes.Ldloc_1),
                 new(OpCodes.Call, Method(typeof(API.Features.Items.Item), nameof(API.Features.Items.Item.Get), new[] { typeof(ItemBase) })),
-                new(OpCodes.Castclass, typeof(Firearm)),
+                new(OpCodes.Isinst, typeof(Firearm)),
                 new(OpCodes.Dup),
                 new(OpCodes.Stloc_S, firearm.LocalIndex),
                 new(OpCodes.Brfalse_S, returnLabel),

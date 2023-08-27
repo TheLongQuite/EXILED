@@ -56,14 +56,14 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, player.LocalIndex),
 
-                    // if (firearm == null)
+                    // if (player == null)
                     //     return;
                     new(OpCodes.Brfalse_S, returnLabel),
 
                     // firearm = (Firearm)Item.Get(curInstance)
                     new(OpCodes.Ldloc_1),
                     new(OpCodes.Call, Method(typeof(Item), nameof(Item.Get), new[] { typeof(ItemBase) })),
-                    new(OpCodes.Castclass, typeof(Firearm)),
+                    new(OpCodes.Isinst, typeof(Firearm)),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, firearm.LocalIndex),
 
@@ -94,6 +94,8 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Callvirt, PropertyGetter(typeof(ShootingEventArgs), nameof(ShootingEventArgs.IsAllowed))),
                     new(OpCodes.Brtrue_S, isAllowedLabel),
 
+                    // firearm.Ammo += 1;
+                    // return;
                     new(OpCodes.Ldloc_S, firearm.LocalIndex),
                     new(OpCodes.Dup),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Firearm), nameof(Firearm.Ammo))),

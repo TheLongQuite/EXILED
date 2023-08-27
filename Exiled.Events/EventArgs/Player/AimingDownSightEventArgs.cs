@@ -15,6 +15,7 @@ namespace Exiled.Events.EventArgs.Player
     /// <summary>
     ///     Contains all information when a player aims.
     /// </summary>
+    // TODO: remove stupid AdsIn/AdsOut propetry, and let exists only one
     public class AimingDownSightEventArgs : IPlayerEvent, IFirearmEvent
     {
         /// <summary>

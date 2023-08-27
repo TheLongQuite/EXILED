@@ -73,8 +73,7 @@ namespace Exiled.CustomItems.API.Features
         {
             if (item is Firearm firearm)
             {
-                if (!Attachments.IsEmpty())
-                    firearm.AddAttachment(Attachments);
+                firearm.AddAttachment(Attachments);
 
                 firearm.Ammo = ClipSize;
 
@@ -100,8 +99,7 @@ namespace Exiled.CustomItems.API.Features
 
             if (item is Firearm firearm)
             {
-                if (!Attachments.IsEmpty())
-                    firearm.AddAttachment(Attachments);
+                firearm.AddAttachment(Attachments);
                 firearm.Ammo = ClipSize;
             }
 

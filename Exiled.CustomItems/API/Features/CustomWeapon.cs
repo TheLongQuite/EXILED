@@ -69,45 +69,17 @@ namespace Exiled.CustomItems.API.Features
         public virtual bool FriendlyFire { get; set; }
 
         /// <inheritdoc />
-        public override Pickup? Spawn(Vector3 position, Player? previousOwner = null)
-        {
-            if (Item.Create(Type) is not Firearm firearm)
-            {
-                Log.Debug($"{nameof(Spawn)}: Item is not Firearm.");
-                return null;
-            }
-
-            if (!Attachments.IsEmpty())
-                firearm.AddAttachment(Attachments);
-
-            firearm.Ammo = ClipSize;
-
-            Pickup? pickup = firearm.CreatePickup(position);
-
-            if (pickup is null)
-            {
-                Log.Debug($"{nameof(Spawn)}: Pickup is null.");
-                return null;
-            }
-
-            pickup.Weight = Weight;
-            pickup.Scale = Scale;
-            if (previousOwner is not null)
-                pickup.PreviousOwner = previousOwner;
-
-            TrackedSerials.Add(pickup.Serial);
-            return pickup;
-        }
-
-        /// <inheritdoc />
         public override Pickup? Spawn(Vector3 position, Item item, Player? previousOwner = null)
         {
             if (item is Firearm firearm)
             {
                 if (!Attachments.IsEmpty())
                     firearm.AddAttachment(Attachments);
-                byte ammo = firearm.Ammo;
-                Log.Debug($"{nameof(Name)}.{nameof(Spawn)}: Spawning weapon with {ammo} ammo.");
+
+                firearm.Ammo = ClipSize;
+
+                Log.Debug($"{nameof(Name)}.{nameof(Spawn)}: Spawning weapon with {firearm.Ammo} ammo.");
+
                 Pickup? pickup = firearm.CreatePickup(position);
                 pickup.Scale = Scale;
 
@@ -122,10 +94,8 @@ namespace Exiled.CustomItems.API.Features
         }
 
         /// <inheritdoc/>
-        public override void Give(Player player, bool displayMessage = true)
+        public override void Give(Player player, Item item, bool displayMessage = true)
         {
-            Item item = player.AddItem(Type);
-
             item.Scale = Scale;
 
             if (item is Firearm firearm)

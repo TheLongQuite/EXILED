@@ -95,6 +95,8 @@ namespace Exiled.CustomItems.API.Features
         /// <inheritdoc/>
         public override void Give(Player player, Item item, bool displayMessage = true)
         {
+            player.AddItem(item);
+
             item.Scale = Scale;
 
             if (item is Firearm firearm)

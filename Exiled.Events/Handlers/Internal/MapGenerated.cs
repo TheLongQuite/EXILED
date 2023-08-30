@@ -74,8 +74,6 @@ namespace Exiled.Events.Handlers.Internal
             Map.AmbientSoundPlayer = ReferenceHub.HostHub.GetComponent<AmbientSoundPlayer>();
 
             Handlers.Map.OnGenerated();
-
-            Timing.CallDelayed(0.1f, Handlers.Server.OnWaitingForPlayers);
         }
 
         private static void GenerateRooms()

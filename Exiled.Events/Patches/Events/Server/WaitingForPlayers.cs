@@ -15,6 +15,8 @@ namespace Exiled.Events.Patches.Events.Server
     using API.Features.Pools;
 
     using HarmonyLib;
+
+    using PluginAPI.Core;
     using PluginAPI.Events;
 
     using RoundRestarting;
@@ -22,10 +24,10 @@ namespace Exiled.Events.Patches.Events.Server
     using static HarmonyLib.AccessTools;
 
     /// <summary>
-    /// Patches <see cref="RoundRestart.InitiateRoundRestart"/>.
-    /// Adds the RestartingRound event.
+    /// Patches <see cref="CharacterClassManager.Init"/> coroutine.
+    /// Adds the <see cref="Handlers.Server.WaitingForPlayers"/> event.
     /// </summary>
-    [HarmonyPatch(typeof(RoundRestart), nameof(RoundRestart.InitiateRoundRestart))]
+    [HarmonyPatch]
     internal static class WaitingForPlayers
     {
         private static MethodInfo TargetMethod()
@@ -37,8 +39,8 @@ namespace Exiled.Events.Patches.Events.Server
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            int offset = 2;
-            int index = newInstructions.FindIndex(i => i.Calls(Method(typeof(EventManager), nameof(EventManager.ExecuteEvent), new[] { typeof(IEventArguments) }))) + offset;
+            int offset = 1;
+            int index = newInstructions.FindIndex(i => i.StoresField(Field(typeof(Statistics), nameof(Statistics.CurrentRound)))) + offset;
 
             newInstructions.InsertRange(
                 index,

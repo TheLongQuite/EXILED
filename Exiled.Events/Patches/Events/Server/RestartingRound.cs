@@ -44,45 +44,10 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Call, Method(typeof(API.Features.Log), nameof(API.Features.Log.Debug), new[] { typeof(string) })),
                 });
 
-            const int offset = 1;
-            int index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Brfalse);
-
-            newInstructions.InsertRange(
-                index + offset,
-                new CodeInstruction[]
-                {
-                    // if (ServerStatic.StopNextRound == ServerStatic.NextRoundAction.Restart)  -> goto normal round restart
-                    new(OpCodes.Call, PropertyGetter(typeof(ServerStatic), nameof(ServerStatic.StopNextRound))),
-                    new(OpCodes.Ldc_I4_1),
-                    new(OpCodes.Beq_S, newInstructions[index].operand),
-
-                    // if (ShouldServerRestart()) -> goto normal round restart
-                    new(OpCodes.Call, Method(typeof(RestartingRound), nameof(ShouldServerRestart))),
-                    new(OpCodes.Brtrue, newInstructions[index].operand),
-                });
-
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
-        }
-
-        private static bool ShouldServerRestart()
-        {
-            bool flag = false;
-
-            try
-            {
-                int num = ConfigFile.ServerConfig.GetInt("restart_after_rounds");
-
-                flag = num > 0 && RoundRestart.UptimeRounds >= num;
-            }
-            catch (Exception ex)
-            {
-                ServerConsole.AddLog("Failed to check the restart_after_rounds config value: " + ex.Message, ConsoleColor.Red);
-            }
-
-            return flag;
         }
     }
 }

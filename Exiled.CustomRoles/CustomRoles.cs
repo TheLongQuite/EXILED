@@ -43,7 +43,7 @@ namespace Exiled.CustomRoles
         /// <summary>
         /// Gets a static reference to the plugin's instance.
         /// </summary>
-        public static CustomRoles? Instance { get; private set; }
+        public static CustomRoles Instance { get; private set; } = null!;
 
         /// <inheritdoc/>
         public override void OnEnabled()

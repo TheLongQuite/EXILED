@@ -200,6 +200,9 @@ namespace Exiled.Events.Patches.Events.Server
                     roundSummary.RpcShowRoundSummary(roundSummary.classlistStart, newList, leadingTeam, RoundSummary.EscapedClassD, RoundSummary.EscapedScientists, RoundSummary.KilledBySCPs, num5, (int)RoundStart.RoundLength.TotalSeconds);
                 }
 
+                RoundEndedEventArgs roundEndedEventArgs = new((API.Enums.LeadingTeam)leadingTeam, newList, num5);
+                Handlers.Server.OnRoundEnded(roundEndedEventArgs);
+
                 yield return Timing.WaitForSeconds(num5 - 1);
 
                 roundSummary.RpcDimScreen();

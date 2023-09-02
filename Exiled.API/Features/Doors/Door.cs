@@ -163,7 +163,7 @@ namespace Exiled.API.Features.Doors
         /// Gets a value indicating whether or not this door requires a keycard to open.
         /// </summary>
         /// <remarks>
-        /// This value is <see langword="false"/> if <see cref="KeycardPermissions"/> is equal to <see cref="KeycardPermissions.None"/>.
+        /// This value is <see langword="false"/> if <see cref="KeycardPermissions"/> is equal to <see cref="Exiled.API.Enums.KeycardPermissions.None"/>.
         /// </remarks>
         public bool IsKeycardDoor => KeycardPermissions is not KeycardPermissions.None;
 
@@ -171,7 +171,7 @@ namespace Exiled.API.Features.Doors
         /// Gets or sets the keycard permissions required to open the door.
         /// </summary>
         /// <remarks>
-        /// Setting this value to <see cref="KeycardPermissions.None"/> will allow this door to be opened without a keycard.
+        /// Setting this value to <see cref="Exiled.API.Enums.KeycardPermissions.None"/> will allow this door to be opened without a keycard.
         /// </remarks>
         public KeycardPermissions KeycardPermissions
         {

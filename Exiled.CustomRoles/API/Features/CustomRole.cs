@@ -82,6 +82,11 @@ namespace Exiled.CustomRoles.API.Features
         public virtual RoleTypeId Role { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating whether the <see cref="RoleTypeId"/> role is always replaced by this CustomRole.
+        /// </summary>
+        public virtual bool ReplacesBaseRole { get; set; } = false;
+
+        /// <summary>
         /// Gets or sets a list of the roles custom abilities.
         /// </summary>
         public virtual List<CustomAbility> CustomAbilities { get; set; } = new();
@@ -852,10 +857,30 @@ namespace Exiled.CustomRoles.API.Features
                 if (ev.Reason == SpawnReason.Destroyed)
                 {
                     RemoveRoleWhenDisconnect(ev.Player);
-                    return;
+                }
+                else
+                {
+                    RemoveRole(ev.Player);
                 }
 
-                RemoveRole(ev.Player);
+                return;
+            }
+
+            if (ReplacesBaseRole && Role != RoleTypeId.None && Role == ev.NewRole)
+            {
+                Timing.CallDelayed(1, () =>
+                {
+                    try
+                    {
+                        if (ev.Player.GetCustomRoles().Any())
+                            return;
+                        AddRole(ev.Player);
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"[{nameof(CustomRole)}.{nameof(OnInternalChangingRole)}] [{Name}] Failed to add customRole, replacing basic {Role}:\n{e}");
+                    }
+                });
             }
         }
     }

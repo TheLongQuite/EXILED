@@ -48,6 +48,24 @@ namespace Exiled.CustomRoles
         public Hint AbilityReadyHint { get; private set; } = new("Ability {0} is ready.\n{1}", 5);
 
         /// <summary>
+        /// Gets the hint that is shown when someone used a cooldowned <see cref="CustomAbility"/>.
+        /// </summary>
+        [Description("The hint that is shown when someone tries to use cooldowned ability. Also used in console respond. {0} - remaining cooldown, {1} - ability name")]
+        public Hint AbilityOnCooldownHint { get; private set; } = new Hint("Способность на перезарядке!\nПодождите ещё {0} секунд перед использованием.", 5);
+
+        /// <summary>
+        /// Gets the hint that is shown when someone tries to use <see cref="CustomAbility"/> without required energy.
+        /// </summary>
+        [Description("The hint that is shown when someone tries to use ability without required energy. Also used in console respond. {0} - current energy, {1} - required energy")]
+        public Hint InsufficientEnergyHint { get; private set; } = new Hint("Недостаточно энергии!\nУ вас {0}/{1}", 5);
+
+        /// <summary>
+        /// Gets the hint that is shown when someone tries to use <see cref="CustomAbility"/> without required level.
+        /// </summary>
+        [Description("The hint that is shown when someone tries to use ability without required level. Also used in console respond. {0} - current level, {1} - required level")]
+        public Hint InsufficientLevelHint { get; private set; } = new Hint("Недостаточный уровень!\nУ вас {0}/{1}", 5);
+
+        /// <summary>
         /// Gets or sets customroles nickname display to spectators.
         /// </summary>
         [Description("Задержка до синхронизации имён кастомных ролей и наблюдателей.")]

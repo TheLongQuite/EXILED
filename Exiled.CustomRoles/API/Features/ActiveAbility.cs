@@ -109,22 +109,23 @@ namespace Exiled.CustomRoles.API.Features
                 return CanUseOverride.Invoke();
             }
 
-            if (!LastUsed.ContainsKey(player))
+            if (!LastUsed.TryGetValue(player, out var lastUsed))
             {
                 response = string.Empty;
                 return true;
             }
 
-            DateTime usableTime = LastUsed[player] + TimeSpan.FromSeconds(Cooldown);
+            DateTime usableTime = lastUsed + TimeSpan.FromSeconds(Cooldown);
             if (DateTime.Now > usableTime)
             {
                 response = string.Empty;
-
                 return true;
             }
 
-            response =
-                $"You must wait another {Math.Round((usableTime - DateTime.Now).TotalSeconds, 2)} seconds to use {Name}";
+            var hint = CustomRoles.Instance!.Config.AbilityOnCooldownHint;
+            response = string.Format(hint.Content, Math.Round((usableTime - DateTime.Now).TotalSeconds, 2), Name);
+            if (hint.Show)
+                player.ShowHint(response, hint.Duration);
 
             return false;
         }

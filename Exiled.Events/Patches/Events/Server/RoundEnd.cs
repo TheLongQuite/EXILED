@@ -17,15 +17,19 @@ namespace Exiled.Events.Patches.Events.Server
     using Exiled.Events.EventArgs.Server;
 
     using GameCore;
+
     using HarmonyLib;
+
     using MEC;
+
     using PlayerRoles;
+
     using PluginAPI.Core;
     using PluginAPI.Events;
-    using RoundRestarting;
-    using UnityEngine;
 
-    using Round = API.Features.Round;
+    using RoundRestarting;
+
+    using UnityEngine;
 
     /// <summary>
     ///     Patches <see cref="RoundSummary.Start" />.

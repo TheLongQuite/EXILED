@@ -79,7 +79,7 @@ namespace Exiled.CustomItems.API.Features
 
                 Log.Debug($"{nameof(Name)}.{nameof(Spawn)}: Spawning weapon with {firearm.Ammo} ammo.");
 
-                Pickup? pickup = firearm.CreatePickup(position);
+                Pickup pickup = firearm.CreatePickup(position);
                 pickup.Scale = Scale;
 
                 if (previousOwner is not null)
@@ -95,8 +95,6 @@ namespace Exiled.CustomItems.API.Features
         /// <inheritdoc/>
         public override void Give(Player player, Item item, bool displayMessage = true)
         {
-            player.AddItem(item);
-
             item.Scale = Scale;
 
             if (item is Firearm firearm)
@@ -104,6 +102,8 @@ namespace Exiled.CustomItems.API.Features
                 firearm.AddAttachment(Attachments);
                 firearm.Ammo = ClipSize;
             }
+
+            player.AddItem(item);
 
             Log.Debug($"{nameof(Give)}: Adding {item.Serial} to tracker.");
             TrackedSerials.Add(item.Serial);

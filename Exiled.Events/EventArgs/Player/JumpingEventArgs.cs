@@ -53,7 +53,12 @@ namespace Exiled.Events.EventArgs.Player
         public float Speed
         {
             get => Direction.y;
-            set => Direction += Vector3.up * value;
+            set
+            {
+                Vector3 direction = Direction;
+                direction.y = value;
+                Direction = direction;
+            }
         }
 
         /// <summary>

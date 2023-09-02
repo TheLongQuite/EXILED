@@ -129,8 +129,14 @@ namespace Exiled.API.Extensions
 
                         byte[] bytecodes = methodBody.GetILAsByteArray();
 
-                        if (!RpcFullNamesValue.ContainsKey($"{method.ReflectedType.Name}.{method.Name}"))
-                            RpcFullNamesValue.Add($"{method.ReflectedType.Name}.{method.Name}", method.Module.ResolveString(BitConverter.ToInt32(bytecodes, bytecodes.LastIndexOf((byte)OpCodes.Ldstr.Value) + 1)));
+                        try
+                        {
+                            if (!RpcFullNamesValue.ContainsKey($"{method.ReflectedType.Name}.{method.Name}"))
+                                RpcFullNamesValue.Add($"{method.ReflectedType.Name}.{method.Name}", method.Module.ResolveString(BitConverter.ToInt32(bytecodes, bytecodes.LastIndexOf((byte)OpCodes.Ldstr.Value) + 1)));
+                        }
+                        catch
+                        {
+                        }
                     }
                 }
 

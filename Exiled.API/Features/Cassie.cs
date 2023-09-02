@@ -7,11 +7,11 @@
 
 namespace Exiled.API.Features
 {
-    using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Text;
 
+    using Exiled.API.Enums;
     using Exiled.API.Features.Pools;
     using MEC;
     using PlayerRoles;
@@ -146,22 +146,22 @@ namespace Exiled.API.Features
         {
             string message = $"SCP {scpName} ";
             string translation = $"SCP-{scpName.Replace(" ", string.Empty)} ";
-            if (info.Is(out MicroHidDamageHandler _))
+            if (info.Type == DamageType.Tesla)
             {
                 message += "SUCCESSFULLY TERMINATED BY AUTOMATIC SECURITY SYSTEM";
                 translation += "успешно уничтожен Автоматической Системой Охраны.";
             }
-            else if (info.Is(out WarheadDamageHandler _))
+            else if (info.Type == DamageType.Warhead)
             {
                 message += "SUCCESSFULLY TERMINATED BY ALPHA WARHEAD";
                 translation += "успешно уничтожен боеголовкой Альфа.";
             }
-            else if (info.Is(out UniversalDamageHandler _))
+            else if (info.Type == DamageType.Decontamination)
             {
                 message += "LOST IN DECONTAMINATION SEQUENCE";
                 translation += " утерян в процессе обеззараживания.";
             }
-            else if (info.BaseIs(out CustomFirearmHandler firearmDamageHandler) && firearmDamageHandler.Attacker is Player attacker)
+            else if (info.BaseIs(out DamageHandlers.AttackerDamageHandler attackerDamageHandler) && attackerDamageHandler.Attacker is Player attacker)
             {
                 message += "CONTAINEDSUCCESSFULLY " + ConvertTeam(attacker.Role.Team, attacker.UnitName);
                 switch (attacker.Role.Team)
@@ -189,8 +189,6 @@ namespace Exiled.API.Features
                         break;
                 }
             }
-
-            // result += "To be changed";
             else
             {
                 message += "SUCCESSFULLY TERMINATED . TERMINATION CAUSE UNSPECIFIED";

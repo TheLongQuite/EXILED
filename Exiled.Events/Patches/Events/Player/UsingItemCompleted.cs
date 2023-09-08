@@ -22,8 +22,6 @@ namespace Exiled.Events.Patches.Events.Player
 
     using static HarmonyLib.AccessTools;
 
-#pragma warning disable SA1600 // Elements should be documented
-
     /// <summary>
     ///     Patches <see cref="UsableItemsController.Update" />
     ///     Adds the <see cref="Handlers.Player.UsedItem" /> event.
@@ -31,7 +29,7 @@ namespace Exiled.Events.Patches.Events.Player
     [HarmonyPatch(typeof(UsableItemsController), nameof(UsableItemsController.Update))]
     internal static class UsingItemCompleted
     {
-        internal static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
             Label continueLabel = generator.DefineLabel();

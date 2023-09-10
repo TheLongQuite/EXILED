@@ -218,7 +218,7 @@ namespace Exiled.CustomItems.API.Features
         /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
-        public static bool TryGet<T>(out CustomItem? customItem)
+        public static bool TryGet<T>(out T? customItem)
             where T : CustomItem
         {
             customItem = Get<T>();

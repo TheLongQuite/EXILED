@@ -159,6 +159,17 @@ namespace Exiled.CustomItems.API.Features
         }
 
         /// <summary>
+        /// Gets a <see cref="CustomItem"/> with a specific type.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <returns>The <see cref="CustomItem"/> matching the search, <see langwod="null"/> if not registered.</returns>
+        public static T? Get<T>()
+            where T : CustomItem
+        {
+            return Registered.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
         /// Tries to get a <see cref="CustomItem"/> with a specific ID.
         /// </summary>
         /// <param name="id">The <see cref="CustomItem"/> ID to look for.</param>
@@ -197,6 +208,20 @@ namespace Exiled.CustomItems.API.Features
         public static bool TryGet(Type t, out CustomItem? customItem)
         {
             customItem = Get(t);
+
+            return customItem is not null;
+        }
+
+        /// <summary>
+        /// Tries to get a <see cref="CustomItem"/> with a specific type.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
+        /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
+        public static bool TryGet<T>(out CustomItem? customItem)
+            where T : CustomItem
+        {
+            customItem = Get<T>();
 
             return customItem is not null;
         }

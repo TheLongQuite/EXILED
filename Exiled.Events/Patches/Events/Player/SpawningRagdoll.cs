@@ -131,8 +131,6 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnSpawnedRagdoll))),
             });
 
-            Log.Warn(newInstructions.ToString(true));
-
             newInstructions[newInstructions.Count - 1].labels.Add(ret);
 
             for (int z = 0; z < newInstructions.Count; z++)

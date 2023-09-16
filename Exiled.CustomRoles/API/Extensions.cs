@@ -10,16 +10,21 @@ namespace Exiled.CustomRoles.API
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
-    using System.Linq;
 
     using Exiled.API.Features;
     using Exiled.CustomRoles.API.Features;
+    using PlayerRoles;
 
     /// <summary>
     /// A collection of API methods.
     /// </summary>
     public static class Extensions
     {
+        /// <summary>
+        /// SessionVariable key.
+        /// </summary>
+        public const string LastRoleKey = "LastRole";
+
         /// <summary>
         /// Gets a <see cref="ReadOnlyCollection{T}"/> of the player's current custom roles.
         /// </summary>
@@ -36,6 +41,21 @@ namespace Exiled.CustomRoles.API
             }
 
             return roles.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Get player's last customrole or basic role.
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> to check for roles.</param>
+        /// <param name="customRole">Player's last custom role. Null if wasn't.</param>
+        /// <param name="roleTypeId">Player's last default role. None if he was custom role.</param>
+        /// <returns>Was operation succeeded or not.</returns>
+        public static bool TryGetLastRole(this Player player, out CustomRole? customRole, out RoleTypeId roleTypeId)
+        {
+            customRole = null;
+            roleTypeId = RoleTypeId.None;
+
+            return player.TryGetSessionVariable(LastRoleKey, out string lastRole) && (CustomRole.TryGet(lastRole, out customRole) || Enum.TryParse(lastRole, true, out roleTypeId));
         }
 
         /// <summary>

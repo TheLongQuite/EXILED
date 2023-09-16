@@ -25,8 +25,12 @@ namespace Exiled.CustomRoles.Events
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole"/>
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
+            var lastRole = ev.Player.GetCustomRoles().FirstOrDefault() is not { } cr ? ev.Player.Role.Type.ToString() : cr.Id.ToString();
+            ev.Player.SessionVariables[Extensions.LastRoleKey] = lastRole;
+
             if (ev.Reason == SpawnReason.Destroyed)
                 return;
+
             Timing.CallDelayed(CustomRoles.Instance!.Config.CustomRolesSpectatorDisplayDelay, () =>
             {
                 if (ev.Player.IsDead)

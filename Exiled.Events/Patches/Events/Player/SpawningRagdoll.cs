@@ -11,6 +11,8 @@ namespace Exiled.Events.Patches.Events.Player
     using System.Reflection.Emit;
 
     using API.Features.Pools;
+
+    using Exiled.API.Extensions;
     using Exiled.API.Features;
     using Exiled.Events.Attributes;
     using Exiled.Events.EventArgs.Player;
@@ -40,41 +42,20 @@ namespace Exiled.Events.Patches.Events.Player
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
             Label ret = generator.DefineLabel();
+            Label cnt = generator.DefineLabel();
 
             LocalBuilder ev = generator.DeclareLocal(typeof(SpawningRagdollEventArgs));
-            LocalBuilder newRagdoll = generator.DeclareLocal(typeof(Ragdoll));
-            LocalBuilder localScale = generator.DeclareLocal(typeof(Vector3));
-            LocalBuilder evScale = generator.DeclareLocal(typeof(Vector3));
             LocalBuilder targetScale = generator.DeclareLocal(typeof(Vector3));
 
-            int offset = 1;
-            int index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Ldloc_1) + offset;
+            int offset = 0;
+            int index = newInstructions.FindIndex(instruction => instruction.Calls(PropertySetter(typeof(BasicRagdoll), nameof(BasicRagdoll.NetworkInfo)))) + offset;
 
-            newInstructions.RemoveRange(index, 7);
-
-            index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Ldloc_1);
-
-            newInstructions.InsertRange(index, new[]
+            newInstructions.InsertRange(index, new CodeInstruction[]
             {
-                 // hub
-                new CodeInstruction(OpCodes.Ldarg_0),
+                // RagdollInfo loads into stack before il inject
 
                 // handler
-                new(OpCodes.Ldarg_1),
-
-                // ragdollRole.transform.localPosition
-                new(OpCodes.Ldloc_2),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(Transform), nameof(Transform.localPosition))),
-
-                // ragdollRole.transform.localRotation
-                new(OpCodes.Ldloc_2),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(Transform), nameof(Transform.localRotation))),
-
-                // new RagdollInfo(ReferenceHub, DamageHandlerBase, Vector3, Quaternion)
-                new(OpCodes.Newobj, GetDeclaredConstructors(typeof(RagdollData))[0]),
-
-                // handler
-                new(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Ldarg_1),
 
                 // true
                 new(OpCodes.Ldc_I4_1),
@@ -88,64 +69,32 @@ namespace Exiled.Events.Patches.Events.Player
                 // Player.OnSpawningRagdoll(ev)
                 new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnSpawningRagdoll))),
 
-                // if (!ev.IsAllowed)
-                //    return;
+                // if (!ev.IsAllowed) {
+                //     Object.Destroy(gameObject);
+                //     return null;
+                // }
                 new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.IsAllowed))),
-                new(OpCodes.Brfalse_S, ret),
-            });
+                new(OpCodes.Brtrue_S, cnt),
 
-            // Search the index in which our logic will be injected
-            offset = 0;
-            index = newInstructions.FindIndex(instruction => instruction.Calls(PropertySetter(typeof(BasicRagdoll), nameof(BasicRagdoll.NetworkInfo)))) + offset;
+                // gameobject loads into stack before il inject
+                new(OpCodes.Pop),
+                new(OpCodes.Call, Method(typeof(Object), nameof(Object.Destroy), new[] { typeof(Object) })),
+                new(OpCodes.Ldnull),
+                new(OpCodes.Ret),
 
-            newInstructions.InsertRange(index, new CodeInstruction[]
-            {
-                // ev.Info
-                new(OpCodes.Ldloc_S, ev.LocalIndex),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Info))),
-
-                // new Vector3()
-                new(OpCodes.Ldloca_S, targetScale.LocalIndex),
-                new(OpCodes.Initobj, typeof(Vector3)),
-
-                // localScale = ragdoll.gameObject.transform.localScale
-                new(OpCodes.Ldloc_1),
+                // ragdoll localScale
+                new CodeInstruction(OpCodes.Ldloc_1).WithLabels(cnt),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(BasicRagdoll), nameof(BasicRagdoll.gameObject))),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(GameObject), nameof(GameObject.transform))),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(Transform), nameof(Transform.localScale))),
-                new(OpCodes.Stloc_S, localScale.LocalIndex),
 
-                // evScale = ev.Scale
+                // ev.Scale
                 new(OpCodes.Ldloc_S, ev.LocalIndex),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Scale))),
-                new(OpCodes.Stloc_S, evScale.LocalIndex),
 
-                // targetScale.x = evScale.x * localScale.x
-                new(OpCodes.Ldloca_S, targetScale.LocalIndex),
-                new(OpCodes.Ldloc_S, evScale.LocalIndex),
-                new(OpCodes.Ldfld, Field(typeof(Vector3), nameof(Vector3.x))),
-                new(OpCodes.Ldloc_S, localScale.LocalIndex),
-                new(OpCodes.Ldfld, Field(typeof(Vector3), nameof(Vector3.x))),
-                new(OpCodes.Mul),
-                new(OpCodes.Stfld, Field(typeof(Vector3), nameof(Vector3.x))),
-
-                // targetScale.y = evScale.y * localScale.y
-                new(OpCodes.Ldloca_S, targetScale.LocalIndex),
-                new(OpCodes.Ldloc_S, evScale.LocalIndex),
-                new(OpCodes.Ldfld, Field(typeof(Vector3), nameof(Vector3.y))),
-                new(OpCodes.Ldloc_S, localScale.LocalIndex),
-                new(OpCodes.Ldfld, Field(typeof(Vector3), nameof(Vector3.y))),
-                new(OpCodes.Mul),
-                new(OpCodes.Stfld, Field(typeof(Vector3), nameof(Vector3.y))),
-
-                // targetScale.z = evScale.z * localScale.z
-                new(OpCodes.Ldloca_S, targetScale.LocalIndex),
-                new(OpCodes.Ldloc_S, evScale.LocalIndex),
-                new(OpCodes.Ldfld, Field(typeof(Vector3), nameof(Vector3.z))),
-                new(OpCodes.Ldloc_S, localScale.LocalIndex),
-                new(OpCodes.Ldfld, Field(typeof(Vector3), nameof(Vector3.z))),
-                new(OpCodes.Mul),
-                new(OpCodes.Stfld, Field(typeof(Vector3), nameof(Vector3.z))),
+                // newScale = Vector3.Scale(ragdollScale, ev.Scale);
+                new(OpCodes.Callvirt, Method(typeof(Vector3), nameof(Vector3.Scale), new[] { typeof(Vector3), typeof(Vector3) })),
+                new(OpCodes.Stloc_S, targetScale.LocalIndex),
 
                 // ragdoll.gameObject.transform.localScale = targetScale
                 new(OpCodes.Ldloc_1),
@@ -153,6 +102,10 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Callvirt, PropertyGetter(typeof(GameObject), nameof(GameObject.transform))),
                 new(OpCodes.Ldloc_S, targetScale.LocalIndex),
                 new(OpCodes.Callvirt, PropertySetter(typeof(Transform), nameof(Transform.localScale))),
+
+                // load ragdoll info into stack*/
+                new CodeInstruction(OpCodes.Ldloc_S, ev.LocalIndex),
+                new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Info))),
             });
 
             newInstructions.InsertRange(newInstructions.Count - 2, new CodeInstruction[]
@@ -177,6 +130,8 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(SpawnedRagdollEventArgs))[0]),
                 new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnSpawnedRagdoll))),
             });
+
+            Log.Warn(newInstructions.ToString(true));
 
             newInstructions[newInstructions.Count - 1].labels.Add(ret);
 

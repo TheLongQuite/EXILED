@@ -171,5 +171,17 @@ namespace Exiled.API.Features.Items
             VestEfficacy = VestEfficacy,
             HelmetEfficacy = HelmetEfficacy,
         };
+
+        /// <summary>
+        /// Change the owner of the <see cref="Armor"/>.
+        /// </summary>
+        /// <param name="oldOwner">old <see cref="Armor"/> owner.</param>
+        /// <param name="newOwner">new <see cref="Armor"/> owner.</param>
+        internal override void ChangeOwner(Player oldOwner, Player newOwner)
+        {
+            Base.Owner = newOwner.ReferenceHub;
+
+            Base.OnAdded(null);
+        }
     }
 }

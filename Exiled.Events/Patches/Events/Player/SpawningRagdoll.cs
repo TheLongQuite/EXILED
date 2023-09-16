@@ -41,7 +41,6 @@ namespace Exiled.Events.Patches.Events.Player
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            Label ret = generator.DefineLabel();
             Label cnt = generator.DefineLabel();
 
             LocalBuilder ev = generator.DeclareLocal(typeof(SpawningRagdollEventArgs));
@@ -130,8 +129,6 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(SpawnedRagdollEventArgs))[0]),
                 new(OpCodes.Call, Method(typeof(Player), nameof(Player.OnSpawnedRagdoll))),
             });
-
-            newInstructions[newInstructions.Count - 1].labels.Add(ret);
 
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];

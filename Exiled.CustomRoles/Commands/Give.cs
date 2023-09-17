@@ -12,6 +12,8 @@ namespace Exiled.CustomRoles.Commands
     using System.Linq;
 
     using CommandSystem;
+
+    using Exiled.API.Enums;
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
     using Exiled.CustomRoles.API;
@@ -110,7 +112,7 @@ namespace Exiled.CustomRoles.Commands
             foreach (var cRole in player.GetCustomRoles())
                 cRole?.RemoveRole(player);
 
-            customRole.AddRole(player);
+            customRole.AddRole(player, SpawnReason.ForceClass);
         }
     }
 }

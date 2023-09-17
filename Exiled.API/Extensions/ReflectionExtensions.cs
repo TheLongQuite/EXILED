@@ -35,9 +35,9 @@ namespace Exiled.API.Extensions
         /// <summary>
         /// Invoke a static event.
         /// </summary>
-        /// <param name="type">The method type.</param>
-        /// <param name="eventName">The method name.</param>
-        /// <param name="param">The method parameters.</param>
+        /// <param name="type">The event type.</param>
+        /// <param name="eventName">The event name.</param>
+        /// <param name="param">The event arguments.</param>
         public static void InvokeStaticEvent(this Type type, string eventName, object[] param)
         {
             var eventDelegate = (MulticastDelegate)type.GetField(eventName, AccessTools.all).GetValue(null);

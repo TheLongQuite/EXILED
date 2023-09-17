@@ -63,11 +63,6 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         public virtual byte AmmoUsage { get; set; } = 1;
 
-        /// <summary>
-        /// Gets or sets a value indicating whether or not to allow friendly fire with this weapon on FF-enabled servers.
-        /// </summary>
-        public virtual bool FriendlyFire { get; set; }
-
         /// <inheritdoc />
         public override Pickup? Spawn(Vector3 position, Item item, Player? previousOwner = null)
         {
@@ -278,12 +273,6 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(firearmDamageHandler.Item))
             {
                 Log.Debug($"{Name}: {nameof(OnInternalHurting)}: type != type");
-                return;
-            }
-
-            if (!FriendlyFire && (ev.Attacker.Role.Team == ev.Player.Role.Team))
-            {
-                Log.Debug($"{Name}: {nameof(OnInternalHurting)}: FF is disabled for this weapon!");
                 return;
             }
 

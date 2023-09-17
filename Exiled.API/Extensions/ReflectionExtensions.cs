@@ -10,6 +10,8 @@ namespace Exiled.API.Extensions
     using System;
     using System.Reflection;
 
+    using HarmonyLib;
+
     using LiteNetLib.Utils;
 
     /// <summary>
@@ -28,6 +30,24 @@ namespace Exiled.API.Extensions
             const BindingFlags flags = BindingFlags.Instance | BindingFlags.InvokeMethod | BindingFlags.NonPublic | BindingFlags.Static | BindingFlags.Public;
 
             type.GetMethod(methodName, flags)?.Invoke(null, param);
+        }
+
+        /// <summary>
+        /// Invoke a static event.
+        /// </summary>
+        /// <param name="type">The method type.</param>
+        /// <param name="eventName">The method name.</param>
+        /// <param name="param">The method parameters.</param>
+        public static void InvokeStaticEvent(this Type type, string eventName, object[] param)
+        {
+            var eventDelegate = (MulticastDelegate)type.GetField(eventName, AccessTools.all).GetValue(null);
+            if (eventDelegate != null)
+            {
+                foreach (var handler in eventDelegate.GetInvocationList())
+                {
+                    handler.Method.Invoke(handler.Target, param);
+                }
+            }
         }
 
         /// <summary>

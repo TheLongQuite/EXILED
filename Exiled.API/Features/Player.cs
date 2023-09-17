@@ -1999,6 +1999,8 @@ namespace Exiled.API.Features
             usableItem.Base.Owner = referenceHub;
             usableItem.Base.ServerOnUsingCompleted();
 
+            typeof(UsableItemsController).InvokeStaticEvent(nameof(UsableItemsController.ServerOnUsingCompleted), new object[] { referenceHub, usableItem.Base });
+
             if (usableItem.Base is not null)
                 usableItem.Destroy();
 

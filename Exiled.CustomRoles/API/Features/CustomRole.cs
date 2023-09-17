@@ -456,7 +456,16 @@ namespace Exiled.CustomRoles.API.Features
         /// Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
         /// </summary>
         /// <param name="player">The <see cref="Player"/> to add the role to.</param>
-        public virtual void AddRole(Player player)
+        [Obsolete("Используй AddRole(player, SpawnReason), SpawnReason задай явно, по дефолту лучше ставить ForceClass")]
+        public virtual void AddRole(Player player) =>
+            AddRole(player, SpawnReason.ForceClass);
+
+        /// <summary>
+        /// Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> to add the role to.</param>
+        /// <param name="spawnReason">The <see cref="SpawnReason"/> to spawn player.</param>
+        public virtual void AddRole(Player player, SpawnReason spawnReason)
         {
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
 
@@ -473,7 +482,7 @@ namespace Exiled.CustomRoles.API.Features
                 RoleSpawnFlags flags = RoleSpawnFlags.None;
                 if (!posAltered)
                     flags |= RoleSpawnFlags.UseSpawnpoint;
-                player.Role.Set(Role, SpawnReason.ForceClass, flags);
+                player.Role.Set(Role, spawnReason, flags);
                 Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
             }
 
@@ -874,7 +883,7 @@ namespace Exiled.CustomRoles.API.Features
                     {
                         if (ev.Player.GetCustomRoles().Any())
                             return;
-                        AddRole(ev.Player);
+                        AddRole(ev.Player, SpawnReason.ForceClass);
                     }
                     catch (Exception e)
                     {

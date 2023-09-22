@@ -60,7 +60,7 @@ namespace Exiled.API.Extensions
         /// </summary>
         /// <param name="type">The item to be checked.</param>
         /// <returns>Returns whether or not the <see cref="ItemType"/> is a medical item.</returns>
-        public static bool IsMedical(this ItemType type) => GetCategory(type) == ItemCategory.Medical;
+        public static bool IsMedical(this ItemType type) => GetCategory(type) == ItemCategory.Medical || type == ItemType.SCP500;
 
         /// <summary>
         /// Check if an <see cref="ItemType">item</see> is a utility item.

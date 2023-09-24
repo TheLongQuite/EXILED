@@ -14,6 +14,7 @@ namespace Exiled.CustomItems.API.Features
     using Exiled.API.Features.Pickups.Projectiles;
     using Exiled.Events.EventArgs.Map;
     using Exiled.Events.EventArgs.Player;
+    using InventorySystem.Items.ThrowableProjectiles;
 
     using Server = Exiled.API.Features.Server;
 
@@ -130,7 +131,9 @@ namespace Exiled.CustomItems.API.Features
                 timeGrenade.FuseTime = FuseTime;
 
             if (ExplodeOnCollision)
-                ev.Projectile.GameObject.AddComponent<Exiled.API.Features.Components.CollisionHandler>().Init((ev.Player ?? Server.Host).GameObject, ev.Projectile.Base);
+            {
+                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Player ?? Server.Host);
+            }
         }
 
         private void OnInternalExplodingGrenade(ExplodingGrenadeEventArgs ev)
@@ -152,7 +155,9 @@ namespace Exiled.CustomItems.API.Features
             OnChangedIntoGrenade(ev);
 
             if (ExplodeOnCollision)
-                ev.Projectile.GameObject.AddComponent<Exiled.API.Features.Components.CollisionHandler>().Init((ev.Pickup.PreviousOwner ?? Server.Host).GameObject, ev.Projectile.Base);
+            {
+                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Pickup.PreviousOwner ?? Server.Host);
+            }
         }
     }
 }

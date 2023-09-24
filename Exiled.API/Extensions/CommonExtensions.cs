@@ -7,9 +7,11 @@
 
 namespace Exiled.API.Extensions
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
+    using Exiled.API.Features;
     using UnityEngine;
 
     /// <summary>
@@ -23,7 +25,7 @@ namespace Exiled.API.Extensions
         /// <param name="enumerable"><see cref="IEnumerable{T}"/> to be used to get a random value.</param>
         /// <typeparam name="T">Type of <see cref="IEnumerable{T}"/> elements.</typeparam>
         /// <returns>Returns a random value from <see cref="IEnumerable{T}"/>.</returns>
-        public static T GetRandomValue<T>(this IEnumerable<T> enumerable) => enumerable is null || enumerable.Count() == 0 ? default : enumerable.ElementAt(Random.Range(0, enumerable.Count()));
+        public static T GetRandomValue<T>(this IEnumerable<T> enumerable) => enumerable is null || enumerable.Count() == 0 ? default : enumerable.ElementAt(UnityEngine.Random.Range(0, enumerable.Count()));
 
         /// <summary>
         /// Gets a random value from an <see cref="IEnumerable{T}"/> that matches the provided condition.
@@ -33,5 +35,17 @@ namespace Exiled.API.Extensions
         /// <param name="condition">The condition to require.</param>
         /// <returns>Returns a random value from <see cref="IEnumerable{T}"/>.</returns>
         public static T GetRandomValue<T>(this IEnumerable<T> enumerable, System.Func<T, bool> condition) => enumerable is null || enumerable.Count() == 0 ? default : enumerable.Where(condition).GetRandomValue();
+
+        /// <summary>
+        /// Adds an action for OnCollisionEnter event of specified gameObject.
+        /// </summary>
+        /// <param name="gameObject">GameObject to attach action.</param>
+        /// <param name="action">Action on collision.</param>
+        /// <param name="owner">GameObject that will be ignored in collision.</param>
+        /// <param name="fuseDelay">Delay before collision may be proceeded.</param>
+        public static void AttachActionOnCollision(this GameObject gameObject, Action action, Player owner = null, float fuseDelay = 0.15f)
+        {
+            gameObject.AddComponent<Exiled.API.Features.Components.CollisionHandler>().Init((owner ?? Server.Host).GameObject, action, fuseDelay);
+        }
     }
 }

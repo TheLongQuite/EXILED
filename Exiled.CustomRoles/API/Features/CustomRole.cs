@@ -114,11 +114,6 @@ namespace Exiled.CustomRoles.API.Features
         public virtual bool KeepInventoryOnSpawn { get; set; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether players die when this role is removed.
-        /// </summary>
-        public virtual bool RemovalKillsPlayer { get; set; } = true;
-
-        /// <summary>
         /// Gets or sets a value indicating whether players keep this role when they die.
         /// </summary>
         public virtual bool KeepRoleOnDeath { get; set; }
@@ -596,8 +591,6 @@ namespace Exiled.CustomRoles.API.Features
             player.CustomInfo = string.Empty;
             player.InfoArea |= PlayerInfoArea.Role;
             player.Scale = Vector3.one;
-            if (RemovalKillsPlayer)
-                player.Role.Set(RoleTypeId.Spectator);
 
             if (CustomAbilities is not null)
             {

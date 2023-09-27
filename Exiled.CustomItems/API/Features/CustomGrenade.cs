@@ -44,6 +44,11 @@ namespace Exiled.CustomItems.API.Features
         public abstract bool ExplodeOnCollision { get; set; }
 
         /// <summary>
+        /// Gets or sets a value indicating how long grenate will not detonate when contacting any surface is you use <see cref="ExplodeOnCollision"/>.
+        /// </summary>
+        public virtual float ExplodeOnCollisionFuseTime { get; set; } = 0.15f;
+
+        /// <summary>
         /// Gets or sets a value indicating how long the grenade's fuse time should be.
         /// </summary>
         public abstract float FuseTime { get; set; }
@@ -132,7 +137,7 @@ namespace Exiled.CustomItems.API.Features
 
             if (ExplodeOnCollision)
             {
-                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Player ?? Server.Host);
+                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Player ?? Server.Host, ExplodeOnCollisionFuseTime);
             }
         }
 
@@ -156,7 +161,7 @@ namespace Exiled.CustomItems.API.Features
 
             if (ExplodeOnCollision)
             {
-                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Pickup.PreviousOwner ?? Server.Host);
+                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Pickup.PreviousOwner ?? Server.Host, ExplodeOnCollisionFuseTime);
             }
         }
     }

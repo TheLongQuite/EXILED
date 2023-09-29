@@ -313,7 +313,7 @@ namespace Exiled.API.Extensions
             {
                 if (controller != null)
                 {
-                    SendFakeTargetRpc(player, controller.netIdentity, typeof(RespawnEffectsController), nameof(RespawnEffectsController.RpcCassieAnnouncement), words, makeHold, makeNoise, isSubtitles);
+                    SendFakeTargetRpc(player, controller.netIdentity, typeof(RespawnEffectsController), nameof(RespawnEffectsController.RpcCassieAnnouncement), words.ReplaceVars(), makeHold, makeNoise, isSubtitles);
                 }
             }
         }
@@ -331,8 +331,8 @@ namespace Exiled.API.Extensions
         {
             StringBuilder announcement = StringBuilderPool.Pool.Get();
 
-            string[] cassies = words.Split('\n');
-            string[] translations = translation.Split('\n');
+            string[] cassies = words.ReplaceVars().Split('\n');
+            string[] translations = translation.ReplaceVars().Split('\n');
 
             for (int i = 0; i < cassies.Length; i++)
                 announcement.Append($"{translations[i]}<size=0> {cassies[i].Replace(' ', ' ')} </size><split>");

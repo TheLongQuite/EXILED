@@ -12,6 +12,7 @@ namespace Exiled.API.Features
     using System.Text;
 
     using Exiled.API.Enums;
+    using Exiled.API.Extensions;
     using Exiled.API.Features.Pools;
     using MEC;
     using PlayerRoles;
@@ -49,7 +50,7 @@ namespace Exiled.API.Features
         /// <param name="isNoisy">Indicates whether C.A.S.S.I.E has to make noises or not during the message.</param>
         /// <param name="isSubtitles">Indicates whether C.A.S.S.I.E has to make subtitles.</param>
         public static void Message(string message, bool isHeld = false, bool isNoisy = true, bool isSubtitles = false) =>
-            RespawnEffectsController.PlayCassieAnnouncement(message, isHeld, isNoisy, isSubtitles);
+            RespawnEffectsController.PlayCassieAnnouncement(message.ReplaceVars(), isHeld, isNoisy, isSubtitles);
 
         /// <summary>
         /// Reproduce a non-glitched C.A.S.S.I.E message with a possibility to custom the subtitles.
@@ -62,8 +63,8 @@ namespace Exiled.API.Features
         public static void MessageTranslated(string message, string translation, bool isHeld = false, bool isNoisy = true, bool isSubtitles = true)
         {
             StringBuilder announcement = StringBuilderPool.Pool.Get();
-            string[] cassies = message.Split('\n');
-            string[] translations = translation.Split('\n');
+            string[] cassies = message.ReplaceVars().Split('\n');
+            string[] translations = translation.ReplaceVars().Split('\n');
             for (int i = 0; i < cassies.Length; i++)
                 announcement.Append($"{translations[i].Replace(' ', ' ')}<size=0> {cassies[i]} </size><split>");
 
@@ -78,7 +79,7 @@ namespace Exiled.API.Features
         /// <param name="glitchChance">The chance of placing a glitch between each word.</param>
         /// <param name="jamChance">The chance of jamming each word.</param>
         public static void GlitchyMessage(string message, float glitchChance, float jamChance) =>
-            Announcer.ServerOnlyAddGlitchyPhrase(message, glitchChance, jamChance);
+            Announcer.ServerOnlyAddGlitchyPhrase(message.ReplaceVars(), glitchChance, jamChance);
 
         /// <summary>
         /// Reproduce a non-glitched C.A.S.S.I.E message after a certain amount of seconds.
@@ -89,7 +90,7 @@ namespace Exiled.API.Features
         /// <param name="isNoisy">Indicates whether C.A.S.S.I.E has to make noises or not during the message.</param>
         /// <param name="isSubtitles">Indicates whether C.A.S.S.I.E has to make subtitles.</param>
         public static void DelayedMessage(string message, float delay, bool isHeld = false, bool isNoisy = true, bool isSubtitles = false) =>
-            Timing.CallDelayed(delay, () => RespawnEffectsController.PlayCassieAnnouncement(message, isHeld, isNoisy, isSubtitles));
+            Timing.CallDelayed(delay, () => Message(message, isHeld, isNoisy, isSubtitles));
 
         /// <summary>
         /// Reproduce a glitchy C.A.S.S.I.E announcement after a certain period of seconds.
@@ -99,7 +100,7 @@ namespace Exiled.API.Features
         /// <param name="glitchChance">The chance of placing a glitch between each word.</param>
         /// <param name="jamChance">The chance of jamming each word.</param>
         public static void DelayedGlitchyMessage(string message, float delay, float glitchChance, float jamChance) =>
-            Timing.CallDelayed(delay, () => Announcer.ServerOnlyAddGlitchyPhrase(message, glitchChance, jamChance));
+            Timing.CallDelayed(delay, () => GlitchyMessage(message, glitchChance, jamChance));
 
         /// <summary>
         /// Calculates the duration of a C.A.S.S.I.E message.

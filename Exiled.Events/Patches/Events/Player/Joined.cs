@@ -25,44 +25,12 @@ namespace Exiled.Events.Patches.Events.Player
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.Start))]
     internal static class Joined
     {
-        internal static void CallEvent(ReferenceHub hub, out Player player)
-        {
-            try
-            {
-#if DEBUG
-                Log.Debug("Creating new player object");
-#endif
-                player = new Player(hub);
-#if DEBUG
-                Log.Debug($"Object exists {player is not null}");
-                Log.Debug($"Creating player object for {hub.nicknameSync.Network_displayName}");
-#endif
-                if (ReferenceHub.HostHub == null)
-                {
-                    Server.Host = player;
-                }
-                else
-                {
-                    Player.UnverifiedPlayers.Add(hub.gameObject, player);
-
-                    Handlers.Player.OnJoined(new JoinedEventArgs(player));
-                }
-            }
-            catch (Exception exception)
-            {
-                Log.Error($"{nameof(CallEvent)}: {exception}\n{exception.StackTrace}");
-                player = null;
-            }
-        }
-
         private static void Postfix(ReferenceHub __instance)
         {
-            if (ReferenceHub.AllHubs.Count - 1 >= CustomNetworkManager.slots)
+            if (ReferenceHub.HostHub == null)
             {
-                MultiAdminFeatures.CallEvent(MultiAdminFeatures.EventType.SERVER_FULL);
+                Server.Host = new Player(__instance);
             }
-
-            CallEvent(__instance, out _);
         }
     }
 }

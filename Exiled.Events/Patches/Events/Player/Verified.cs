@@ -55,8 +55,7 @@ namespace Exiled.Events.Patches.Events.Player
 
         private static void HandleCmdServerSignature(ServerRoles instance)
         {
-            if (!Player.UnverifiedPlayers.TryGetValue(instance._hub.gameObject, out Player player))
-                Joined.CallEvent(instance._hub, out player);
+            Player player = new Player(instance._hub);
 
             Player.Dictionary.Add(instance._hub.gameObject, player);
 

@@ -19,6 +19,8 @@ namespace Exiled.API.Features
     using PlayerStatsSystem;
     using Respawning;
 
+    using UnityEngine;
+
     using CustomFirearmHandler = DamageHandlers.FirearmDamageHandler;
     using CustomHandlerBase = DamageHandlers.DamageHandlerBase;
 
@@ -53,6 +55,13 @@ namespace Exiled.API.Features
             RespawnEffectsController.PlayCassieAnnouncement(message.ReplaceVars(), isHeld, isNoisy, isSubtitles);
 
         /// <summary>
+        /// Reproduce a non-glitched C.A.S.S.I.E message.
+        /// </summary>
+        /// <param name="message">The message to be reproduced.</param>
+        public static void Message(CassieMessage message) =>
+            MessageTranslated(message.Message, message.Subtitles, message.IsHeld, message.IsNoisy, message.IsSubtitles);
+
+        /// <summary>
         /// Reproduce a non-glitched C.A.S.S.I.E message with a possibility to custom the subtitles.
         /// </summary>
         /// <param name="message">The message to be reproduced.</param>
@@ -65,7 +74,8 @@ namespace Exiled.API.Features
             StringBuilder announcement = StringBuilderPool.Pool.Get();
             string[] cassies = message.ReplaceVars().Split('\n');
             string[] translations = translation.ReplaceVars().Split('\n');
-            for (int i = 0; i < cassies.Length; i++)
+
+            for (int i = 0; i < Mathf.Min(cassies.Length, translation.Length); i++)
                 announcement.Append($"{translations[i].Replace(' ', ' ')}<size=0> {cassies[i]} </size><split>");
 
             RespawnEffectsController.PlayCassieAnnouncement(announcement.ToString(), isHeld, isNoisy, isSubtitles);

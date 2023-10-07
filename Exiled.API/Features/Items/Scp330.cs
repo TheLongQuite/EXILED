@@ -237,10 +237,12 @@ namespace Exiled.API.Features.Items
         {
             Scp330Pickup pickup = (Scp330Pickup)Pickup.Get(Object.Instantiate(Base.PickupDropModel, position, rotation));
 
-            pickup.Info = new(Type, Weight, ItemSerialGenerator.GenerateNext());
-            pickup.Candies = new(Base.Candies);
-            pickup.ExposedCandy = ExposedType;
-            pickup.Scale = Scale;
+            ipb.Info = new(Type, Weight, Serial);
+            ipb.gameObject.transform.localScale = Scale;
+
+            Base.OnRemoved(ipb);
+
+            Pickup pickup = Pickup.Get(ipb);
 
             if (spawn)
                 pickup.Spawn();

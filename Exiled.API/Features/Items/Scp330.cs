@@ -235,7 +235,7 @@ namespace Exiled.API.Features.Items
         /// <returns>The created <see cref="Pickup"/>.</returns>
         public override Pickup CreatePickup(Vector3 position, Quaternion rotation = default, bool spawn = true)
         {
-            Scp330Pickup pickup = (Scp330Pickup)Pickup.Get(Object.Instantiate(Base.PickupDropModel, position, rotation));
+            InventorySystem.Items.Usables.Scp330.Scp330Pickup ipb = (InventorySystem.Items.Usables.Scp330.Scp330Pickup)Object.Instantiate(Base.PickupDropModel, position, rotation);
 
             ipb.Info = new(Type, Weight, Serial);
             ipb.gameObject.transform.localScale = Scale;

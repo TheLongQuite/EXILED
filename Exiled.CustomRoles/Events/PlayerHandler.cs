@@ -22,11 +22,18 @@ namespace Exiled.CustomRoles.Events
     /// </summary>
     public class PlayerHandler
     {
+        /// <summary>
+        /// SessionVariable key.
+        /// </summary>
+        public const string LastCustomRoleKey = "LastCustomRole";
+
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole"/>
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            var lastRole = ev.Player.GetCustomRoles().FirstOrDefault() is not { } cr ? ev.Player.Role.Type.ToString() : cr.Id.ToString();
-            ev.Player.SessionVariables[Extensions.LastRoleKey] = lastRole;
+            if (ev.Player.GetCustomRoles().FirstOrDefault() is CustomRole customRole)
+                ev.Player.SessionVariables[LastCustomRoleKey] = customRole;
+            else
+                ev.Player.SessionVariables.Remove(LastCustomRoleKey);
 
             if (ev.Reason == SpawnReason.Destroyed)
                 return;

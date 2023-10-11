@@ -63,6 +63,11 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         public virtual byte AmmoUsage { get; set; } = 1;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether firearm can be unloaded.
+        /// </summary>
+        public virtual bool CanUnload { get; set; } = true;
+
         /// <inheritdoc />
         public override Pickup? Spawn(Vector3 position, Item item, Player? previousOwner = null)
         {
@@ -113,6 +118,7 @@ namespace Exiled.CustomItems.API.Features
             Exiled.Events.Handlers.Player.Shooting += OnInternalShooting;
             Exiled.Events.Handlers.Player.Shot += OnInternalShot;
             Exiled.Events.Handlers.Player.Hurting += OnInternalHurting;
+            Exiled.Events.Handlers.Player.UnloadingWeapon += OnInternalUnloading;
 
             base.SubscribeEvents();
         }
@@ -124,6 +130,7 @@ namespace Exiled.CustomItems.API.Features
             Exiled.Events.Handlers.Player.Shooting -= OnInternalShooting;
             Exiled.Events.Handlers.Player.Shot -= OnInternalShot;
             Exiled.Events.Handlers.Player.Hurting -= OnInternalHurting;
+            Exiled.Events.Handlers.Player.UnloadingWeapon -= OnInternalUnloading;
 
             base.UnsubscribeEvents();
         }
@@ -157,6 +164,14 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         /// <param name="ev"><see cref="HurtingEventArgs"/>.</param>
         protected virtual void OnHurting(HurtingEventArgs ev)
+        {
+        }
+
+        /// <summary>
+        /// Handles unloading for custom weapons.
+        /// </summary>
+        /// <param name="ev"><see cref="HurtingEventArgs"/>.</param>
+        protected virtual void OnUnloading(UnloadingWeaponEventArgs ev)
         {
         }
 
@@ -279,6 +294,16 @@ namespace Exiled.CustomItems.API.Features
             ev.Amount = Damage;
 
             OnHurting(ev);
+        }
+
+        private void OnInternalUnloading(UnloadingWeaponEventArgs ev)
+        {
+            if (!Check(ev.Firearm))
+                return;
+
+            ev.IsAllowed = CanUnload;
+
+            OnUnloading(ev);
         }
     }
 }

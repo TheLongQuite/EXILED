@@ -282,11 +282,15 @@ namespace Exiled.Events.Patches.Events.Player
 
         private static void Helper(NetworkConnection conn, RequestMessage msg)
         {
-            API.Features.Log.Info(conn);
-            API.Features.Log.Info(conn.GetType().Name);
-            API.Features.Log.Info(conn.identity);
-            API.Features.Log.Info(msg.Request);
-            API.Features.Log.Info(msg.Serial);
+            if (conn.identity == null)
+            {
+                API.Features.Log.Info(conn);
+                API.Features.Log.Info(conn.GetType().Name);
+                API.Features.Log.Info(msg.Request);
+                API.Features.Log.Info(msg.Serial);
+                API.Features.Log.Info(API.Features.Items.Item.Get(msg.Serial));
+
+            }
         }
     }
 }

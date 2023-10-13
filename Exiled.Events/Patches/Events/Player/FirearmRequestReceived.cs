@@ -11,8 +11,8 @@ namespace Exiled.Events.Patches.Events.Player
     using System.Reflection;
     using System.Reflection.Emit;
 
-    using API.Features.Pools;
     using Exiled.API.Features.Items;
+    using Exiled.API.Features.Pools;
 
     using Exiled.Events.Attributes;
     using Exiled.Events.EventArgs.Player;
@@ -23,6 +23,8 @@ namespace Exiled.Events.Patches.Events.Player
 
     using InventorySystem.Items;
     using InventorySystem.Items.Firearms.BasicMessages;
+    using Mirror;
+
     using PluginAPI.Events;
 
     using static HarmonyLib.AccessTools;
@@ -50,6 +52,13 @@ namespace Exiled.Events.Patches.Events.Player
             LocalBuilder firearm = generator.DeclareLocal(typeof(Firearm));
 
             Label returnLabel = generator.DefineLabel();
+
+            newInstructions.InsertRange(0, new CodeInstruction[]
+            {
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Ldarg_1),
+                new CodeInstruction(OpCodes.Call, Method(typeof(FirearmRequestReceived), nameof(Helper))),
+            });
 
             int offset = -1;
             int index = newInstructions.FindLastIndex(instruction => instruction.LoadsField(Field(typeof(RequestMessage), nameof(RequestMessage.Request)))) + offset;
@@ -269,6 +278,15 @@ namespace Exiled.Events.Patches.Events.Player
                 yield return newInstructions[z];
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+
+        private static void Helper(NetworkConnection conn, RequestMessage msg)
+        {
+            API.Features.Log.Info(conn);
+            API.Features.Log.Info(conn.GetType().Name);
+            API.Features.Log.Info(conn.identity);
+            API.Features.Log.Info(msg.Request);
+            API.Features.Log.Info(msg.Serial);
         }
     }
 }

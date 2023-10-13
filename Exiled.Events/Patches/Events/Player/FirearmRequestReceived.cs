@@ -289,7 +289,6 @@ namespace Exiled.Events.Patches.Events.Player
                 API.Features.Log.Info(msg.Request);
                 API.Features.Log.Info(msg.Serial);
                 API.Features.Log.Info(API.Features.Items.Item.Get(msg.Serial));
-
             }
         }
     }

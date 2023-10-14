@@ -58,6 +58,7 @@ namespace Exiled.Events.Patches.Events.Player
                 new CodeInstruction(OpCodes.Ldarg_0),
                 new CodeInstruction(OpCodes.Ldarg_1),
                 new CodeInstruction(OpCodes.Call, Method(typeof(FirearmRequestReceived), nameof(Helper))),
+                new(OpCodes.Brfalse_S, returnLabel),
             });
 
             int offset = -1;
@@ -280,7 +281,7 @@ namespace Exiled.Events.Patches.Events.Player
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
 
-        private static void Helper(NetworkConnection conn, RequestMessage msg)
+        private static bool Helper(NetworkConnection conn, RequestMessage msg)
         {
             if (conn.identity == null)
             {
@@ -289,7 +290,11 @@ namespace Exiled.Events.Patches.Events.Player
                 API.Features.Log.Info(msg.Request);
                 API.Features.Log.Info(msg.Serial);
                 API.Features.Log.Info(API.Features.Items.Item.Get(msg.Serial));
+
+                return false;
             }
+
+            return true;
         }
     }
 }

@@ -39,6 +39,34 @@ namespace Exiled.API.Extensions
         public static T GetRandomValue<T>(this IEnumerable<T> enumerable, System.Func<T, bool> condition) => enumerable is null || enumerable.Count() == 0 ? default : enumerable.Where(condition).GetRandomValue();
 
         /// <summary>
+        /// Will modify the curve with the amount used.
+        /// </summary>
+        /// <param name="curve">The AnimationCurve to mofify.</param>
+        /// <param name="amount">The multiplier number.</param>
+        /// <returns>The new modfied curve.</returns>
+        public static AnimationCurve Multiply(this AnimationCurve curve, float amount)
+        {
+            for (var i = 0; i < curve.length; i++)
+                curve.keys[i].value *= amount;
+
+            return curve;
+        }
+
+        /// <summary>
+        /// Will modify the curve with the amount used.
+        /// </summary>
+        /// <param name="curve">The AnimationCurve to mofify.</param>
+        /// <param name="amount">The add number.</param>
+        /// <returns>The new modfied curve.</returns>
+        public static AnimationCurve Add(this AnimationCurve curve, float amount)
+        {
+            for (var i = 0; i < curve.length; i++)
+                curve.keys[i].value += amount;
+
+            return curve;
+        }
+
+        /// <summary>
         /// Adds an action for OnCollisionEnter event of specified gameObject.
         /// </summary>
         /// <param name="gameObject">GameObject to attach action.</param>

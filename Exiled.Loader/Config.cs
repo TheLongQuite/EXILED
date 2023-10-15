@@ -7,6 +7,7 @@
 
 namespace Exiled.Loader
 {
+    using System;
     using System.ComponentModel;
     using System.IO;
 
@@ -29,27 +30,27 @@ namespace Exiled.Loader
         public bool Debug { get; set; } = false;
 
         /// <summary>
-        /// Gets or sets a value indicating whether outdated exiled should be loaded or not.
+        /// Gets or sets a value indicating whether outdated Exiled versions should be loaded or not.
         /// </summary>
-        [Description("Indicates whether outdated Exiled should be loaded or not. It could cause issues when it's true")]
+        [Description("Indicates whether outdated Exiled versions should be loaded or not.")]
         public bool ShouldLoadOutdatedExiled { get; set; } = false;
 
         /// <summary>
         /// Gets or sets a value indicating whether outdated plugins should be loaded or not.
         /// </summary>
-        [Description("Indicates whether outdated plugins should be loaded or not")]
+        [Description("Indicates whether outdated plugins should be loaded or not.")]
         public bool ShouldLoadOutdatedPlugins { get; set; } = true;
 
         /// <summary>
         /// Gets or sets the Exiled directory path from which plugins will be loaded.
         /// </summary>
-        [Description("The Exiled directory path from which plugins will be loaded")]
+        [Description("The Exiled directory path from which plugins will be loaded.")]
         public string ExiledDirectoryPath { get; set; } = Path.Combine(Paths.AppData, "EXILED");
 
         /// <summary>
         /// Gets or sets the environment type.
         /// </summary>
-        [Description("The working environment type (Development, Testing, Production, Ptb, ProductionDebug)")]
+        [Description("The working environment type (Development, Testing, Production, Ptb, ProductionDebug).")]
         public EnvironmentType Environment { get; set; } = EnvironmentType.Production;
 
         /// <summary>

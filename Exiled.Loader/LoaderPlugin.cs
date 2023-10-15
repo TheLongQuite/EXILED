@@ -11,8 +11,6 @@ namespace Exiled.Loader
     using System.IO;
     using System.Reflection;
 
-    using MEC;
-
     using PluginAPI.Core.Attributes;
 
     using Log = API.Features.Log;
@@ -44,6 +42,20 @@ namespace Exiled.Loader
             }
 
             Log.Info($"Loading EXILED Version: {Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyInformationalVersionAttribute>().InformationalVersion}");
+            if (!Config.ShouldLoadOutdatedExiled &&
+                !GameCore.Version.CompatibilityCheck(
+                    (byte)AutoUpdateFiles.RequiredSCPSLVersion.Major,
+                    (byte)AutoUpdateFiles.RequiredSCPSLVersion.Minor,
+                    (byte)AutoUpdateFiles.RequiredSCPSLVersion.Revision,
+                    GameCore.Version.Major,
+                    GameCore.Version.Minor,
+                    GameCore.Version.Revision,
+                    GameCore.Version.BackwardCompatibility,
+                    GameCore.Version.BackwardRevision))
+            {
+                ServerConsole.AddLog($"Exiled is outdated, please update to the latest version. Wait for release if still shows after update.\nSCP:SL: {GameCore.Version.VersionString} Exiled Supported Version: {AutoUpdateFiles.RequiredSCPSLVersion}", ConsoleColor.DarkRed);
+                return;
+            }
 
             Paths.Reload(Config.ExiledDirectoryPath);
 
@@ -54,7 +66,13 @@ namespace Exiled.Loader
             Directory.CreateDirectory(Paths.Plugins);
             Directory.CreateDirectory(Paths.Dependencies);
 
-            Timing.RunCoroutine(new Loader().Run());
+            if (!File.Exists(Path.Combine(Paths.Dependencies, "Exiled.API.dll")))
+            {
+                Log.Error($"Exiled.API.dll was not found at {Path.Combine(Paths.Dependencies, "Exiled.API.dll")}, Exiled won't be loaded!");
+                return;
+            }
+
+            new Loader().Run();
         }
     }
 }

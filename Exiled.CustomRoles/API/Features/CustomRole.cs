@@ -33,6 +33,11 @@ namespace Exiled.CustomRoles.API.Features
     /// </summary>
     public abstract class CustomRole
     {
+        /// <summary>
+        /// This var makes player skip base role replace by <see cref="ReplacesBaseRole"/> for one rolechange.
+        /// </summary>
+        public const string SkipBaseRoleReplaceKey = "skipRoleReplace";
+
         private static Dictionary<uint, CustomRole?> idLookupTable = new();
 
         /// <summary>
@@ -870,11 +875,17 @@ namespace Exiled.CustomRoles.API.Features
 
             if (ReplacesBaseRole && Role != RoleTypeId.None && Role == ev.NewRole)
             {
-                Timing.CallDelayed(1, () =>
+                if (ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
+                {
+                    Log.Debug($"Skipping base role replace");
+                    return;
+                }
+
+                Timing.CallDelayed(1.1f, () =>
                 {
                     try
                     {
-                        if (ev.Player.GetCustomRoles().Any())
+                        if (!ev.Player.IsConnected || ev.Player.GetCustomRoles().Any() || ev.Player.Role != Role)
                             return;
                         AddRole(ev.Player, SpawnReason.ForceClass);
                     }

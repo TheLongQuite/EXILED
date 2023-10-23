@@ -57,6 +57,7 @@ namespace Exiled.CustomRoles.API.Features
         {
             ActivePlayers.Add(player);
             LastUsed[player] = DateTime.Now;
+            ShowMessage(player);
             AbilityUsed(player);
             Timing.CallDelayed(Duration, () => EndAbility(player));
             Timing.CallDelayed(Cooldown, () => RemindAbility(player));

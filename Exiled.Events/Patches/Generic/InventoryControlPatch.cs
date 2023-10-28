@@ -17,6 +17,8 @@ namespace Exiled.Events.Patches.Generic
     using API.Features.Items;
     using API.Features.Pools;
 
+    using Exiled.API.Features.Pickups;
+
     using HarmonyLib;
 
     using InventorySystem;

@@ -27,7 +27,7 @@ namespace Exiled.Events.Patches.Events.Player
     {
         private static void Postfix(PlayerAuthenticationManager __instance)
         {
-            Player player = new Player(instance._hub);
+            Player player = new Player(__instance._hub);
 
             Player.Dictionary.Add(__instance._hub.gameObject, player);
 

@@ -27,6 +27,9 @@ namespace Exiled.API.Features.Pickups
     /// </summary>
     public class BodyArmorPickup : Pickup, IWrapper<BaseBodyArmor>
     {
+        private int helmetEfficacy;
+        private int vestEfficacy;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="BodyArmorPickup"/> class.
         /// </summary>

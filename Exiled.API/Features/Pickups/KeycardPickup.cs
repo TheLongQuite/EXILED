@@ -9,6 +9,9 @@ namespace Exiled.API.Features.Pickups
 {
     using Exiled.API.Interfaces;
 
+    using InventorySystem.Items;
+    using InventorySystem.Items.Keycards;
+
     using BaseKeycard = InventorySystem.Items.Keycards.KeycardPickup;
 
     /// <summary>
@@ -40,5 +43,25 @@ namespace Exiled.API.Features.Pickups
         /// Gets the <see cref="BaseKeycard"/> that this class is encapsulating.
         /// </summary>
         public new BaseKeycard Base { get; }
+
+        /// <inheritdoc/>
+        internal override void ReadItemInfo(Item item)
+        {
+            base.ReadItemInfo(item);
+            if (item is Keycard keycarditem)
+            {
+                Permissions = keycarditem.Permissions;
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void InitializeProperties(ItemBase itemBase)
+        {
+            base.InitializeProperties(itemBase);
+            if (itemBase is KeycardItem keycardItem)
+            {
+                Permissions = (KeycardPermissions)keycardItem.Permissions;
+            }
+        }
     }
 }

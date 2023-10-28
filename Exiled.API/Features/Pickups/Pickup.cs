@@ -7,6 +7,7 @@
 
 namespace Exiled.API.Features.Pickups
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
 
@@ -34,6 +35,7 @@ namespace Exiled.API.Features.Pickups
     using BaseScp1576Pickup = InventorySystem.Items.Usables.Scp1576.Scp1576Pickup;
     using BaseScp2176Projectile = InventorySystem.Items.ThrowableProjectiles.Scp2176Projectile;
     using BaseScp330Pickup = InventorySystem.Items.Usables.Scp330.Scp330Pickup;
+    using Object = UnityEngine.Object;
 
     /// <summary>
     /// A wrapper class for <see cref="ItemPickupBase"/>.
@@ -68,6 +70,8 @@ namespace Exiled.API.Features.Pickups
                 return;
 
             BaseToPickup.Add(pickupBase, this);
+
+            InitializeProperties(InventoryItemLoader.AvailableItems[pickupBase.Info.ItemId]);
         }
 
         /// <summary>
@@ -91,6 +95,8 @@ namespace Exiled.API.Features.Pickups
             Info = psi;
 
             BaseToPickup.Add(Base, this);
+
+            InitializeProperties(itemBase);
         }
 
         /// <summary>
@@ -480,7 +486,7 @@ namespace Exiled.API.Features.Pickups
         /// <param name="previousOwner">An optional previous owner of the item.</param>
         /// <returns>The <see cref="Pickup"/>. See documentation of <see cref="Create(ItemType)"/> for more information on casting.</returns>
         /// <seealso cref="Projectile.CreateAndSpawn(Enums.ProjectileType, Vector3, Quaternion, bool, Player)"/>
-        public static Pickup CreateAndSpawn(ItemType type, Vector3 position, Quaternion rotation, Player previousOwner = null) => Spawn(Create(type), position, rotation, previousOwner);
+        public static Pickup CreateAndSpawn(ItemType type, Vector3 position, Quaternion rotation, Player previousOwner = null) => Create(type).Spawn(position, rotation, previousOwner);
 
         /// <summary>
         /// Spawns a <see cref="Pickup"/>.
@@ -490,16 +496,10 @@ namespace Exiled.API.Features.Pickups
         /// <param name="rotation">The rotation to spawn the <see cref="Pickup"/>.</param>
         /// <param name="previousOwner">An optional previous owner of the item.</param>
         /// <returns>The <see cref="Pickup"/> Spawn.</returns>
-        /// <seealso cref="Projectile.Spawn(Projectile, Vector3, Quaternion, bool, Player)"/>
+        /// <seealso cref="Projectile.Spawn(Vector3, Quaternion, bool, Player)"/>
+        [Obsolete("Use pickup.Spawn(Vector3, Quaternion, Player) instead of this", true)]
         public static Pickup Spawn(Pickup pickup, Vector3 position, Quaternion rotation, Player previousOwner = null)
-        {
-            pickup.Position = position;
-            pickup.Rotation = rotation;
-            pickup.PreviousOwner = previousOwner;
-            pickup.Spawn();
-
-            return pickup;
-        }
+            => pickup.Spawn(position, rotation, previousOwner);
 
         /// <summary>
         /// Clones current <see cref="Pickup"/> object.
@@ -528,7 +528,7 @@ namespace Exiled.API.Features.Pickups
         }
 
         /// <summary>
-        /// Spawns pickup on server.
+        /// Spawns pickup on a server.
         /// </summary>
         /// <seealso cref="UnSpawn"/>
         public void Spawn()
@@ -544,6 +544,24 @@ namespace Exiled.API.Features.Pickups
                 NetworkServer.Spawn(GameObject);
                 IsSpawned = true;
             }
+        }
+
+        /// <summary>
+        /// Spawns pickup on a server.
+        /// </summary>
+        /// <param name="position">The position to spawn the <see cref="Pickup"/> at.</param>
+        /// <param name="rotation">The rotation to spawn the <see cref="Pickup"/>.</param>
+        /// <param name="previousOwner">An optional previous owner of the item.</param>
+        /// <returns>The spawned <see cref="Pickup"/>.</returns>
+        /// <seealso cref="Projectile.Spawn(Vector3, Quaternion, bool, Player)"/>
+        public Pickup Spawn(Vector3 position, Quaternion rotation, Player previousOwner = null)
+        {
+            Position = position;
+            Rotation = rotation;
+            PreviousOwner = previousOwner;
+            Spawn();
+
+            return this;
         }
 
         /// <summary>
@@ -571,5 +589,25 @@ namespace Exiled.API.Features.Pickups
         /// </summary>
         /// <returns>A string containing Pickup-related data.</returns>
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* |{Position}| -{IsLocked}- ={InUse}=";
+
+        /// <summary>
+        /// Helper method for saving data between items and pickups.
+        /// </summary>
+        /// <param name="item"> <see cref="Items.Item"/>-related data to give to the <see cref="Pickup"/>.</param>
+        internal virtual void ReadItemInfo(Items.Item item)
+        {
+            if (item is not null)
+            {
+                Scale = item.Scale;
+            }
+        }
+
+        /// <summary>
+        /// initialize item properties.
+        /// </summary>
+        /// <param name="itemBase">target item.</param>
+        protected virtual void InitializeProperties(ItemBase itemBase)
+        {
+        }
     }
 }

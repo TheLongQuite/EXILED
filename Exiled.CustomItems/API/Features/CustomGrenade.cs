@@ -58,7 +58,7 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         /// <param name="grenade">The <see cref="Projectile">grenade</see> to check.</param>
         /// <returns>True if it is a custom grenade.</returns>
-        public virtual bool Check(Projectile grenade) => TrackedSerials.Contains(grenade.Serial);
+        public virtual bool Check(Projectile grenade) => grenade is not null && TrackedSerials.Contains(grenade.Serial);
 
         /// <inheritdoc/>
         protected override void SubscribeEvents()
@@ -155,7 +155,8 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(ev.Pickup))
                 return;
 
-            ev.FuseTime = FuseTime;
+            if (ev.Projectile is TimeGrenadeProjectile timedGrenade)
+                timedGrenade.FuseTime = FuseTime;
 
             OnChangedIntoGrenade(ev);
 

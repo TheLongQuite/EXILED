@@ -7,6 +7,7 @@
 
 namespace Exiled.API.Features.Pickups
 {
+    using Exiled.API.Features.Items;
     using Exiled.API.Interfaces;
 
     using InventorySystem.Items;

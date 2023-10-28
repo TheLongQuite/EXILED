@@ -9,6 +9,7 @@ namespace Exiled.API.Features.Pickups
 {
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
+    using Exiled.API.Features.Pickups.Projectiles;
     using Exiled.API.Interfaces;
 
     using Footprinting;

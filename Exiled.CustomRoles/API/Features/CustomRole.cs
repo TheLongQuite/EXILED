@@ -525,13 +525,14 @@ namespace Exiled.CustomRoles.API.Features
                                 break;
                             }
                         }
-                    });
-            }
 
-            foreach (var ammo in Ammo)
-            {
-                Log.Debug($"{Name}: Setting {ammo.Value} to {ammo}.");
-                player.SetAmmo(ammo.Key, ammo.Value);
+
+                        foreach (var ammo in Ammo)
+                        {
+                            Log.Debug($"{Name}: Setting {ammo.Value} to {ammo}.");
+                            player.SetAmmo(ammo.Key, ammo.Value);
+                        }
+                    });
             }
 
             Log.Debug($"{Name}: Setting health values.");

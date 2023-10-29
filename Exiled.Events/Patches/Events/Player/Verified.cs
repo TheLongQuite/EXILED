@@ -8,15 +8,18 @@
 namespace Exiled.Events.Patches.Events.Player
 {
     using System;
+    using System.Collections.Generic;
+    using System.Reflection.Emit;
 
     using API.Features;
     using CentralAuth;
     using Exiled.API.Extensions;
+    using Exiled.API.Features.Pools;
     using Exiled.Events.EventArgs.Player;
 
     using HarmonyLib;
 
-#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+    using static HarmonyLib.AccessTools;
 
     /// <summary>
     ///     Patches <see cref="PlayerAuthenticationManager.FinalizeAuthentication" />.
@@ -25,11 +28,33 @@ namespace Exiled.Events.Patches.Events.Player
     [HarmonyPatch(typeof(PlayerAuthenticationManager), nameof(PlayerAuthenticationManager.FinalizeAuthentication))]
     internal static class Verified
     {
-        private static void Postfix(PlayerAuthenticationManager __instance)
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
         {
-            Player player = new Player(__instance._hub);
+            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            Player.Dictionary.Add(__instance._hub.gameObject, player);
+            const int offset = -4;
+            int index = newInstructions.FindIndex(instruction => instruction.Calls(Method(typeof(ServerRoles), nameof(ServerRoles.RefreshPermissions)))) + offset;
+
+            newInstructions.InsertRange(
+                index,
+                new CodeInstruction[]
+                {
+                    // Helper(authenticationManager);
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Call, Method(typeof(Verified), nameof(Helper))),
+                });
+
+            for (int z = 0; z < newInstructions.Count; z++)
+                yield return newInstructions[z];
+
+            ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+
+        private static void Helper(PlayerAuthenticationManager auth)
+        {
+            Player player = new Player(auth._hub);
+
+            Player.Dictionary.Add(auth._hub.gameObject, player);
 
             player.IsVerified = true;
             player.RawUserId = player.UserId.GetRawUserId();

@@ -131,14 +131,7 @@ namespace Exiled.API.Features
                         }
                         catch (ArgumentException e)
                         {
-                            if (e.Message.StartsWith("An"))
-                            {
-                                Log.Error($"Command with same name has already registered! Command: {command.Command}");
-                            }
-                            else
-                            {
-                                Log.Error($"An error has occurred while registering a command: {e}");
-                            }
+                            Log.Error($"An error has occurred while registering a command: {e}");
                         }
 
                         Commands[commandType][type] = command;

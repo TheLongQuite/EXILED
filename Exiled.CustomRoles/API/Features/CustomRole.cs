@@ -526,7 +526,6 @@ namespace Exiled.CustomRoles.API.Features
                             }
                         }
 
-
                         foreach (var ammo in Ammo)
                         {
                             Log.Debug($"{Name}: Setting {ammo.Value} to {ammo}.");

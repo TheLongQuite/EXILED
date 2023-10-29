@@ -310,7 +310,12 @@ namespace Exiled.API.Features.Pickups
                 BaseAmmoPickup ammoPickup => new AmmoPickup(ammoPickup),
                 BaseRadioPickup radioPickup => new RadioPickup(radioPickup),
                 BaseMicroHIDPickup microHidPickup => new MicroHIDPickup(microHidPickup),
-                TimedGrenadePickup timeGrenade => new GrenadePickup(timeGrenade),
+                TimedGrenadePickup timeGrenade => timeGrenade.NetworkInfo.ItemId switch
+                {
+                    ItemType.GrenadeHE => new ExplosiveGrenadePickup(timeGrenade),
+                    ItemType.GrenadeFlash => new FlashGrenadePickup(timeGrenade),
+                    _ => new GrenadePickup(timeGrenade),
+                },
                 BaseFirearmPickup firearmPickup => new FirearmPickup(firearmPickup),
                 BaseKeycardPickup keycardPickup => new KeycardPickup(keycardPickup),
                 BaseBodyArmorPickup bodyArmorPickup => new BodyArmorPickup(bodyArmorPickup),

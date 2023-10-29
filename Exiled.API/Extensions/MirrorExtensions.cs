@@ -359,6 +359,9 @@ namespace Exiled.API.Extensions
         /// <param name="value">Value of send to target.</param>
         public static void SendFakeSyncVar(this Player target, NetworkIdentity behaviorOwner, Type targetType, string propertyName, object value)
         {
+            Log.Warn($"SendFakeSyncVar in unavailable");
+            return;
+/*
             NetworkWriterPooled writer = NetworkWriterPool.Get();
             NetworkWriterPooled writer2 = NetworkWriterPool.Get();
             MakeCustomSyncWriter(behaviorOwner, targetType, null, CustomSyncVarGenerator, writer, writer2);
@@ -375,6 +378,7 @@ namespace Exiled.API.Extensions
                 targetWriter.WriteULong(SyncVarDirtyBits[$"{targetType.Name}.{propertyName}"]);
                 WriterExtensions[value.GetType()]?.Invoke(null, new object[2] { targetWriter, value });
             }
+*/
         }
 
         /// <summary>
@@ -383,7 +387,14 @@ namespace Exiled.API.Extensions
         /// <param name="behaviorOwner"><see cref="NetworkIdentity"/> of object that owns <see cref="NetworkBehaviour"/>.</param>
         /// <param name="targetType"><see cref="NetworkBehaviour"/>'s type.</param>
         /// <param name="propertyName">Property name starting with Network.</param>
-        public static void ResyncSyncVar(NetworkIdentity behaviorOwner, Type targetType, string propertyName) => SetDirtyBitsMethodInfo.Invoke(behaviorOwner.gameObject.GetComponent(targetType), new object[] { SyncVarDirtyBits[$"{targetType.Name}.{propertyName}"] });
+        public static void ResyncSyncVar(NetworkIdentity behaviorOwner, Type targetType, string propertyName)
+        {
+            Log.Warn($"ResyncSyncVar in unavailable");
+            return;
+/*
+            SetDirtyBitsMethodInfo.Invoke(behaviorOwner.gameObject.GetComponent(targetType), new object[] { SyncVarDirtyBits[$"{targetType.Name}.{propertyName}"] });
+*/
+        }
 
         /// <summary>
         /// Send fake values to client's <see cref="ClientRpcAttribute"/>.
@@ -395,6 +406,9 @@ namespace Exiled.API.Extensions
         /// <param name="values">Values of send to target.</param>
         public static void SendFakeTargetRpc(Player target, NetworkIdentity behaviorOwner, Type targetType, string rpcName, params object[] values)
         {
+            Log.Warn($"SendFakeTargetRpc in unavailable");
+            return;
+/*
             NetworkWriterPooled writer = NetworkWriterPool.Get();
 
             foreach (object value in values)
@@ -411,6 +425,7 @@ namespace Exiled.API.Extensions
             BufferRpcMethodInfo.Invoke(target.Connection, new object[] { msg, 0 });
 
             NetworkWriterPool.Return(writer);
+*/
         }
 
         /// <summary>

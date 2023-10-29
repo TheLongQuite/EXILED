@@ -22,7 +22,6 @@ namespace Exiled.Events.EventArgs.Player
     /// </summary>
     public class KickingEventArgs : IPlayerEvent, IDeniableEvent
     {
-        private readonly string startkickmessage;
         private bool isAllowed;
         private Player target;
         private ICommandSender sender;
@@ -52,7 +51,7 @@ namespace Exiled.Events.EventArgs.Player
 
             Player = Player.Get(issuer) ?? Server.Host;
             Reason = reason;
-            startkickmessage = fullMessage;
+            FullMessage = fullMessage;
             IsAllowed = isAllowed;
         }
 
@@ -82,12 +81,7 @@ namespace Exiled.Events.EventArgs.Player
         /// <summary>
         ///     Gets or sets the full kick message.
         /// </summary>
-        public string FullMessage
-        {
-            get => startkickmessage + Reason;
-            [Obsolete("this will be remove use Reason instead of FullMessage")]
-            set => Reason = value.StartsWith(startkickmessage) ? value.Remove(0, startkickmessage.Count()) : value;
-        }
+        public string FullMessage { get; set; }
 
         /// <summary>
         ///     Gets or sets a value indicating whether or not action is taken against the target.

@@ -95,7 +95,6 @@ namespace Exiled.Events.Patches.Generic
             if (attackerFootprint.Hub == Server.Host.ReferenceHub)
                 return true;
 
-
             if (attackerFootprint.Hub is null || victimHub is null)
             {
                 Log.Debug($"CheckFriendlyFirePlayerRules, Attacker hub null: {attackerFootprint.Hub is null}, Victim hub null: {victimHub is null}");

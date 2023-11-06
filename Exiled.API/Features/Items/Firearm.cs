@@ -661,7 +661,8 @@ namespace Exiled.API.Features.Items
             base.ReadPickupInfo(pickup);
             if (pickup is FirearmPickup firearmPickup)
             {
-                DefaultMaxAmmo = firearmPickup.MaxAmmo;
+                if (firearmPickup.MaxAmmo != 0)
+                    DefaultMaxAmmo = firearmPickup.MaxAmmo;
             }
         }
     }

@@ -31,7 +31,6 @@ namespace Exiled.API.Features.Items
     using InventorySystem.Items.Pickups;
 
     using UnityEngine;
-    using YamlDotNet.Core.Tokens;
 
     using BaseFirearm = InventorySystem.Items.Firearms.Firearm;
     using FirearmPickup = Pickups.FirearmPickup;
@@ -123,43 +122,6 @@ namespace Exiled.API.Features.Items
         /// Gets the max ammo for this firearm.
         /// </summary>
         public byte MaxAmmo => Base.AmmoManagerModule.MaxAmmo;
-
-        /// <summary>
-        /// Gets or sets the default max ammo for this firearm without attachments.
-        /// </summary>
-        public byte DefaultMaxAmmo
-        {
-            get
-            {
-                return Base.AmmoManagerModule switch
-                {
-                    TubularMagazineAmmoManager tubularMagazineAmmoManager =>
-                        tubularMagazineAmmoManager._defaultMaxAmmo,
-                    ClipLoadedInternalMagAmmoManager clipLoadedInternalMagAmmoManager =>
-                        clipLoadedInternalMagAmmoManager._defaultMaxAmmo,
-                    AutomaticAmmoManager automaticAmmoManager =>
-                        automaticAmmoManager._defaultMaxAmmo,
-                    DisruptorAction => 5,
-                    _ => Base.AmmoManagerModule.MaxAmmo,
-                };
-            }
-
-            set
-            {
-                switch (Base.AmmoManagerModule)
-                {
-                    case TubularMagazineAmmoManager tubularMagazineAmmoManager:
-                        tubularMagazineAmmoManager._defaultMaxAmmo = value;
-                        break;
-                    case ClipLoadedInternalMagAmmoManager clipLoadedInternalMagAmmoManager:
-                        clipLoadedInternalMagAmmoManager._defaultMaxAmmo = value;
-                        break;
-                    case AutomaticAmmoManager automaticAmmoManager:
-                        automaticAmmoManager._defaultMaxAmmo = value;
-                        break;
-                }
-            }
-        }
 
         /// <summary>
         /// Gets the <see cref="Enums.FirearmType"/> of the firearm.
@@ -654,16 +616,6 @@ namespace Exiled.API.Features.Items
 
             Base._sendStatusNextFrame = true;
             Base._footprintValid = false;
-        }
-
-        /// <inheritdoc/>
-        internal override void ReadPickupInfo(Pickup pickup)
-        {
-            base.ReadPickupInfo(pickup);
-            if (pickup is FirearmPickup firearmPickup)
-            {
-                DefaultMaxAmmo = firearmPickup.MaxAmmo;
-            }
         }
     }
 }

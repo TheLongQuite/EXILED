@@ -31,6 +31,7 @@ namespace Exiled.API.Features.Items
     using InventorySystem.Items.Pickups;
 
     using UnityEngine;
+    using YamlDotNet.Core.Tokens;
 
     using BaseFirearm = InventorySystem.Items.Firearms.Firearm;
     using FirearmPickup = Pickups.FirearmPickup;

@@ -76,7 +76,7 @@ namespace Exiled.API.Features.Pickups
         /// <summary>
         /// Gets or sets a value indicating a max ammo for this <see cref="FirearmPickup"/>.
         /// </summary>
-        public byte MaxAmmo { get; set; } = 0;
+        public byte MaxAmmo { get; set; }
 
         /// <summary>
         /// Gets or sets the <see cref="FirearmStatusFlags"/>.
@@ -109,6 +109,16 @@ namespace Exiled.API.Features.Pickups
             if (item is Items.Firearm firearm)
             {
                 MaxAmmo = firearm.DefaultMaxAmmo;
+            }
+        }
+
+        /// <inheritdoc/>
+        protected override void InitializeProperties(ItemBase itemBase)
+        {
+            base.InitializeProperties(itemBase);
+            if (itemBase is InventorySystem.Items.Firearms.Firearm firearm)
+            {
+                MaxAmmo = firearm.AmmoManagerModule.MaxAmmo;
             }
         }
     }

@@ -89,11 +89,16 @@ namespace Exiled.Events.Patches.Generic
 
             // Return false, no custom friendly fire allowed, default to NW logic for FF. No point in processing if FF is enabled across the board.
             if (Server.FriendlyFire)
-                return false;
+                return HitboxIdentity.CheckFriendlyFire(attackerFootprint.Role, victimHub.roleManager.CurrentRole.RoleTypeId);
 
             // always allow damage from Server.Host
             if (attackerFootprint.Hub == Server.Host.ReferenceHub)
                 return true;
+
+            // Only check friendlyFire if the FootPrint hasn't changed (Fix for Grenade not dealing damage because it's from a dead player)
+            // TODO rework FriendlyFireRule to make it compatible with Footprint
+            if (!attackerFootprint.SameLife(new(attackerFootprint.Hub)))
+                return HitboxIdentity.CheckFriendlyFire(attackerFootprint.Role, victimHub.roleManager.CurrentRole.RoleTypeId);
 
             if (attackerFootprint.Hub is null || victimHub is null)
             {
@@ -162,10 +167,10 @@ namespace Exiled.Events.Patches.Generic
             }
             catch (Exception ex)
             {
-                Log.Debug($"CheckFriendlyFirePlayerRules failed to handle friendly fire because: {ex}");
+                Log.Error($"CheckFriendlyFirePlayerRules failed to handle friendly fire because: {ex}");
             }
 
-            return false;
+            return HitboxIdentity.CheckFriendlyFire(attackerFootprint.Role, victimHub.roleManager.CurrentRole.RoleTypeId);
         }
     }
 

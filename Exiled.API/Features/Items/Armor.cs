@@ -85,33 +85,19 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets or sets how strong the helmet on the armor is.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">When trying to set the value below 0 or above 100.</exception>
         public int HelmetEfficacy
         {
             get => Base.HelmetEfficacy;
-            set
-            {
-                if (value is <= 101 and >= 0)
-                    Base.HelmetEfficacy = value;
-                else
-                    throw new ArgumentOutOfRangeException(nameof(HelmetEfficacy), "Value of armor efficacy must be between 0 and 100.");
-            }
+            set => Base.HelmetEfficacy = value;
         }
 
         /// <summary>
         /// Gets or sets how strong the vest on the armor is.
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">When trying to set the value below 0 or above 100.</exception>
         public int VestEfficacy
         {
             get => Base.VestEfficacy;
-            set
-            {
-                if (value is <= 101 and >= 0)
-                    Base.VestEfficacy = value;
-                else
-                    throw new ArgumentOutOfRangeException(nameof(VestEfficacy), "Value of armor efficacy must be between 0 and 100.");
-            }
+            set => Base.VestEfficacy = value;
         }
 
         /// <summary>
@@ -126,7 +112,6 @@ namespace Exiled.API.Features.Items
         /// <summary>
         /// Gets or sets how much the users movement speed should be affected when wearing this armor. (higher values = slower movement).
         /// </summary>
-        /// <exception cref="ArgumentOutOfRangeException">When attempting to set the value below 0 or above 1.</exception>
         public float MovementSpeedMultiplier
         {
             get => Base._movementSpeedMultiplier;
@@ -185,18 +170,6 @@ namespace Exiled.API.Features.Items
                 AmmoLimits = armorPickup.AmmoLimits;
                 CategoryLimits = armorPickup.CategoryLimits;
             }
-        }
-
-        /// <summary>
-        /// Change the owner of the <see cref="Armor"/>.
-        /// </summary>
-        /// <param name="oldOwner">old <see cref="Armor"/> owner.</param>
-        /// <param name="newOwner">new <see cref="Armor"/> owner.</param>
-        internal override void ChangeOwner(Player oldOwner, Player newOwner)
-        {
-            Base.Owner = newOwner.ReferenceHub;
-
-            Base.OnAdded(null);
         }
     }
 }

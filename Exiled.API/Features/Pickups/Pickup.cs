@@ -291,7 +291,7 @@ namespace Exiled.API.Features.Pickups
         /// <summary>
         /// Gets a value indicating whether this pickup is spawned.
         /// </summary>
-        public bool IsSpawned { get; internal set; }
+        public bool IsSpawned => NetworkServer.spawned.ContainsValue(Base.netIdentity);
 
         /// <summary>
         /// Gets an existing <see cref="Pickup"/> or creates a new instance of one.
@@ -511,17 +511,6 @@ namespace Exiled.API.Features.Pickups
             => pickup.Spawn(position, rotation, previousOwner);
 
         /// <summary>
-        /// Clones current <see cref="Pickup"/> object.
-        /// </summary>
-        /// <returns> New <see cref="Pickup"/> object.</returns>
-        public Pickup Clone() => new(Type)
-        {
-            Scale = Scale,
-            PreviousOwner = PreviousOwner,
-            Info = Info,
-        };
-
-        /// <summary>
         /// Returns the amount of time it will take for the provided <paramref name="player"/> to pick up this item, based on <see cref="Weight"/> and active status effects.
         /// </summary>
         /// <param name="player">The player to check search time.</param>
@@ -551,7 +540,6 @@ namespace Exiled.API.Features.Pickups
             if (!IsSpawned)
             {
                 NetworkServer.Spawn(GameObject);
-                IsSpawned = true;
             }
         }
 
@@ -582,7 +570,6 @@ namespace Exiled.API.Features.Pickups
         {
             if (IsSpawned)
             {
-                IsSpawned = false;
                 NetworkServer.UnSpawn(GameObject);
             }
         }

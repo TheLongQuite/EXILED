@@ -54,7 +54,7 @@ namespace Exiled.CustomItems.API.Features
         public abstract float FuseTime { get; set; }
 
         /// <summary>
-        /// Checks to see if the grenade is a tracked custom grenade.
+        /// Checks to see if the grenade is a custom grenade.
         /// </summary>
         /// <param name="grenade">The <see cref="Projectile">grenade</see> to check.</param>
         /// <returns>True if it is a custom grenade.</returns>

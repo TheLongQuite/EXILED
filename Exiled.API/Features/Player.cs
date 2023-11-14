@@ -169,6 +169,8 @@ namespace Exiled.API.Features
                 HintDisplay = value.hints;
                 Inventory = value.inventory;
                 CameraTransform = value.PlayerCameraReference;
+
+                value.playerStats._dictionarizedTypes[typeof(HealthStat)] = value.playerStats.StatModules[Array.IndexOf(PlayerStats.DefinedModules, typeof(HealthStat))] = healthStat = new CustomHealthStat { Hub = value };
             }
         }
 
@@ -563,6 +565,7 @@ namespace Exiled.API.Features
         /// <br /><see cref="RoleTypeId.Scp096"/> = <see cref="Scp096Role"/>.
         /// <br /><see cref="RoleTypeId.Scp106"/> = <see cref="Scp106Role"/>.
         /// <br /><see cref="RoleTypeId.Scp173"/> = <see cref="Scp173Role"/>.
+        /// <br /><see cref="RoleTypeId.Scp3114"/> = <see cref="Scp3114Role"/>.
         /// <br /><see cref="RoleTypeId.Scp939"/> = <see cref="Scp939Role"/>.
         /// <br />If not listed above, the type of Role will be <see cref="HumanRole"/>.
         /// </para>
@@ -2228,7 +2231,7 @@ namespace Exiled.API.Features
         /// <returns><see langword="true"/> if message was send; otherwise, <see langword="false"/>.</returns>
         public bool SendStaffMessage(string message, EncryptedChannelManager.EncryptedChannel channel = EncryptedChannelManager.EncryptedChannel.AdminChat)
         {
-            return ReferenceHub.encryptedChannelManager.TrySendMessageToClient("!0" + message, channel);
+            return ReferenceHub.encryptedChannelManager.TrySendMessageToClient("!" + NetId + message, channel);
         }
 
         /// <summary>
@@ -2922,8 +2925,8 @@ namespace Exiled.API.Features
             if (statusEffect is null)
                 return false;
 
-            statusEffect.ServerSetState(intensity);
-            statusEffect.ServerChangeDuration(duration, addDurationIfActive);
+            statusEffect.ServerSetState(intensity, duration, addDurationIfActive);
+
             return statusEffect is not null && statusEffect.IsEnabled;
         }
 

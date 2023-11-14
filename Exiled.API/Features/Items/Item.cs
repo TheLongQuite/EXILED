@@ -13,7 +13,7 @@ namespace Exiled.API.Features.Items
     using Exiled.API.Features.Core;
     using Exiled.API.Features.Pickups;
     using Exiled.API.Interfaces;
-    using Footprinting;
+
     using InventorySystem;
     using InventorySystem.Items;
     using InventorySystem.Items.Armor;
@@ -26,11 +26,12 @@ namespace Exiled.API.Features.Items
     using InventorySystem.Items.SwitchableLightSources;
     using InventorySystem.Items.SwitchableLightSources.Flashlight;
     using InventorySystem.Items.ThrowableProjectiles;
+    using InventorySystem.Items.ToggleableLights;
+    using InventorySystem.Items.ToggleableLights.Flashlight;
     using InventorySystem.Items.Usables;
     using InventorySystem.Items.Usables.Scp1576;
     using InventorySystem.Items.Usables.Scp244;
     using InventorySystem.Items.Usables.Scp330;
-
     using UnityEngine;
 
     using BaseConsumable = InventorySystem.Items.Usables.Consumable;
@@ -153,7 +154,7 @@ namespace Exiled.API.Features.Items
         public bool IsThrowable => this is Throwable;
 
         /// <summary>
-        /// Gets a value indicating whether or not this item can be used by player.
+        /// Gets a value indicating whether or not this item can be used by a player.
         /// </summary>
         public bool IsUsable => this is Usable;
 
@@ -161,6 +162,16 @@ namespace Exiled.API.Features.Items
         /// Gets a value indicating whether or not this item is a weapon.
         /// </summary>
         public bool IsWeapon => this is Firearm;
+
+        /// <summary>
+        /// Gets a value indicating whether or not this item emits light.
+        /// </summary>
+        public bool IsLightEmitter => Base is ILightEmittingItem;
+
+        /// <summary>
+        /// Gets a value indicating whether or not this item can be used to disarm players.
+        /// </summary>
+        public bool IsDisarmer => Base is IDisarmingItem;
 
         /// <summary>
         /// Gets the <see cref="Player"/> who owns the item.
@@ -196,7 +207,7 @@ namespace Exiled.API.Features.Items
                 MicroHIDItem micro => new MicroHid(micro),
                 BodyArmor armor => new Armor(armor),
                 AmmoItem ammo => new Ammo(ammo),
-                SwitchableLightSourceItemBase flashlight => new Flashlight(flashlight),
+                ToggleableLightItemBase flashlight => new Flashlight(flashlight),
                 JailbirdItem jailbird => new Jailbird(jailbird),
                 ThrowableItem throwable => throwable.Projectile switch
                 {

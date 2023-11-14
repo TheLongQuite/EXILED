@@ -125,9 +125,9 @@ namespace Exiled.Events.Patches.Events.Player
                     new CodeInstruction(OpCodes.Ldloc_0),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
 
-                    // evCancelledItemUseEventArgs.Item
+                    // evCancellingItemUseEventArgs.Item
                     new(OpCodes.Ldloc_S, evCancellingItemUseEventArgs.LocalIndex),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(CancelledItemUseEventArgs), nameof(CancelledItemUseEventArgs.Item))),
+                    new(OpCodes.Callvirt, PropertyGetter(typeof(CancellingItemUseEventArgs), nameof(CancellingItemUseEventArgs.Item))),
 
                     // CancelledItemUseEventArgs ev = new(Player, UsableItem)
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(CancelledItemUseEventArgs))[0]),

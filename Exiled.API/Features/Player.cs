@@ -14,9 +14,13 @@ namespace Exiled.API.Features
     using System.Runtime.CompilerServices;
 
     using Core;
+
     using CustomPlayerEffects;
+
     using DamageHandlers;
+
     using Enums;
+
     using Exiled.API.Features.Core.Interfaces;
     using Exiled.API.Features.Doors;
     using Exiled.API.Features.Hazards;
@@ -26,11 +30,17 @@ namespace Exiled.API.Features
     using Exiled.API.Features.Roles;
     using Exiled.API.Interfaces;
     using Exiled.API.Structs;
+
     using Extensions;
+
     using Footprinting;
+
     using global::Scp914;
+
     using Hints;
+
     using Interactables.Interobjects;
+
     using InventorySystem;
     using InventorySystem.Disarming;
     using InventorySystem.Items;
@@ -40,26 +50,39 @@ namespace Exiled.API.Features
     using InventorySystem.Items.Firearms.BasicMessages;
     using InventorySystem.Items.Usables;
     using InventorySystem.Items.Usables.Scp330;
+
     using MapGeneration.Distributors;
+
     using MEC;
+
     using Mirror;
     using Mirror.LiteNetLib4Mirror;
+
     using NorthwoodLib;
+
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
     using PlayerRoles.RoleAssign;
     using PlayerRoles.Spectating;
     using PlayerRoles.Voice;
+
     using PlayerStatsSystem;
+
     using PluginAPI.Core;
 
     using RelativePositioning;
+
     using RemoteAdmin;
+
     using Respawning.NamingRules;
+
     using RoundRestarting;
+
     using UnityEngine;
+
     using Utils;
     using Utils.Networking;
+
     using VoiceChat;
     using VoiceChat.Playbacks;
 
@@ -80,16 +103,12 @@ namespace Exiled.API.Features
         /// A list of the player's items.
         /// </summary>
         internal readonly List<Item> ItemsValue = new(8);
-
-        /// <summary>
-        /// A overriden <see cref="MaxHealth"/> value.
-        /// </summary>
-        internal float OverrideMaxHealth;
 #pragma warning restore SA1401
 
         private readonly HashSet<EActor> componentsInChildren = new();
 
         private ReferenceHub referenceHub;
+        private CustomHealthStat healthStat;
         private Role role;
 
         /// <summary>
@@ -841,13 +860,13 @@ namespace Exiled.API.Features
         /// </summary>
         public float Health
         {
-            get => ReferenceHub.playerStats.GetModule<HealthStat>().CurValue;
+            get => healthStat.CurValue;
             set
             {
                 if (value > MaxHealth)
                     MaxHealth = value;
 
-                ReferenceHub.playerStats.GetModule<HealthStat>().CurValue = value;
+                healthStat.CurValue = value;
             }
         }
 
@@ -856,15 +875,8 @@ namespace Exiled.API.Features
         /// </summary>
         public float MaxHealth
         {
-            get
-            {
-                return ReferenceHub.playerStats.GetModule<HealthStat>().MaxValue;
-            }
-
-            set
-            {
-                OverrideMaxHealth = value;
-            }
+            get => healthStat.MaxValue;
+            set => healthStat.CustomMaxValue = value;
         }
 
         /// <summary>
@@ -2625,29 +2637,26 @@ namespace Exiled.API.Features
         /// <returns><see langword="true"/> if a candy was given.</returns>
         public bool TryAddCandy(CandyKindID candyType)
         {
-            bool flag = false;
-            if (!Scp330Bag.TryGetBag(referenceHub, out Scp330Bag scp330Bag))
+            if (Scp330Bag.TryGetBag(ReferenceHub, out Scp330Bag bag))
             {
-                flag = true;
-                if (Items.Count > 7)
-                    return false;
+                bool flag = bag.TryAddSpecific(candyType);
 
-                scp330Bag = AddItem(ItemType.SCP330).As<Scp330>().Base;
+                if (flag)
+                    bag.ServerRefreshBag();
+
+                return flag;
             }
 
-            if (flag)
-            {
-                scp330Bag.Candies = new List<CandyKindID> { candyType };
-                scp330Bag.ServerRefreshBag();
-            }
-            else if (scp330Bag.TryAddSpecific(candyType))
-            {
-                scp330Bag.ServerRefreshBag();
-            }
-            else
-            {
+            if (Items.Count > 7)
                 return false;
-            }
+
+            Scp330 scp330 = (Scp330)AddItem(ItemType.SCP330);
+
+            Timing.CallDelayed(0.02f, () =>
+            {
+                scp330.Base.Candies.Clear();
+                scp330.AddCandy(candyType);
+            });
 
             return true;
         }
@@ -2989,7 +2998,7 @@ namespace Exiled.API.Features
                 EnableEffect(effect.Type, effect.Duration, effect.AddDurationIfActive);
 
                 if (effect.Intensity > 0)
-                    ChangeEffectIntensity(effect.Type, effect.Intensity);
+                    ChangeEffectIntensity(effect.Type, effect.Intensity, effect.Duration);
             }
         }
 
@@ -3126,20 +3135,12 @@ namespace Exiled.API.Features
         /// <param name="type">The <see cref="EffectType"/> to change.</param>
         /// <param name="intensity">The new intensity to use.</param>
         /// <param name="duration">The new duration to add to the effect.</param>
-        [Obsolete("Кринж")]
-        public void ChangeEffectIntensity(EffectType type, byte intensity, float duration = 0) =>
-            ChangeEffectIntensity(type, intensity);
-
-        /// <summary>
-        /// Changes the intensity of a <see cref="StatusEffectBase"/>.
-        /// </summary>
-        /// <param name="type">The <see cref="EffectType"/> to change.</param>
-        /// <param name="intensity">The new intensity to use.</param>
-        public void ChangeEffectIntensity(EffectType type, byte intensity)
+        public void ChangeEffectIntensity(EffectType type, byte intensity, float duration = 0)
         {
             if (TryGetEffect(type, out StatusEffectBase statusEffect))
             {
                 statusEffect.Intensity = intensity;
+                statusEffect.ServerChangeDuration(duration, true);
             }
         }
 
@@ -3149,19 +3150,10 @@ namespace Exiled.API.Features
         /// <param name="effectName">The name of the <see cref="StatusEffectBase"/> to enable.</param>
         /// <param name="intensity">The intensity of the effect.</param>
         /// <param name="duration">The new length of the effect. Defaults to infinite length.</param>
-        [Obsolete("Кринж")]
-        public void ChangeEffectIntensity(string effectName, byte intensity, float duration = 0) =>
-            ChangeEffectIntensity(effectName, intensity);
-
-        /// <summary>
-        /// Changes the intensity of a <see cref="StatusEffectBase">status effect</see>.
-        /// </summary>
-        /// <param name="effectName">The name of the <see cref="StatusEffectBase"/> to enable.</param>
-        /// <param name="intensity">The intensity of the effect.</param>
-        public void ChangeEffectIntensity(string effectName, byte intensity)
+        public void ChangeEffectIntensity(string effectName, byte intensity, float duration = 0)
         {
             if (Enum.TryParse(effectName, out EffectType type))
-                ChangeEffectIntensity(type, intensity);
+                ChangeEffectIntensity(type, intensity, duration);
         }
 
         /// <summary>

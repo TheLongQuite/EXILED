@@ -23,8 +23,6 @@ namespace Exiled.API.Features.Items
     using InventorySystem.Items.MicroHID;
     using InventorySystem.Items.Pickups;
     using InventorySystem.Items.Radio;
-    using InventorySystem.Items.SwitchableLightSources;
-    using InventorySystem.Items.SwitchableLightSources.Flashlight;
     using InventorySystem.Items.ThrowableProjectiles;
     using InventorySystem.Items.ToggleableLights;
     using InventorySystem.Items.ToggleableLights.Flashlight;

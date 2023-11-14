@@ -12,6 +12,7 @@ namespace Exiled.Events.EventArgs.Player
 
     using Interfaces;
 
+    using InventorySystem.Items.ToggleableLights;
     using InventorySystem.Items.ToggleableLights.Flashlight;
 
     /// <summary>
@@ -33,7 +34,7 @@ namespace Exiled.Events.EventArgs.Player
         /// <param name="newState">
         ///     <inheritdoc cref="NewState" />
         /// </param>
-        public TogglingFlashlightEventArgs(ReferenceHub hub, SwitchableLightSourceItemBase flashlight, bool newState)
+        public TogglingFlashlightEventArgs(ReferenceHub hub, ToggleableLightItemBase flashlight, bool newState)
         {
             Player = Player.Get(hub);
             Flashlight = (Flashlight)Item.Get(flashlight);

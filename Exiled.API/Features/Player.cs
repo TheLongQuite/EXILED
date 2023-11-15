@@ -3134,6 +3134,19 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="type">The <see cref="EffectType"/> to change.</param>
         /// <param name="intensity">The new intensity to use.</param>
+        public void ChangeEffectIntensity(EffectType type, byte intensity)
+        {
+            if (TryGetEffect(type, out StatusEffectBase statusEffect))
+            {
+                statusEffect.Intensity = intensity;
+            }
+        }
+
+        /// <summary>
+        /// Changes the intensity of a <see cref="StatusEffectBase"/>.
+        /// </summary>
+        /// <param name="type">The <see cref="EffectType"/> to change.</param>
+        /// <param name="intensity">The new intensity to use.</param>
         /// <param name="duration">The new duration to add to the effect.</param>
         public void ChangeEffectIntensity(EffectType type, byte intensity, float duration = 0)
         {

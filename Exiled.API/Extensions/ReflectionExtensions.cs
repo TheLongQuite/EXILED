@@ -20,7 +20,7 @@ namespace Exiled.API.Extensions
     public static class ReflectionExtensions
     {
         /// <summary>
-        /// Invoke a static method.
+        /// Invokes a static method.
         /// </summary>
         /// <param name="type">The method type.</param>
         /// <param name="methodName">The method name.</param>
@@ -33,7 +33,7 @@ namespace Exiled.API.Extensions
         }
 
         /// <summary>
-        /// Invoke a static event.
+        /// Invokes a static event.
         /// </summary>
         /// <param name="type">The event type.</param>
         /// <param name="eventName">The event name.</param>

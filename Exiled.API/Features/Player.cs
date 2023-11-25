@@ -2577,6 +2577,8 @@ namespace Exiled.API.Features
                     acquisitionConfirmationTrigger.AcquisitionAlreadyReceived = false;
                 }
 
+                typeof(InventoryExtensions).InvokeStaticEvent(nameof(InventoryExtensions.OnItemAdded), new object[] { ReferenceHub, itemBase, null });
+
                 ItemsValue.Add(item);
 
                 Inventory.SendItemsNextFrame = true;

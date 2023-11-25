@@ -11,9 +11,7 @@ namespace Exiled.Events.EventArgs.Player
     using API.Features.Items;
 
     using Interfaces;
-
     using InventorySystem.Items.ToggleableLights;
-    using InventorySystem.Items.ToggleableLights.Flashlight;
 
     /// <summary>
     ///     Contains all information before a player toggles a flashlight.

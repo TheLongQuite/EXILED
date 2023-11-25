@@ -213,7 +213,6 @@ namespace Exiled.Events.Patches.Events.Player
                 Scp173Role.TurnedPlayers.Remove(player);
 
             player.MaxHealth = default;
-
         }
 
         private static void ChangeInventory(ChangingRoleEventArgs ev)

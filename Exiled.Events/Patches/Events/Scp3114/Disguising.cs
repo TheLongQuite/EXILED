@@ -14,9 +14,7 @@ namespace Exiled.Events.Patches.Events.Scp3114
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
     using HarmonyLib;
-    using Mirror;
     using PlayerRoles.PlayableScps.Scp3114;
-    using PlayerRoles.PlayableScps.Subroutines;
     using PlayerRoles.Ragdolls;
 
     /// <summary>

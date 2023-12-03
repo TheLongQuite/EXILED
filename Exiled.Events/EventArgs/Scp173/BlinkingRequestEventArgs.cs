@@ -12,11 +12,6 @@ namespace Exiled.Events.EventArgs.Scp173
     using API.Features;
 
     using Interfaces;
-
-    using PlayerRoles.PlayableScps.Scp173;
-
-    using UnityEngine;
-
     using Scp173Role = API.Features.Roles.Scp173Role;
 
     /// <summary>

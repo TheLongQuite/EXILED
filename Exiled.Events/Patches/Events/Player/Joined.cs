@@ -10,12 +10,7 @@ namespace Exiled.Events.Patches.Events.Player
 #pragma warning disable SA1600
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-    using System;
-
     using API.Features;
-    using Exiled.Events.EventArgs.Player;
-    using Exiled.Loader.Features;
-
     using HarmonyLib;
 
     /// <summary>

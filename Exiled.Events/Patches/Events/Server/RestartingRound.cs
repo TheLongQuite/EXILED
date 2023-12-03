@@ -7,14 +7,11 @@
 
 namespace Exiled.Events.Patches.Events.Server
 {
-    using System;
     using System.Collections.Generic;
     using System.Reflection.Emit;
 
     using API.Features.Pools;
     using Exiled.Events.Attributes;
-    using GameCore;
-
     using HarmonyLib;
 
     using RoundRestarting;

@@ -89,6 +89,6 @@ namespace Exiled.CustomRoles.API.Features
                 role.Energy -= EnergyUsage;
         }
 
-        internal bool IsAlreadyUnAvailable(Player player) => player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel;
+        internal bool IsAvailable(Player player) => player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel && (!CustomRoles.Instance!.Config.HideUnavailableHighLevelAbilities || scp079Role.Level >= MinRequiredLevel);
     }
 }

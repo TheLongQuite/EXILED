@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using CommandSystem;
 using Exiled.API.Features;
@@ -34,16 +35,30 @@ namespace Exiled.CustomRoles.Commands.User
                 return false;
             }
 
-            var activeAbilities = role.CustomAbilities.OfType<ActiveAbility>().ToList();
-            if (activeAbilities.IsEmpty())
-            {
-                response = "У вашей спецроли нет спецспособностей!";
-                return false;
-            }
-
             if (arguments.Count == 0)
             {
                 response = string.Format(CustomRoles.Instance!.Config.UseAbilityResponse, RoleInfo.GetAbilitiesInfo(player, role));
+                return false;
+            }
+
+            var activeAbilities = new List<ActiveAbility>();
+            foreach (var ability in role.CustomAbilities)
+            {
+                if (ability is Scp079ActiveAbility scp079ActiveAbility)
+                {
+                    if (!scp079ActiveAbility.IsAvailable(player))
+                        continue;
+                    activeAbilities.Add(scp079ActiveAbility);
+                }
+                else if (ability is ActiveAbility activeAbility)
+                {
+                    activeAbilities.Add(activeAbility);
+                }
+            }
+
+            if (activeAbilities.IsEmpty())
+            {
+                response = "У вашей спецроли нет спецспособностей!";
                 return false;
             }
 

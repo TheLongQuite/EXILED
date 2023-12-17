@@ -57,7 +57,7 @@ namespace Exiled.CustomRoles.Commands.User
                 switch (ability)
                 {
                     case Scp079ActiveAbility scp079ActiveAbility:
-                        if (!scp079ActiveAbility.IsAlreadyUnAvailable(player))
+                        if (!scp079ActiveAbility.IsAvailable(player))
                             continue;
                         scp079ActiveAbilities.Add(scp079ActiveAbility);
                         break;

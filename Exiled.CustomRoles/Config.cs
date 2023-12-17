@@ -113,10 +113,16 @@ namespace Exiled.CustomRoles
         public string Active079AbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
 
         /// <summary>
-        /// f.
+        /// Ability line format.
         /// </summary>
         [Description("Формат названия раздела способностей. {0} - 'Пассивные способности:'/'Активные способности:'")]
         public string AbilityBlockFormat { get; set; } = "<b>{0}</b>";
+
+        /// <summary>
+        /// Fuck these docs.
+        /// </summary>
+        [Description("Формат названия раздела способностей. {0} - 'Пассивные способности:'/'Активные способности:'")]
+        public bool HideUnavailableHighLevelAbilities { get; set; } = false;
 
         /// <summary>
         /// Gets or sets customroles nickname display to spectators.

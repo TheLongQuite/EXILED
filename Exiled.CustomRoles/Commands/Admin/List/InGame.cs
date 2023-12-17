@@ -5,17 +5,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.Commands.List
+using System;
+using System.Text;
+using CommandSystem;
+using Exiled.API.Features;
+using Exiled.CustomRoles.API.Features;
+using Exiled.Permissions.Extensions;
+using NorthwoodLib.Pools;
+
+namespace Exiled.CustomRoles.Commands.Admin.List
 {
-    using System;
-    using System.Text;
-
-    using CommandSystem;
-    using Exiled.API.Features;
-    using Exiled.CustomRoles.API.Features;
-    using Exiled.Permissions.Extensions;
-    using NorthwoodLib.Pools;
-
     /// <inheritdoc/>
     internal sealed class InGame : ICommand
     {

@@ -5,6 +5,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using System.ComponentModel;
+
 namespace Exiled.CustomRoles.API.Features
 {
     using System;
@@ -24,6 +26,12 @@ namespace Exiled.CustomRoles.API.Features
         public abstract byte MinRequiredLevel { get; set; }
 
         /// <summary>
+        /// Gets or sets maximum SCP-079 level to use this ability.
+        /// </summary>
+        [Description("Уровень, с которого способность перестанет отображаться и станет недоступна для использования.")]
+        public virtual byte MaxRequiredLevel { get; set; } = 10;
+
+        /// <summary>
         /// Gets or sets energy usage for ability.
         /// </summary>
         public abstract float EnergyUsage { get; set; }
@@ -41,6 +49,15 @@ namespace Exiled.CustomRoles.API.Features
             {
                 var hint = CustomRoles.Instance!.Config.InsufficientLevelHint;
                 response = string.Format(hint.Content, scp079Role.Level + 1, MinRequiredLevel + 1);
+                if (hint.Show)
+                    player.ShowHint(response, hint.Duration);
+                return false;
+            }
+
+            if (scp079Role.Level > MaxRequiredLevel)
+            {
+                var hint = CustomRoles.Instance!.Config.RedundantLevelHint;
+                response = string.Format(hint.Content, scp079Role.Level + 1, MaxRequiredLevel + 1);
                 if (hint.Show)
                     player.ShowHint(response, hint.Duration);
                 return false;
@@ -71,5 +88,7 @@ namespace Exiled.CustomRoles.API.Features
             if (player.Role.Is(out Scp079Role role))
                 role.Energy -= EnergyUsage;
         }
+
+        internal bool IsAlreadyUnAvailable(Player player) => player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel;
     }
 }

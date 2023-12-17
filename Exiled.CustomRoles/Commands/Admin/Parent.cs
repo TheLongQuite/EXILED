@@ -5,12 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.Commands
+using System;
+using CommandSystem;
+
+namespace Exiled.CustomRoles.Commands.Admin
 {
-    using System;
-
-    using CommandSystem;
-
     /// <summary>
     /// The main parent command.
     /// </summary>

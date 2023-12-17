@@ -5,22 +5,20 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.Commands
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using CommandSystem;
+using Exiled.API.Enums;
+using Exiled.API.Features;
+using Exiled.API.Features.Pools;
+using Exiled.CustomRoles.API;
+using Exiled.CustomRoles.API.Features;
+using Exiled.Permissions.Extensions;
+using RemoteAdmin;
+
+namespace Exiled.CustomRoles.Commands.Admin
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
-    using CommandSystem;
-
-    using Exiled.API.Enums;
-    using Exiled.API.Features;
-    using Exiled.API.Features.Pools;
-    using Exiled.CustomRoles.API;
-    using Exiled.CustomRoles.API.Features;
-    using Exiled.Permissions.Extensions;
-    using RemoteAdmin;
-
     /// <summary>
     /// The command to give a role to player(s).
     /// </summary>

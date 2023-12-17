@@ -5,12 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.Commands.List
+using System;
+using CommandSystem;
+
+namespace Exiled.CustomRoles.Commands.Admin.List
 {
-    using System;
-
-    using CommandSystem;
-
     /// <summary>
     /// The command to list all registered roles.
     /// </summary>

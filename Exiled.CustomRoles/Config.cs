@@ -5,6 +5,8 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using Exiled.CustomRoles.Commands.User;
+
 namespace Exiled.CustomRoles
 {
     using System.ComponentModel;
@@ -64,6 +66,57 @@ namespace Exiled.CustomRoles
         /// </summary>
         [Description("The hint that is shown when someone tries to use ability without required level. Also used in console respond. {0} - current level, {1} - required level")]
         public Hint InsufficientLevelHint { get; private set; } = new Hint("Недостаточный уровень!\nУ вас {0}/{1}", 5);
+
+        /// <summary>
+        /// Gets the hint that is shown when someone tries to use <see cref="CustomAbility"/> with too high level.
+        /// </summary>
+        [Description("The hint that is shown when someone tries to use ability with too high level. Also used in console respond. {0} - current level, {1} - required level")]
+        public Hint RedundantLevelHint { get; private set; } = new Hint("Избыточный уровень!\nУ вас {0}/{1}", 5);
+        /// <summary>
+        /// Response of <see cref="RoleInfo"/>
+        /// </summary>
+        [Description("Формат ответа команды RoleInfo. 0 - Название, 1 - айди, 2 - описание, 3 - способности")]
+        public string RoleInfoResponse { get; set; } = "\n<b>Ваша особая роль: <color=red>{0}</color></b>\n" +
+                                                       "<b>ID: <color=red>{1}</color></b>\n" +
+                                                       "{2}\n" +
+                                                       "<b><color=green>{3}</b></color>\n" + // Теги будут влиять на заголовки разделов
+                                                       "<color=yellow><i>Для активации способности напишите команду .ability</i></color>\n\n" +
+                                                       "<b><color=red>Вы можете сделать активацию способности по клавише!</color></b>\n" +
+                                                       "Для этого напишите команду cmdbind КЛАВИША .ability НОМЕР_СПОСОБНОСТИ";
+
+        /// <summary>
+        /// Response of <see cref="UseAbility"/>
+        /// </summary>
+        [Description("Формат ответа команды RoleInfo. 0 - способности")]
+        public string UseAbilityResponse { get; set; } = "\n<b><color=red>Укажите номер способности.</color></b>\n" +
+                                                         "<b>Список:</b>\n" +
+                                                         "\n{0}\n" +
+                                                         "<b><color=yellow>Вы можете сделать активацию способности по клавише!</color></b>\n" +
+                                                         "<color=yellow>Для этого напишите команду cmdbind КЛАВИША .ability НОМЕР_СПОСОБНОСТИ</color>";
+
+        /// <summary>
+        /// Format for displaing <see cref="PassiveAbility"/> in <see cref="RoleInfo"/> command.
+        /// </summary>
+        [Description("Формат отображения строки способности. 0 - номер в разделе, 1 - название, 2 - описание. Следует помнить, что эта строка вставляется в раздел 3 выше")]
+        public string PassiveAbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
+
+        /// <summary>
+        /// Format for displaing <see cref="ActiveAbility"/> in <see cref="RoleInfo"/> and <see cref="UseAbility"/> commands.
+        /// </summary>
+        [Description("Формат отображения строки способности. 0 - номер в разделе, 1 - название, 2 - описание, 3 - длительность (заменяется на 'Мгновенно', если равно нулю), 4 - КД. Следует помнить, что эта строка вставляется в раздел 3 выше")]
+        public string ActiveAbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
+
+        /// <summary>
+        /// Format for displaing <see cref="Scp079ActiveAbility"/> in <see cref="RoleInfo"/> and <see cref="UseAbility"/> commands.
+        /// </summary>
+        [Description("Формат отображения строки способности. 0 - номер в разделе, 1 - название, 2 - описание, 3 - длительность (заменяется на 'Мгновенно', если равно нулю), 4 - КД, 5 - требуемый уровень, 6 - требуемая энергия. Следует помнить, что эта строка вставляется в раздел 3 выше")]
+        public string Active079AbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
+
+        /// <summary>
+        /// f.
+        /// </summary>
+        [Description("Формат названия раздела способностей. {0} - 'Пассивные способности:'/'Активные способности:'")]
+        public string AbilityBlockFormat { get; set; } = "<b>{0}</b>";
 
         /// <summary>
         /// Gets or sets customroles nickname display to spectators.

@@ -5,18 +5,16 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.Commands.List
+using System;
+using System.Linq;
+using System.Text;
+using CommandSystem;
+using Exiled.API.Features.Pools;
+using Exiled.CustomRoles.API.Features;
+using Exiled.Permissions.Extensions;
+
+namespace Exiled.CustomRoles.Commands.Admin.List
 {
-    using System;
-    using System.Linq;
-    using System.Text;
-
-    using CommandSystem;
-
-    using Exiled.API.Features.Pools;
-    using Exiled.CustomRoles.API.Features;
-    using Exiled.Permissions.Extensions;
-
     /// <inheritdoc />
     internal sealed class Registered : ICommand
     {

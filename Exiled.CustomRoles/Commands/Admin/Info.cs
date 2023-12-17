@@ -5,17 +5,15 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.Commands
+using System;
+using System.Text;
+using CommandSystem;
+using Exiled.API.Features.Pools;
+using Exiled.CustomRoles.API.Features;
+using Exiled.Permissions.Extensions;
+
+namespace Exiled.CustomRoles.Commands.Admin
 {
-    using System;
-    using System.Text;
-
-    using CommandSystem;
-
-    using Exiled.API.Features.Pools;
-    using Exiled.CustomRoles.API.Features;
-    using Exiled.Permissions.Extensions;
-
     /// <summary>
     /// The command to view info about a specific role.
     /// </summary>

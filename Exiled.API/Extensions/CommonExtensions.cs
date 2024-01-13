@@ -46,7 +46,7 @@ namespace Exiled.API.Extensions
         /// <returns>The new modfied curve.</returns>
         public static AnimationCurve Multiply(this AnimationCurve curve, float amount)
         {
-            for (var i = 0; i < curve.length; i++)
+            for (int i = 0; i < curve.length; i++)
                 curve.keys[i].value *= amount;
 
             return curve;
@@ -60,7 +60,7 @@ namespace Exiled.API.Extensions
         /// <returns>The new modfied curve.</returns>
         public static AnimationCurve Add(this AnimationCurve curve, float amount)
         {
-            for (var i = 0; i < curve.length; i++)
+            for (int i = 0; i < curve.length; i++)
                 curve.keys[i].value += amount;
 
             return curve;

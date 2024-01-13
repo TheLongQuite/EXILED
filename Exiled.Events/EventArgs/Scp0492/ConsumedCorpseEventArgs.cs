@@ -15,7 +15,7 @@ namespace Exiled.Events.EventArgs.Scp0492
     using PlayerRoles.Ragdolls;
 
     /// <summary>
-    ///     Contains all information after zombie consumes RagDolls.
+    /// Contains all information after zombie consumes RagDolls.
     /// </summary>
     public class ConsumedCorpseEventArgs : IScp0492Event, IRagdollEvent
     {
@@ -33,7 +33,7 @@ namespace Exiled.Events.EventArgs.Scp0492
         }
 
         /// <summary>
-        ///     Gets the player who is controlling SCP-049-2.
+        /// Gets the player who is controlling SCP-049-2.
         /// </summary>
         public Player Player { get; }
 
@@ -41,12 +41,12 @@ namespace Exiled.Events.EventArgs.Scp0492
         public Scp0492Role Scp0492 { get; }
 
         /// <summary>
-        ///     Gets the RagDoll to be consumed.
+        /// Gets the RagDoll to be consumed.
         /// </summary>
         public Ragdoll Ragdoll { get; }
 
         /// <summary>
-        ///     Gets or sets a value about how mush heath the Zombie will get.
+        /// Gets or sets a value about how mush heath the Zombie will get.
         /// </summary>
         public float ConsumeHeal { get; set; } = ZombieConsumeAbility.ConsumeHeal;
     }

@@ -23,8 +23,8 @@ namespace Exiled.Events.Patches.Events.Player
     using static HarmonyLib.AccessTools;
 
     /// <summary>
-    ///     Patches <see cref="UsableItemsController.Update" />
-    ///     Adds the <see cref="Handlers.Player.UsedItem" /> event.
+    /// Patches <see cref="UsableItemsController.Update" />
+    /// Adds the <see cref="Handlers.Player.UsedItem" /> event.
     /// </summary>
     [HarmonyPatch(typeof(UsableItemsController), nameof(UsableItemsController.Update))]
     internal static class UsingItemCompleted

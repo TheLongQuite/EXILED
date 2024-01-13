@@ -73,7 +73,8 @@ namespace Exiled.CustomItems.API.Features
         {
             if (item is Firearm firearm)
             {
-                firearm.AddAttachment(Attachments);
+                if (!Attachments.IsEmpty())
+                    firearm.AddAttachment(Attachments);
 
                 firearm.Ammo = ClipSize;
 
@@ -99,7 +100,8 @@ namespace Exiled.CustomItems.API.Features
 
             if (item is Firearm firearm)
             {
-                firearm.AddAttachment(Attachments);
+                if (!Attachments.IsEmpty())
+                    firearm.AddAttachment(Attachments);
                 firearm.Ammo = ClipSize;
             }
 
@@ -177,7 +179,7 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalReloading(ReloadingWeaponEventArgs ev)
         {
-            if (!Check(ev.Firearm))
+            if (!Check(ev.Player.CurrentItem))
                 return;
 
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: Reloading weapon. Calling external reload event..");
@@ -215,7 +217,6 @@ namespace Exiled.CustomItems.API.Features
                 return;
 
             ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
-
             ev.Player.ReferenceHub.playerEffectsController.GetEffect<CustomPlayerEffects.Invisible>().Intensity = 0;
 
             ev.Player.Ammo[ammoType.GetItemType()] -= amountToReload;

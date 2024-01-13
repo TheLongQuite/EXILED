@@ -148,9 +148,17 @@ namespace Exiled.API.Features
                 Log.Debug($"Ignore: {e}");
             }
 
-            int conId = id == 0 ? ReferenceHub.AllHubs.Count + 1 : id;
+            if (RecyclablePlayerId.FreeIds.Contains(id))
+            {
+                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
+            }
+            else if (RecyclablePlayerId._autoIncrement >= id)
+            {
+                RecyclablePlayerId._autoIncrement = id = RecyclablePlayerId._autoIncrement + 150;
+                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
+            }
 
-            NetworkServer.AddPlayerForConnection(new FakeConnection(conId), newObject);
+            NetworkServer.AddPlayerForConnection(new FakeConnection(id), newObject);
 
             try
             {

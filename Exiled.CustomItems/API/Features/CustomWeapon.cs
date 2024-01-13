@@ -199,7 +199,10 @@ namespace Exiled.CustomItems.API.Features
             byte remainingClip = ev.Firearm.Ammo;
 
             if (remainingClip >= ClipSize)
+            {
+                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: remainingClip >= ClipSize, returning.");
                 return;
+            }
 
             Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] is reloading a {Name} ({Id}) [{Type} ({remainingClip}/{ClipSize})]!");
 

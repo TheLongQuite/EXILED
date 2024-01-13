@@ -1,13 +1,14 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.CustomRoles.API;
-using Exiled.CustomRoles.API.Features;
-
 namespace Exiled.CustomRoles.Commands.User
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using CommandSystem;
+    using Exiled.API.Features;
+    using Exiled.CustomRoles.API;
+    using Exiled.CustomRoles.API.Features;
+
     /// <summary>
     /// Handles the using of custom role abilities.
     /// </summary>

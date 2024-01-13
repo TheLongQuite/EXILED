@@ -72,8 +72,9 @@ namespace Exiled.CustomRoles
         /// </summary>
         [Description("The hint that is shown when someone tries to use ability with too high level. Also used in console respond. {0} - current level, {1} - required level")]
         public Hint RedundantLevelHint { get; private set; } = new Hint("Избыточный уровень!\nУ вас {0}/{1}", 5);
+
         /// <summary>
-        /// Response of <see cref="RoleInfo"/>
+        /// Gets or sets response of <see cref="RoleInfo"/>.
         /// </summary>
         [Description("Формат ответа команды RoleInfo. 0 - Название, 1 - айди, 2 - описание, 3 - способности")]
         public string RoleInfoResponse { get; set; } = "\n<b>Ваша особая роль: <color=red>{0}</color></b>\n" +
@@ -85,7 +86,7 @@ namespace Exiled.CustomRoles
                                                        "Для этого напишите команду cmdbind КЛАВИША .ability НОМЕР_СПОСОБНОСТИ";
 
         /// <summary>
-        /// Response of <see cref="UseAbility"/>
+        /// Gets or sets response of <see cref="UseAbility"/>.
         /// </summary>
         [Description("Формат ответа команды RoleInfo. 0 - способности")]
         public string UseAbilityResponse { get; set; } = "\n<b><color=red>Укажите номер способности.</color></b>\n" +
@@ -95,31 +96,31 @@ namespace Exiled.CustomRoles
                                                          "<color=yellow>Для этого напишите команду cmdbind КЛАВИША .ability НОМЕР_СПОСОБНОСТИ</color>";
 
         /// <summary>
-        /// Format for displaing <see cref="PassiveAbility"/> in <see cref="RoleInfo"/> command.
+        /// Gets or sets format for displaing <see cref="PassiveAbility"/> in <see cref="RoleInfo"/> command.
         /// </summary>
         [Description("Формат отображения строки способности. 0 - номер в разделе, 1 - название, 2 - описание. Следует помнить, что эта строка вставляется в раздел 3 выше")]
         public string PassiveAbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
 
         /// <summary>
-        /// Format for displaing <see cref="ActiveAbility"/> in <see cref="RoleInfo"/> and <see cref="UseAbility"/> commands.
+        /// Gets or sets format for displaing <see cref="ActiveAbility"/> in <see cref="RoleInfo"/> and <see cref="UseAbility"/> commands.
         /// </summary>
         [Description("Формат отображения строки способности. 0 - номер в разделе, 1 - название, 2 - описание, 3 - длительность (заменяется на 'Мгновенно', если равно нулю), 4 - КД. Следует помнить, что эта строка вставляется в раздел 3 выше")]
         public string ActiveAbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
 
         /// <summary>
-        /// Format for displaing <see cref="Scp079ActiveAbility"/> in <see cref="RoleInfo"/> and <see cref="UseAbility"/> commands.
+        /// Gets or sets format for displaing <see cref="Scp079ActiveAbility"/> in <see cref="RoleInfo"/> and <see cref="UseAbility"/> commands.
         /// </summary>
         [Description("Формат отображения строки способности. 0 - номер в разделе, 1 - название, 2 - описание, 3 - длительность (заменяется на 'Мгновенно', если равно нулю), 4 - КД, 5 - требуемый уровень, 6 - требуемая энергия. Следует помнить, что эта строка вставляется в раздел 3 выше")]
         public string Active079AbilityLineFormat { get; set; } = " - <color=gray><i>#{0} {1}\n{2}</i></color>";
 
         /// <summary>
-        /// Ability line format.
+        /// Gets or sets ability line format.
         /// </summary>
         [Description("Формат названия раздела способностей. {0} - 'Пассивные способности:'/'Активные способности:'")]
         public string AbilityBlockFormat { get; set; } = "<b>{0}</b>";
 
         /// <summary>
-        /// Fuck these docs.
+        /// Gets or sets a value indicating whether fuck these docs.
         /// </summary>
         [Description("Формат названия раздела способностей. {0} - 'Пассивные способности:'/'Активные способности:'")]
         public bool HideUnavailableHighLevelAbilities { get; set; } = false;

@@ -48,6 +48,7 @@ namespace Exiled.Events.Patches.Events.Scp106
 
                     // is entering false
                     new(OpCodes.Ldc_I4_0),
+
                     // is enabled true
                     new(OpCodes.Ldc_I4_1),
 
@@ -79,6 +80,7 @@ namespace Exiled.Events.Patches.Events.Scp106
 
                     // is entering true
                     new(OpCodes.Ldc_I4_1),
+
                     // is enabled true
                     new(OpCodes.Ldc_I4_1),
 

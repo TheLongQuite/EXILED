@@ -7,25 +7,31 @@
 
 namespace Exiled.CustomRoles
 {
+    using API.Features;
+    using API.Features.Parsers;
+
+    using Events;
+
     using Exiled.API.Features;
-    using Exiled.CustomRoles.API.Features;
-    using Exiled.CustomRoles.API.Features.Parsers;
-    using Exiled.CustomRoles.Events;
-    using Exiled.Loader;
-    using Exiled.Loader.Features.Configs.CustomConverters;
+
+    using Loader;
+    using Loader.Features.Configs.CustomConverters;
+
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NamingConventions;
     using YamlDotNet.Serialization.NodeDeserializers;
 
+    using Player = Exiled.Events.Handlers.Player;
+
     /// <summary>
-    /// Handles all custom role API functions.
+    ///     Handles all custom role API functions.
     /// </summary>
     public class CustomRoles : Plugin<Config>
     {
         private PlayerHandler playerHandler = null!;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="CustomRoles"/> class.
+        ///     Initializes a new instance of the <see cref="CustomRoles" /> class.
         /// </summary>
         public CustomRoles()
         {
@@ -41,25 +47,25 @@ namespace Exiled.CustomRoles
         }
 
         /// <summary>
-        /// Gets a static reference to the plugin's instance.
+        ///     Gets a static reference to the plugin's instance.
         /// </summary>
         public static CustomRoles? Instance { get; private set; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override void OnEnabled()
         {
             Instance = this;
             playerHandler = new PlayerHandler();
 
-            Exiled.Events.Handlers.Player.ChangingRole += playerHandler.OnChangingRole;
+            Player.ChangingRole += playerHandler.OnChangingRole;
 
             base.OnEnabled();
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override void OnDisabled()
         {
-            Exiled.Events.Handlers.Player.ChangingRole -= playerHandler.OnChangingRole;
+            Player.ChangingRole -= playerHandler.OnChangingRole;
 
             Instance = null;
             base.OnDisabled();

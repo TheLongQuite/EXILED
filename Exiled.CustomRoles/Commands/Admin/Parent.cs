@@ -5,36 +5,37 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using CommandSystem;
-
 namespace Exiled.CustomRoles.Commands.Admin
 {
+    using System;
+
+    using CommandSystem;
+
     /// <summary>
-    /// The main parent command.
+    ///     The main parent command.
     /// </summary>
     [CommandHandler(typeof(RemoteAdminCommandHandler))]
     [CommandHandler(typeof(GameConsoleCommandHandler))]
     public class Parent : ParentCommand
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="Parent"/> class.
+        ///     Initializes a new instance of the <see cref="Parent" /> class.
         /// </summary>
         public Parent()
         {
             LoadGeneratedCommands();
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string Command { get; } = "customroles";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string[] Aliases { get; } = { "cr", "crs" };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string Description { get; } = string.Empty;
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override void LoadGeneratedCommands()
         {
             RegisterCommand(Give.Instance);
@@ -42,7 +43,7 @@ namespace Exiled.CustomRoles.Commands.Admin
             RegisterCommand(List.List.Instance);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             response = "Доступные команды: give, info, list";

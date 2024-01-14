@@ -5,22 +5,27 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using CommandSystem;
-using Exiled.API.Enums;
-using Exiled.API.Features;
-using Exiled.API.Features.Pools;
-using Exiled.CustomRoles.API;
-using Exiled.CustomRoles.API.Features;
-using Exiled.Permissions.Extensions;
-using RemoteAdmin;
-
 namespace Exiled.CustomRoles.Commands.Admin
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Linq;
+
+    using API;
+    using API.Features;
+
+    using CommandSystem;
+
+    using Exiled.API.Enums;
+    using Exiled.API.Features;
+    using Exiled.API.Features.Pools;
+
+    using Permissions.Extensions;
+
+    using RemoteAdmin;
+
     /// <summary>
-    /// The command to give a role to player(s).
+    ///     The command to give a role to player(s).
     /// </summary>
     internal sealed class Give : ICommand
     {
@@ -29,20 +34,20 @@ namespace Exiled.CustomRoles.Commands.Admin
         }
 
         /// <summary>
-        /// Gets the <see cref="Give"/> command instance.
+        ///     Gets the <see cref="Give" /> command instance.
         /// </summary>
         public static Give Instance { get; } = new();
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Command { get; } = "give";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string[] Aliases { get; } = { "g" };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Description { get; } = "Gives the specified custom role to the indicated player(s).";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.give"))
@@ -107,7 +112,7 @@ namespace Exiled.CustomRoles.Commands.Admin
 
         private void TryAddRole(Player player, CustomRole customRole)
         {
-            foreach (var cRole in player.GetCustomRoles())
+            foreach (CustomRole? cRole in player.GetCustomRoles())
                 cRole?.RemoveRole(player);
 
             customRole.AddRole(player, SpawnReason.ForceClass);

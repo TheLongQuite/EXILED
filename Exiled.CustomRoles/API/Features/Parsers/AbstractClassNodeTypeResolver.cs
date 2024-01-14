@@ -14,14 +14,14 @@ namespace Exiled.CustomRoles.API.Features.Parsers
     using System.ComponentModel.DataAnnotations;
     using System.Linq;
 
-    using Exiled.CustomRoles.API.Features.Interfaces;
+    using Interfaces;
 
     using YamlDotNet.Core;
     using YamlDotNet.Core.Events;
     using YamlDotNet.Serialization;
 
     /// <summary>
-    /// A node resolver for <see cref="CustomAbility"/>.
+    ///     A node resolver for <see cref="CustomAbility" />.
     /// </summary>
     public class AbstractClassNodeTypeResolver : INodeDeserializer
     {
@@ -29,10 +29,10 @@ namespace Exiled.CustomRoles.API.Features.Parsers
         private readonly ITypeDiscriminator[] typeDiscriminators;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AbstractClassNodeTypeResolver"/> class.
+        ///     Initializes a new instance of the <see cref="AbstractClassNodeTypeResolver" /> class.
         /// </summary>
-        /// <param name="original">The <see cref="INodeDeserializer"/> original deserializer.</param>
-        /// <param name="discriminators">The <see cref="ITypeDiscriminator"/> array of discriminators.</param>
+        /// <param name="original">The <see cref="INodeDeserializer" /> original deserializer.</param>
+        /// <param name="discriminators">The <see cref="ITypeDiscriminator" /> array of discriminators.</param>
         public AbstractClassNodeTypeResolver(INodeDeserializer original, params ITypeDiscriminator[] discriminators)
         {
             this.original = original;
@@ -71,7 +71,7 @@ namespace Exiled.CustomRoles.API.Features.Parsers
             }
             catch (Exception exception)
             {
-                throw new YamlException(start ?? new(), reader.Current?.End ?? new(), "Failed when resolving abstract type", exception);
+                throw new YamlException(start ?? new Mark(), reader.Current?.End ?? new Mark(), "Failed when resolving abstract type", exception);
             }
 
             buffer.Reset();

@@ -5,13 +5,14 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using CommandSystem;
-
 namespace Exiled.CustomRoles.Commands.Admin.List
 {
+    using System;
+
+    using CommandSystem;
+
     /// <summary>
-    /// The command to list all registered roles.
+    ///     The command to list all registered roles.
     /// </summary>
     internal sealed class List : ParentCommand
     {
@@ -21,27 +22,27 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         }
 
         /// <summary>
-        /// Gets the <see cref="List"/> command instance.
+        ///     Gets the <see cref="List" /> command instance.
         /// </summary>
         public static List Instance { get; } = new();
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string Command { get; } = "list";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string[] Aliases { get; } = { "l" };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override string Description { get; } = "Списки кастомных ролей.";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override void LoadGeneratedCommands()
         {
             RegisterCommand(Registered.Instance);
             RegisterCommand(InGame.Instance);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             response = "Доступные команды: registered, ingame.";

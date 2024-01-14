@@ -9,25 +9,28 @@ namespace Exiled.CustomRoles.Events
 {
     using System.Linq;
 
+    using API;
+    using API.Features;
+
     using Exiled.API.Enums;
     using Exiled.API.Features;
-    using Exiled.CustomRoles.API;
-    using Exiled.CustomRoles.API.Features;
     using Exiled.Events.EventArgs.Player;
+
     using FLXLib.Extensions;
+
     using MEC;
 
     /// <summary>
-    /// Event Handlers for the CustomRole API.
+    ///     Event Handlers for the CustomRole API.
     /// </summary>
     public class PlayerHandler
     {
         /// <summary>
-        /// SessionVariable key.
+        ///     SessionVariable key.
         /// </summary>
         public const string LastCustomRoleKey = "LastCustomRole";
 
-        /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole"/>
+        /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole" />
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
             if (ev.Player.GetCustomRoles().FirstOrDefault() is CustomRole customRole)
@@ -42,8 +45,8 @@ namespace Exiled.CustomRoles.Events
             {
                 if (ev.Player.IsDead)
                 {
-                    Log.Debug($"Player is now a spectrator. Sending data of CustomRoles...");
-                    foreach (var player in Player.List)
+                    Log.Debug("Player is now a spectrator. Sending data of CustomRoles...");
+                    foreach (Player? player in Player.List)
                     {
                         if (player.GetCustomRoles().FirstOrDefault() is not CustomRole role)
                             continue;
@@ -53,8 +56,8 @@ namespace Exiled.CustomRoles.Events
                 }
                 else
                 {
-                    Log.Debug($"Player is a regular player. Sending real data of names");
-                    foreach (var player in Player.List)
+                    Log.Debug("Player is a regular player. Sending real data of names");
+                    foreach (Player? player in Player.List)
                     {
                         if (player.GetCustomRoles().IsEmpty())
                             continue;

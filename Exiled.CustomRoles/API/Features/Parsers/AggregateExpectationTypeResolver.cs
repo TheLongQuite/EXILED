@@ -13,9 +13,10 @@ namespace Exiled.CustomRoles.API.Features.Parsers
     using System.Reflection;
 
     using Exiled.API.Features;
-    using Exiled.CustomRoles.API.Features;
-    using Exiled.CustomRoles.API.Features.Extensions;
-    using Exiled.CustomRoles.API.Features.Interfaces;
+
+    using Extensions;
+
+    using Interfaces;
 
     using YamlDotNet.Core.Events;
     using YamlDotNet.Serialization;
@@ -29,9 +30,9 @@ namespace Exiled.CustomRoles.API.Features.Parsers
         private readonly Dictionary<string, Type?> typeLookup;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="AggregateExpectationTypeResolver{T}"/> class.
+        ///     Initializes a new instance of the <see cref="AggregateExpectationTypeResolver{T}" /> class.
         /// </summary>
-        /// <param name="namingConvention">The <see cref="INamingConvention"/> instance.</param>
+        /// <param name="namingConvention">The <see cref="INamingConvention" /> instance.</param>
         public AggregateExpectationTypeResolver(INamingConvention namingConvention)
         {
             targetKey = namingConvention.Apply(TargetKey);
@@ -52,7 +53,10 @@ namespace Exiled.CustomRoles.API.Features.Parsers
         }
 
         /// <inheritdoc />
-        public Type BaseType => typeof(CustomAbility);
+        public Type BaseType
+        {
+            get => typeof(CustomAbility);
+        }
 
         /// <inheritdoc />
         public bool TryResolve(ParsingEventBuffer buffer, out Type? suggestedType)

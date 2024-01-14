@@ -20,19 +20,22 @@ namespace Exiled.CustomRoles.API.Features.Parsers
         private LinkedListNode<ParsingEvent>? current;
 
         /// <summary>
-        /// Initializes a new instance of the <see cref="ParsingEventBuffer"/> class.
+        ///     Initializes a new instance of the <see cref="ParsingEventBuffer" /> class.
         /// </summary>
-        /// <param name="events">The <see cref="LinkedList{T}"/> instance.</param>
+        /// <param name="events">The <see cref="LinkedList{T}" /> instance.</param>
         public ParsingEventBuffer(LinkedList<ParsingEvent> events)
         {
             buffer = events;
             current = events.First;
         }
 
-        /// <inheritdoc cref="IParser"/>
-        public ParsingEvent? Current => current?.Value;
+        /// <inheritdoc cref="IParser" />
+        public ParsingEvent? Current
+        {
+            get => current?.Value;
+        }
 
-        /// <inheritdoc cref="IParser"/>
+        /// <inheritdoc cref="IParser" />
         public bool MoveNext()
         {
             current = current?.Next;
@@ -40,7 +43,7 @@ namespace Exiled.CustomRoles.API.Features.Parsers
         }
 
         /// <summary>
-        /// Resets the buffer.
+        ///     Resets the buffer.
         /// </summary>
         public void Reset()
         {

@@ -1,35 +1,50 @@
+// -----------------------------------------------------------------------
+// <copyright file="UseAbility.cs" company="Exiled Team">
+// Copyright (c) Exiled Team. All rights reserved.
+// Licensed under the CC BY-SA 3.0 license.
+// </copyright>
+// -----------------------------------------------------------------------
+
 namespace Exiled.CustomRoles.Commands.User
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
+    using API;
+    using API.Features;
+
     using CommandSystem;
+
     using Exiled.API.Features;
-    using Exiled.CustomRoles.API;
-    using Exiled.CustomRoles.API.Features;
 
     /// <summary>
-    /// Handles the using of custom role abilities.
+    ///     Handles the using of custom role abilities.
     /// </summary>
     [CommandHandler(typeof(ClientCommandHandler))]
     public class UseAbility : ICommand
     {
-        /// <inheritdoc/>
-        public string Command => "ability";
+        /// <inheritdoc />
+        public string Command
+        {
+            get => "ability";
+        }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string[] Aliases { get; } = { "a" };
 
-        /// <inheritdoc/>
-        public string Description => "Использует спецспособность";
+        /// <inheritdoc />
+        public string Description
+        {
+            get => "Использует спецспособность";
+        }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             Player player = Player.Get((CommandSender)sender);
 
-            var role = player.GetCustomRoles().FirstOrDefault();
+            CustomRole? role = player.GetCustomRoles().FirstOrDefault();
             if (role == null)
             {
                 response = "У вас нет спецролей со спецспособностями";
@@ -42,8 +57,8 @@ namespace Exiled.CustomRoles.Commands.User
                 return false;
             }
 
-            var activeAbilities = new List<ActiveAbility>();
-            foreach (var ability in role.CustomAbilities)
+            List<ActiveAbility> activeAbilities = new List<ActiveAbility>();
+            foreach (CustomAbility? ability in role.CustomAbilities)
             {
                 if (ability is Scp079ActiveAbility scp079ActiveAbility)
                 {

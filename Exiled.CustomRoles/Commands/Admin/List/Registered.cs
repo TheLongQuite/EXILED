@@ -5,16 +5,20 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using System.Linq;
-using System.Text;
-using CommandSystem;
-using Exiled.API.Features.Pools;
-using Exiled.CustomRoles.API.Features;
-using Exiled.Permissions.Extensions;
-
 namespace Exiled.CustomRoles.Commands.Admin.List
 {
+    using System;
+    using System.Linq;
+    using System.Text;
+
+    using API.Features;
+
+    using CommandSystem;
+
+    using Exiled.API.Features.Pools;
+
+    using Permissions.Extensions;
+
     /// <inheritdoc />
     internal sealed class Registered : ICommand
     {
@@ -23,20 +27,20 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         }
 
         /// <summary>
-        /// Gets the command instance.
+        ///     Gets the command instance.
         /// </summary>
         public static Registered Instance { get; } = new();
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Command { get; } = "registered";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string[] Aliases { get; } = { "r", "reg" };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Description { get; } = "Список всех кастомных ролей.";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.list.registered"))

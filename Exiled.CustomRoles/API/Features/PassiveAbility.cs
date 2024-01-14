@@ -8,7 +8,7 @@
 namespace Exiled.CustomRoles.API.Features
 {
     /// <summary>
-    /// The base class for passive (always active) abilities.
+    ///     The base class for passive (always active) abilities.
     /// </summary>
     public abstract class PassiveAbility : CustomAbility
     {

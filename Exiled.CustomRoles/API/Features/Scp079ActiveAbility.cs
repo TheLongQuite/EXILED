@@ -5,38 +5,38 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System.ComponentModel;
-
 namespace Exiled.CustomRoles.API.Features
 {
     using System;
+    using System.ComponentModel;
 
     using Exiled.API.Features;
     using Exiled.API.Features.Roles;
+
     using PlayerRoles;
 
     /// <summary>
-    /// The base class for active (on-use) energy-using abilities for SCP-079.
+    ///     The base class for active (on-use) energy-using abilities for SCP-079.
     /// </summary>
     public abstract class Scp079ActiveAbility : ActiveAbility
     {
         /// <summary>
-        /// Gets or sets minimal SCP-079 level to use this ability.
+        ///     Gets or sets minimal SCP-079 level to use this ability.
         /// </summary>
         public abstract byte MinRequiredLevel { get; set; }
 
         /// <summary>
-        /// Gets or sets maximum SCP-079 level to use this ability.
+        ///     Gets or sets maximum SCP-079 level to use this ability.
         /// </summary>
         [Description("Уровень, с которого способность перестанет отображаться и станет недоступна для использования.")]
         public virtual byte MaxRequiredLevel { get; set; } = 10;
 
         /// <summary>
-        /// Gets or sets energy usage for ability.
+        ///     Gets or sets energy usage for ability.
         /// </summary>
         public abstract float EnergyUsage { get; set; }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public override bool CanUseAbility(Player player, out string response)
         {
             if (!player.Role.Is(out Scp079Role scp079Role))
@@ -47,7 +47,7 @@ namespace Exiled.CustomRoles.API.Features
 
             if (scp079Role.Level < MinRequiredLevel)
             {
-                var hint = CustomRoles.Instance!.Config.InsufficientLevelHint;
+                Hint hint = CustomRoles.Instance!.Config.InsufficientLevelHint;
                 response = string.Format(hint.Content, scp079Role.Level + 1, MinRequiredLevel + 1);
                 if (hint.Show)
                     player.ShowHint(response, hint.Duration);
@@ -56,7 +56,7 @@ namespace Exiled.CustomRoles.API.Features
 
             if (scp079Role.Level > MaxRequiredLevel)
             {
-                var hint = CustomRoles.Instance!.Config.RedundantLevelHint;
+                Hint hint = CustomRoles.Instance!.Config.RedundantLevelHint;
                 response = string.Format(hint.Content, scp079Role.Level + 1, MaxRequiredLevel + 1);
                 if (hint.Show)
                     player.ShowHint(response, hint.Duration);
@@ -65,7 +65,7 @@ namespace Exiled.CustomRoles.API.Features
 
             if (scp079Role.Energy < EnergyUsage)
             {
-                var hint = CustomRoles.Instance!.Config.InsufficientEnergyHint;
+                Hint hint = CustomRoles.Instance!.Config.InsufficientEnergyHint;
                 response = string.Format(hint.Content, scp079Role.Energy, EnergyUsage);
                 if (hint.Show)
                     player.ShowHint(response, hint.Duration);
@@ -75,14 +75,14 @@ namespace Exiled.CustomRoles.API.Features
             return base.CanUseAbility(player, out response);
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override void AbilityAdded(Player player)
         {
             if (player.Role.Type != RoleTypeId.Scp079)
                 throw new Exception($"Unable to give {nameof(Scp079ActiveAbility)} to non-SCP079 player!");
         }
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         protected override void AbilityUsed(Player player)
         {
             if (player.Role.Is(out Scp079Role role))

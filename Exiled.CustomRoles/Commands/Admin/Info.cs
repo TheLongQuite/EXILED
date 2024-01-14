@@ -5,17 +5,21 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using System.Text;
-using CommandSystem;
-using Exiled.API.Features.Pools;
-using Exiled.CustomRoles.API.Features;
-using Exiled.Permissions.Extensions;
-
 namespace Exiled.CustomRoles.Commands.Admin
 {
+    using System;
+    using System.Text;
+
+    using API.Features;
+
+    using CommandSystem;
+
+    using Exiled.API.Features.Pools;
+
+    using Permissions.Extensions;
+
     /// <summary>
-    /// The command to view info about a specific role.
+    ///     The command to view info about a specific role.
     /// </summary>
     internal sealed class Info : ICommand
     {
@@ -24,20 +28,20 @@ namespace Exiled.CustomRoles.Commands.Admin
         }
 
         /// <summary>
-        /// Gets the <see cref="Info"/> instance.
+        ///     Gets the <see cref="Info" /> instance.
         /// </summary>
         public static Info Instance { get; } = new();
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Command { get; } = "info";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string[] Aliases { get; } = { "i" };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Description { get; } = "Информация про кастомную роль.";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.info"))
@@ -52,7 +56,7 @@ namespace Exiled.CustomRoles.Commands.Admin
                 return false;
             }
 
-            if ((!(uint.TryParse(arguments.At(0), out uint id) && CustomRole.TryGet(id, out CustomRole? role)) && !CustomRole.TryGet(arguments.At(0), out role)) || role is null)
+            if (!(uint.TryParse(arguments.At(0), out uint id) && CustomRole.TryGet(id, out CustomRole? role)) && !CustomRole.TryGet(arguments.At(0), out role) || role is null)
             {
                 response = $"{arguments.At(0)} не идентификатор кастомной роли.";
                 return false;

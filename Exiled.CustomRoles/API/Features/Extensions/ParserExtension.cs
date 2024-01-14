@@ -9,24 +9,24 @@ namespace Exiled.CustomRoles.API.Features.Extensions
 {
     using System;
 
-    using Exiled.CustomRoles.API.Features.Parsers;
+    using Parsers;
 
     using YamlDotNet.Core;
     using YamlDotNet.Core.Events;
 
     /// <summary>
-    /// Extensions for <see cref="ParsingEventBuffer"/>.
+    ///     Extensions for <see cref="ParsingEventBuffer" />.
     /// </summary>
     public static class ParserExtension
     {
         /// <summary>
-        /// Tries to find a valid mapping entry.
+        ///     Tries to find a valid mapping entry.
         /// </summary>
-        /// <param name="parser">The <see cref="ParsingEventBuffer"/> parser.</param>
+        /// <param name="parser">The <see cref="ParsingEventBuffer" /> parser.</param>
         /// <param name="selector">The selector.</param>
         /// <param name="key">The key found.</param>
         /// <param name="value">The value found.</param>
-        /// <returns><see langword="true"/> when a valid mapping entry is found; otherwise, <see langword="false"/>.</returns>
+        /// <returns><see langword="true" /> when a valid mapping entry is found; otherwise, <see langword="false" />.</returns>
         public static bool TryFindMappingEntry(this ParsingEventBuffer parser, Func<Scalar, bool> selector, out Scalar? key, out ParsingEvent? value)
         {
             parser.Consume<MappingStart>();

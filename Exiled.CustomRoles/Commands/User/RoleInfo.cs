@@ -1,29 +1,47 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.CustomRoles.API;
-using Exiled.CustomRoles.API.Features;
-using NorthwoodLib.Pools;
+﻿// -----------------------------------------------------------------------
+// <copyright file="RoleInfo.cs" company="Exiled Team">
+// Copyright (c) Exiled Team. All rights reserved.
+// Licensed under the CC BY-SA 3.0 license.
+// </copyright>
+// -----------------------------------------------------------------------
 
 namespace Exiled.CustomRoles.Commands.User
 {
+    using System;
+    using System.Collections.Generic;
+    using System.Globalization;
+    using System.Linq;
+    using System.Text;
+
+    using API;
+    using API.Features;
+
+    using CommandSystem;
+
+    using Exiled.API.Features;
+
+    using NorthwoodLib.Pools;
+
     /// <summary>
-    /// Handles the displaing of custom role info.
+    ///     Handles the displaing of custom role info.
     /// </summary>
     [CommandHandler(typeof(ClientCommandHandler))]
     public class RoleInfo : ICommand
     {
         /// <inheritdoc />
-        public string Command => "roleinfo";
+        public string Command
+        {
+            get => "roleinfo";
+        }
 
         /// <inheritdoc />
         public string[] Aliases { get; } = { "rinfo" };
 
         /// <inheritdoc />
-        public string Description => "Даёт справку по вашей текущей особой роли и её способностях.";
+        public string Description
+        {
+            get => "Даёт справку по вашей текущей особой роли и её способностях.";
+        }
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
@@ -35,7 +53,7 @@ namespace Exiled.CustomRoles.Commands.User
                 return false;
             }
 
-            var customRole = player.GetCustomRoles().FirstOrDefault();
+            CustomRole? customRole = player.GetCustomRoles().FirstOrDefault();
             if (customRole == null)
             {
                 response = "У вас нет особых ролей!";
@@ -48,11 +66,11 @@ namespace Exiled.CustomRoles.Commands.User
 
         internal static string GetAbilitiesInfo(Player player, CustomRole customRole, bool includePassive = true)
         {
-            List<PassiveAbility> passiveAbilities = new List<PassiveAbility>();
-            List<ActiveAbility> activeAbilities = new List<ActiveAbility>();
-            List<Scp079ActiveAbility> scp079ActiveAbilities = new List<Scp079ActiveAbility>();
-            var stringBuilder = StringBuilderPool.Shared.Rent();
-            foreach (var ability in customRole.CustomAbilities)
+            List<PassiveAbility> passiveAbilities = new();
+            List<ActiveAbility> activeAbilities = new();
+            List<Scp079ActiveAbility> scp079ActiveAbilities = new();
+            StringBuilder? stringBuilder = StringBuilderPool.Shared.Rent();
+            foreach (CustomAbility? ability in customRole.CustomAbilities)
             {
                 switch (ability)
                 {

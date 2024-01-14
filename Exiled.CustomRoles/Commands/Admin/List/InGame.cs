@@ -5,17 +5,22 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using System;
-using System.Text;
-using CommandSystem;
-using Exiled.API.Features;
-using Exiled.CustomRoles.API.Features;
-using Exiled.Permissions.Extensions;
-using NorthwoodLib.Pools;
-
 namespace Exiled.CustomRoles.Commands.Admin.List
 {
-    /// <inheritdoc/>
+    using System;
+    using System.Text;
+
+    using API.Features;
+
+    using CommandSystem;
+
+    using Exiled.API.Features;
+
+    using NorthwoodLib.Pools;
+
+    using Permissions.Extensions;
+
+    /// <inheritdoc />
     internal sealed class InGame : ICommand
     {
         private InGame()
@@ -23,20 +28,20 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         }
 
         /// <summary>
-        /// Gets the command instance.
+        ///     Gets the command instance.
         /// </summary>
         public static InGame Instance { get; } = new();
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Command { get; } = "ingame";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string[] Aliases { get; } = { "ig", "alife" };
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public string Description { get; } = "Получает все кастомные роли которые сейчас учавствуют в раунде.";
 
-        /// <inheritdoc/>
+        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.list.ingame"))

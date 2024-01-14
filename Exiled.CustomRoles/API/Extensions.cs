@@ -12,18 +12,19 @@ namespace Exiled.CustomRoles.API
     using System.Collections.ObjectModel;
 
     using Exiled.API.Features;
-    using Exiled.CustomRoles.API.Features;
+
+    using Features;
 
     /// <summary>
-    /// A collection of API methods.
+    ///     A collection of API methods.
     /// </summary>
     public static class Extensions
     {
         /// <summary>
-        /// Gets a <see cref="ReadOnlyCollection{T}"/> of the player's current custom roles.
+        ///     Gets a <see cref="ReadOnlyCollection{T}" /> of the player's current custom roles.
         /// </summary>
-        /// <param name="player">The <see cref="Player"/> to check for roles.</param>
-        /// <returns>A <see cref="ReadOnlyCollection{T}"/> of all current custom roles.</returns>
+        /// <param name="player">The <see cref="Player" /> to check for roles.</param>
+        /// <returns>A <see cref="ReadOnlyCollection{T}" /> of all current custom roles.</returns>
         public static ReadOnlyCollection<CustomRole> GetCustomRoles(this Player player)
         {
             List<CustomRole> roles = new();
@@ -38,9 +39,9 @@ namespace Exiled.CustomRoles.API
         }
 
         /// <summary>
-        /// Registers an <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/>s.
+        ///     Registers an <see cref="IEnumerable{T}" /> of <see cref="CustomRole" />s.
         /// </summary>
-        /// <param name="customRoles"><see cref="CustomRole"/>s to be registered.</param>
+        /// <param name="customRoles"><see cref="CustomRole" />s to be registered.</param>
         public static void Register(this IEnumerable<CustomRole> customRoles)
         {
             if (customRoles is null)
@@ -51,15 +52,15 @@ namespace Exiled.CustomRoles.API
         }
 
         /// <summary>
-        /// Registers a <see cref="CustomRole"/>.
+        ///     Registers a <see cref="CustomRole" />.
         /// </summary>
-        /// <param name="role"><see cref="CustomRole"/> to be registered.</param>
+        /// <param name="role"><see cref="CustomRole" /> to be registered.</param>
         public static void Register(this CustomRole role) => role.TryRegister();
 
         /// <summary>
-        /// Unregisters an <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/>s.
+        ///     Unregisters an <see cref="IEnumerable{T}" /> of <see cref="CustomRole" />s.
         /// </summary>
-        /// <param name="customRoles"><see cref="CustomRole"/>s to be unregistered.</param>
+        /// <param name="customRoles"><see cref="CustomRole" />s to be unregistered.</param>
         public static void Unregister(this IEnumerable<CustomRole> customRoles)
         {
             if (customRoles is null)
@@ -70,9 +71,9 @@ namespace Exiled.CustomRoles.API
         }
 
         /// <summary>
-        /// Unregisters a <see cref="CustomRole"/>.
+        ///     Unregisters a <see cref="CustomRole" />.
         /// </summary>
-        /// <param name="role"><see cref="CustomRole"/> to be unregistered.</param>
+        /// <param name="role"><see cref="CustomRole" /> to be unregistered.</param>
         public static void Unregister(this CustomRole role) => role.TryUnregister();
     }
 }

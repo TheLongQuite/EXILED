@@ -8,7 +8,7 @@
 namespace Exiled.Events.EventArgs.Map
 {
     using System.Collections.Generic;
-
+    using System.Linq;
     using Exiled.API.Features;
     using Exiled.API.Features.Pickups;
     using Exiled.API.Features.Pickups.Projectiles;
@@ -74,6 +74,27 @@ namespace Exiled.Events.EventArgs.Map
                         break;
                 }
             }
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExplodingGrenadeEventArgs" /> class.
+        /// </summary>
+        /// <param name="thrower">
+        /// <inheritdoc cref="Player" />
+        /// </param>
+        /// <param name="grenade">
+        /// <inheritdoc cref="Projectile" />
+        /// </param>
+        /// <param name="isAllowed">
+        /// <inheritdoc cref="IsAllowed" />
+        /// </param>
+        public ExplodingGrenadeEventArgs(Player thrower, EffectGrenade grenade, bool isAllowed = true)
+        {
+            Player = thrower ?? Server.Host;
+            Projectile = (EffectGrenadeProjectile)Pickup.Get(grenade);
+            Position = Projectile.Position;
+            TargetsToAffect = Player.List.ToList();
+            IsAllowed = isAllowed;
         }
 
         /// <summary>

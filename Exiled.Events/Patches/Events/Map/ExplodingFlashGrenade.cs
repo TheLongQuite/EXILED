@@ -17,11 +17,13 @@ namespace Exiled.Events.Patches.Events.Map
     using Exiled.Events.Patches.Generic;
     using HarmonyLib;
     using InventorySystem.Items.ThrowableProjectiles;
+    using PlayerRoles;
     using UnityEngine;
 
     using static HarmonyLib.AccessTools;
 
     using ExiledEvents = Exiled.Events.Events;
+    using Map = Handlers.Map;
 
     /// <summary>
     /// Patches <see cref="FlashbangGrenade.ServerFuseEnd()"/>.
@@ -64,29 +66,28 @@ namespace Exiled.Events.Patches.Events.Map
 
         private static int ProcessEvent(FlashbangGrenade instance)
         {
-            ExplodingGrenadeEventArgs explodingGrenadeEvent = new ExplodingGrenadeEventArgs(Player.Get(instance.PreviousOwner.Hub), instance);
+            double distance = instance._blindingOverDistance.keys[instance._blindingOverDistance.length - 1].time;
+            List<Player> affectedPlayers = new();
+            foreach (Player player in Player.List)
+            {
+                if ((instance.transform.position - player.Position).sqrMagnitude <= distance * distance && (ExiledEvents.Instance.Config.CanFlashbangsAffectThrower || instance.PreviousOwner.Hub != player.ReferenceHub) &&
+                    IndividualFriendlyFire.CheckFriendlyFirePlayer(instance.PreviousOwner, player.ReferenceHub))
+                    affectedPlayers.Add(player);
+            }
 
-            Handlers.Map.OnExplodingGrenade(explodingGrenadeEvent);
-
+            ExplodingGrenadeEventArgs explodingGrenadeEvent = new(Player.Get(instance.PreviousOwner.Hub), instance, affectedPlayers);
+            Map.OnExplodingGrenade(explodingGrenadeEvent);
             if (!explodingGrenadeEvent.IsAllowed)
                 return 0;
 
             int size = 0;
             foreach (Player player in explodingGrenadeEvent.TargetsToAffect)
             {
-                if (!ExiledEvents.Instance.Config.CanFlashbangsAffectThrower && explodingGrenadeEvent.Player == player)
-                    continue;
-
-                if (IndividualFriendlyFire.CheckFriendlyFirePlayer(instance.PreviousOwner, player.ReferenceHub))
-                {
-                    instance.ProcessPlayer(player.ReferenceHub);
-                    size++;
-                }
+                instance.ProcessPlayer(player.ReferenceHub);
+                size++;
             }
 
             return size;
         }
-
-        private static List<Player> ConvertHubs(List<ReferenceHub> hubs) => hubs.Select(Player.Get).ToList();
     }
 }

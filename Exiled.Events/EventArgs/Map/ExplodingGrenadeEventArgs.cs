@@ -14,12 +14,9 @@ namespace Exiled.Events.EventArgs.Map
     using Exiled.API.Features.Pickups.Projectiles;
     using Exiled.API.Features.Pools;
     using Exiled.Events.EventArgs.Interfaces;
-    using Exiled.Events.Patches.Generic;
-
     using Footprinting;
-
     using InventorySystem.Items.ThrowableProjectiles;
-
+    using Patches.Generic;
     using UnityEngine;
 
     /// <summary>
@@ -28,7 +25,7 @@ namespace Exiled.Events.EventArgs.Map
     public class ExplodingGrenadeEventArgs : IPlayerEvent, IDeniableEvent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExplodingGrenadeEventArgs"/> class.
+        /// Initializes a new instance of the <see cref="ExplodingGrenadeEventArgs" /> class.
         /// </summary>
         /// <param name="thrower"><inheritdoc cref="Player"/></param>
         /// <param name="position"><inheritdoc cref="Position"/></param>
@@ -88,15 +85,18 @@ namespace Exiled.Events.EventArgs.Map
         /// <param name="grenade">
         /// <inheritdoc cref="Projectile" />
         /// </param>
+        /// <param name="targetsToAffect">
+        /// <inheritdoc cref="TargetsToAffect" />
+        /// </param>
         /// <param name="isAllowed">
         /// <inheritdoc cref="IsAllowed" />
         /// </param>
-        public ExplodingGrenadeEventArgs(Player thrower, EffectGrenade grenade, bool isAllowed = true)
+        public ExplodingGrenadeEventArgs(Player thrower, EffectGrenade grenade, List<Player> targetsToAffect, bool isAllowed = true)
         {
             Player = thrower ?? Server.Host;
             Projectile = (EffectGrenadeProjectile)Pickup.Get(grenade);
             Position = Projectile.Position;
-            TargetsToAffect = ListPool<Player>.Pool.Get(Player.List);
+            TargetsToAffect = targetsToAffect;
             IsAllowed = isAllowed;
         }
 
@@ -126,7 +126,7 @@ namespace Exiled.Events.EventArgs.Map
         /// <summary>
         /// Gets or sets a value indicating whether or not the grenade can be thrown.
         /// </summary>
-        public bool IsAllowed { get; set; } = true;
+        public bool IsAllowed { get; set; }
 
         /// <summary>
         /// Gets the player who thrown the grenade.

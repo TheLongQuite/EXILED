@@ -1032,6 +1032,13 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalOwnerEscaping(EscapingEventArgs ev)
         {
+            foreach (Item item in ev.Player.Items.ToList())
+            {
+                if (!Check(item))
+                    continue;
+
+                OnOwnerEscaping(new OwnerEscapingEventArgs(item, ev));
+            }
         }
 
         private void OnInternalOwnerHandcuffing(HandcuffingEventArgs ev)

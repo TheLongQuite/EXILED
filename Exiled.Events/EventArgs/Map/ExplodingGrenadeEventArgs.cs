@@ -9,6 +9,7 @@ namespace Exiled.Events.EventArgs.Map
 {
     using System.Collections.Generic;
     using System.Linq;
+
     using Exiled.API.Features;
     using Exiled.API.Features.Pickups;
     using Exiled.API.Features.Pickups.Projectiles;
@@ -37,6 +38,7 @@ namespace Exiled.Events.EventArgs.Map
             Projectile = (EffectGrenadeProjectile)Pickup.Get(grenade);
             Position = position;
             TargetsToAffect = ListPool<Player>.Pool.Get();
+            IsAllowed = true;
 
             if (Projectile.Base is not ExplosionGrenade)
                 return;

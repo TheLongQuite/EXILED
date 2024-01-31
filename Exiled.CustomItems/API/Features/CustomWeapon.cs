@@ -20,6 +20,7 @@ namespace Exiled.CustomItems.API.Features
     using InventorySystem.Items.Firearms.Attachments;
     using InventorySystem.Items.Firearms.Attachments.Components;
     using InventorySystem.Items.Firearms.BasicMessages;
+
     using UnityEngine;
 
     using Firearm = Exiled.API.Features.Items.Firearm;
@@ -69,6 +70,38 @@ namespace Exiled.CustomItems.API.Features
         public virtual bool CanUnload { get; set; } = true;
 
         /// <inheritdoc />
+        public override Pickup? Spawn(Vector3 position, Player? previousOwner = null)
+        {
+            if (Item.Create(Type) is not Firearm firearm)
+            {
+                Log.Debug($"{nameof(Spawn)}: Item is not Firearm.");
+                return null;
+            }
+
+            if (!Attachments.IsEmpty())
+                firearm.AddAttachment(Attachments);
+
+            firearm.Ammo = ClipSize;
+            firearm.MaxAmmo = ClipSize;
+
+            Pickup? pickup = firearm.CreatePickup(position);
+
+            if (pickup is null)
+            {
+                Log.Debug($"{nameof(Spawn)}: Pickup is null.");
+                return null;
+            }
+
+            pickup.Weight = Weight;
+            pickup.Scale = Scale;
+            if (previousOwner is not null)
+                pickup.PreviousOwner = previousOwner;
+
+            TrackedSerials.Add(pickup.Serial);
+            return pickup;
+        }
+
+        /// <inheritdoc />
         public override Pickup? Spawn(Vector3 position, Item item, Player? previousOwner = null)
         {
             if (item is Firearm firearm)
@@ -77,6 +110,7 @@ namespace Exiled.CustomItems.API.Features
                     firearm.AddAttachment(Attachments);
 
                 firearm.Ammo = ClipSize;
+                firearm.MaxAmmo = ClipSize;
 
                 Log.Debug($"{nameof(Name)}.{nameof(Spawn)}: Spawning weapon with {firearm.Ammo} ammo.");
 
@@ -103,6 +137,7 @@ namespace Exiled.CustomItems.API.Features
                 if (!Attachments.IsEmpty())
                     firearm.AddAttachment(Attachments);
                 firearm.Ammo = ClipSize;
+                firearm.MaxAmmo = ClipSize;
             }
 
             player.AddItem(item);

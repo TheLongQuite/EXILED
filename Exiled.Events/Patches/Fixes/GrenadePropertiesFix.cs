@@ -13,7 +13,6 @@ namespace Exiled.Events.Patches.Fixes
     using API.Features.Items;
     using API.Features.Pickups.Projectiles;
     using API.Features.Pools;
-
     using HarmonyLib;
 
     using InventorySystem.Items;
@@ -22,6 +21,7 @@ namespace Exiled.Events.Patches.Fixes
     using UnityEngine;
 
     using static HarmonyLib.AccessTools;
+    using Log = API.Features.Log;
 
     /// <summary>
     /// Patches <see cref="ThrowableItem.ServerThrow(float, float, Vector3, Vector3)"/> to fix all grenade properties.
@@ -65,10 +65,11 @@ namespace Exiled.Events.Patches.Fixes
                 new(OpCodes.Stloc_S, throwable.LocalIndex),
                 new(OpCodes.Brtrue_S, cnt),
 
-                // Log.Error("Item is not Throwable, should never happen");
+                // GrenadePropertiesFix.NotifyWrongType(Item.Get(this));
                 // return;
-                new(OpCodes.Ldstr, "Item is not Throwable, should never happen"),
-                new(OpCodes.Call, Method(typeof(API.Features.Log), nameof(API.Features.Log.Error), new[] { typeof(string) })),
+                new(OpCodes.Ldarg_0),
+                new(OpCodes.Call, Method(typeof(Item), nameof(Item.Get), new[] { typeof(ItemBase) })),
+                new(OpCodes.Call, Method(typeof(GrenadePropertiesFix), nameof(NotifyWrongType))),
                 new(OpCodes.Ret),
 
                 // Projectile projectile = throwable.Projectile;
@@ -109,6 +110,11 @@ namespace Exiled.Events.Patches.Fixes
                 yield return newInstructions[z];
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+
+        private static void NotifyWrongType(Item item)
+        {
+            Log.Error($"Item is not Throwable, should never happen: '{item}'");
         }
     }
 }

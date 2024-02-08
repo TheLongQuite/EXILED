@@ -51,13 +51,10 @@ namespace Exiled.Events.Patches.Events.Player
             {
                 // RagdollInfo loads into stack before il inject
 
-                // handler
-                new CodeInstruction(OpCodes.Ldarg_1),
-
                 // true
                 new(OpCodes.Ldc_I4_1),
 
-                // SpawningRagdollEventArgs ev = new(RagdollInfo, DamageHandlerBase, bool)
+                // SpawningRagdollEventArgs ev = new(RagdollInfo, bool)
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(SpawningRagdollEventArgs))[0]),
                 new(OpCodes.Dup),
                 new(OpCodes.Dup),

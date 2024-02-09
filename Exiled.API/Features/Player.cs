@@ -2622,7 +2622,7 @@ namespace Exiled.API.Features
             }
             catch (Exception exception)
             {
-                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]): {exception}");
+                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) args: ply: {this}|{itemBase?.ItemTypeId}, {item}: {exception}");
             }
 
             return null;

@@ -81,8 +81,11 @@ namespace Exiled.CustomItems.API.Features
             if (!Attachments.IsEmpty())
                 firearm.AddAttachment(Attachments);
 
-            firearm.Ammo = ClipSize;
-            firearm.MaxAmmo = ClipSize;
+            if (firearm.Type != ItemType.GunShotgun)
+            {
+                firearm.Ammo = ClipSize;
+                firearm.MaxAmmo = ClipSize;
+            }
 
             Pickup? pickup = firearm.CreatePickup(position);
 
@@ -109,8 +112,11 @@ namespace Exiled.CustomItems.API.Features
                 if (!Attachments.IsEmpty())
                     firearm.AddAttachment(Attachments);
 
-                firearm.Ammo = ClipSize;
-                firearm.MaxAmmo = ClipSize;
+                if (firearm.Type != ItemType.GunShotgun)
+                {
+                    firearm.Ammo = ClipSize;
+                    firearm.MaxAmmo = ClipSize;
+                }
 
                 Log.Debug($"{nameof(Name)}.{nameof(Spawn)}: Spawning weapon with {firearm.Ammo} ammo.");
 
@@ -136,8 +142,11 @@ namespace Exiled.CustomItems.API.Features
             {
                 if (!Attachments.IsEmpty())
                     firearm.AddAttachment(Attachments);
-                firearm.Ammo = ClipSize;
-                firearm.MaxAmmo = ClipSize;
+                if (firearm.Type != ItemType.GunShotgun)
+                {
+                    firearm.Ammo = ClipSize;
+                    firearm.MaxAmmo = ClipSize;
+                }
             }
 
             player.AddItem(item);
@@ -217,6 +226,9 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(ev.Player.CurrentItem))
                 return;
 
+            if (ev.Firearm.Type == ItemType.GunShotgun)
+                return;
+
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: Reloading weapon. Calling external reload event..");
             OnReloading(ev);
 
@@ -268,6 +280,9 @@ namespace Exiled.CustomItems.API.Features
         private void OnInternalShooting(ShootingEventArgs ev)
         {
             if (!Check(ev.Player))
+                return;
+
+            if (ev.Item.Type == ItemType.GunShotgun)
                 return;
 
             Firearm firearm = ev.Firearm;

@@ -32,12 +32,6 @@ namespace Exiled.CustomRoles.API.Features
         public abstract float Cooldown { get; set; }
 
         /// <summary>
-        ///     Gets or sets an action to override the behavior of <see cref="CanUseAbility" />.
-        /// </summary>
-        [YamlIgnore]
-        public virtual Func<bool>? CanUseOverride { get; set; }
-
-        /// <summary>
         ///     Gets the last time this ability was used.
         /// </summary>
         [YamlIgnore]
@@ -59,8 +53,9 @@ namespace Exiled.CustomRoles.API.Features
             LastUsed[player] = DateTime.Now;
             ShowMessage(player);
             AbilityUsed(player);
-            Timing.CallDelayed(Duration, () => EndAbility(player));
             Timing.CallDelayed(Cooldown, () => RemindAbility(player));
+            if (Duration > 0)
+                Timing.CallDelayed(Duration, () => EndAbility(player));
         }
 
         /// <summary>
@@ -103,12 +98,6 @@ namespace Exiled.CustomRoles.API.Features
         /// <returns>True if the ability is usable.</returns>
         public virtual bool CanUseAbility(Player player, out string response)
         {
-            if (CanUseOverride is not null)
-            {
-                response = string.Empty;
-                return CanUseOverride.Invoke();
-            }
-
             if (!LastUsed.TryGetValue(player, out DateTime lastUsed))
             {
                 response = string.Empty;

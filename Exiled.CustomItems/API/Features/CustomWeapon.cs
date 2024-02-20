@@ -68,8 +68,9 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         public bool AllowAttachmentsChange { get; set; } = true;
         public LocalSoundConfig? ShotAudio { get; set; } = new();
-        [Description("Кулдаун на выстрелы. Работает только при ClipSize > 1 и FireCooldown > 0")]
+        [Description("Кулдаун на выстрелы. Работает только при ClipSize > 1 и FireCooldown > 0. -1 для отключения.")]
         public float FireCooldown { get; set; } = -1;
+        [Description("Сообщение при попытке перезарядить оружие под кулдауном. {0} - кулдаун из конфига")]
         public string WeaponNotReady { get; set; } = "Оружие ещё не готово к выстрелу! Оно может стрелять только раз в {0} секунд.";
         [Description("Множители урона в зависимости от брони и точки попадания. Словарь ТипБрони: (ЗонаПопадания: МножительУрона)")]
         public Dictionary<ItemType, Dictionary<HitboxType, float>> ArmorAndZoneDamageMultipliers { get; set; } = new()

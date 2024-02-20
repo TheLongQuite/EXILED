@@ -114,7 +114,7 @@ namespace Exiled.Events.Patches.Fixes
 
         private static void NotifyWrongType(Item item)
         {
-            Log.Error($"Item is not Throwable, should never happen: '{item}'");
+            Log.Warn($"Item is not Throwable, should never happen: '{item}'");
         }
     }
 }

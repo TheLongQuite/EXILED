@@ -25,7 +25,7 @@ namespace Exiled.CustomItems.Events
         /// <inheritdoc cref="Server.OnWaitingForPlayers"/>
         public void OnWaitingForPlayers()
         {
-            foreach (var customItem in CustomItem.Registered)
+            foreach (CustomItem? customItem in CustomItem.Registered)
             {
                 customItem.TrackedSerials.Clear();
             }

@@ -66,7 +66,7 @@ namespace Exiled.CustomItems.API.Features
         /// <summary>
         ///     Gets or sets a value indicating whether firearm's attachments can be modified.
         /// </summary>
-        public bool AllowAttachmentsChange { get; set; } = false;
+        public bool AllowAttachmentsChange { get; set; } = true;
         public LocalSoundConfig? ShotAudio { get; set; } = new();
         [Description("Кулдаун на выстрелы. Работает только при ClipSize > 1 и FireCooldown > 0")]
         public float FireCooldown { get; set; } = -1;

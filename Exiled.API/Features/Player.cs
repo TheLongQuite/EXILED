@@ -9,6 +9,7 @@ namespace Exiled.API.Features
 {
     using System;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using System.Runtime.CompilerServices;
@@ -2622,7 +2623,7 @@ namespace Exiled.API.Features
             }
             catch (Exception exception)
             {
-                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) args: ply: {this}|{itemBase?.ItemTypeId}, {item}: {exception}");
+                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) args: ply: {this} | {item}: {exception}\nCalled from: {new StackTrace()}");
             }
 
             return null;

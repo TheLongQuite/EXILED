@@ -342,9 +342,13 @@ namespace Exiled.CustomItems.API.Features
 
             Firearm firearm = ev.Firearm;
             if (firearm.Ammo < AmmoUsage - 1)
+            {
                 ev.IsAllowed = false;
-            else
-                firearm.Ammo -= (byte)(AmmoUsage - 1);
+                Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo");
+                return;
+            }
+
+            firearm.Ammo -= (byte)(AmmoUsage - 1);
 
             OnShooting(ev);
         }

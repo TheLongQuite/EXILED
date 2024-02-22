@@ -337,19 +337,33 @@ namespace Exiled.CustomItems.API.Features
                 return;
             }
 
-            if (ev.Item.Type == ItemType.GunShotgun)
-                return;
-
             Firearm firearm = ev.Firearm;
-            if (firearm.Ammo < AmmoUsage - 1)
+            if (ev.Item.Type != ItemType.GunShotgun)
             {
-                ev.IsAllowed = false;
-                Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo");
-                return;
+                if (firearm.Ammo < AmmoUsage - 1)
+                {
+                    ev.IsAllowed = false;
+                    Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo");
+                    return;
+                }
+
+                firearm.Ammo -= (byte)(AmmoUsage - 1);
             }
 
-            firearm.Ammo -= (byte)(AmmoUsage - 1);
+            if (FireCooldown > 0 && ClipSize > 1)
+            {
+                cooldownedPlayers.Add(ev.Player);
+                byte remainingAmmo = (byte)(firearm.Ammo - 1);
+                firearm.Ammo = 0;
+                Timing.CallDelayed(FireCooldown, () =>
+                {
+                    cooldownedPlayers.Remove(ev.Player);
+                    firearm.Ammo = remainingAmmo;
+                    Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
+                });
+            }
 
+            ShotAudio?.PlayPreset(ev.Player.Transform);
             OnShooting(ev);
         }
 
@@ -358,21 +372,7 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(ev.Player.CurrentItem))
                 return;
 
-            ShotAudio?.PlayPreset(ev.Player.Transform);
             OnShot(ev);
-            if (FireCooldown <= 0 || ClipSize <= 1)
-                return;
-
-            cooldownedPlayers.Add(ev.Player);
-            Firearm firearm = (Firearm)ev.Player.CurrentItem;
-            byte recentAmmo = firearm.Ammo;
-            firearm.Ammo = 0;
-            Timing.CallDelayed(FireCooldown, () =>
-            {
-                cooldownedPlayers.Remove(ev.Player);
-                firearm.Ammo = recentAmmo;
-                Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
-            });
         }
 
         private void OnInternalHurting(HurtingEventArgs ev)

@@ -14,7 +14,7 @@ namespace Exiled.Events.EventArgs.Player
     using UnityEngine;
 
     /// <summary>
-    /// Contains all information after a player has fired a weapon.
+    /// Contains all information after a player hits a hitbox with a weapon.
     /// </summary>
     public class ShotEventArgs : IPlayerEvent, IFirearmEvent
     {

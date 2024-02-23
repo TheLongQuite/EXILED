@@ -2623,7 +2623,7 @@ namespace Exiled.API.Features
             }
             catch (Exception exception)
             {
-                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) args: ply: {this} | {item}: {exception}\nCalled from: {new StackTrace()}");
+                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) args: ply: {this} | {item}:\n{exception}\n\n\n**Called from**: {new StackTrace()}");
             }
 
             return null;

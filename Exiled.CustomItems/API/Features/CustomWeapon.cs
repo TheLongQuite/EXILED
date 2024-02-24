@@ -369,7 +369,7 @@ namespace Exiled.CustomItems.API.Features
             {
                 cooldownedPlayers.Add(ev.Player);
                 byte remainingAmmo = (byte)(firearm.Ammo - 1);
-                firearm.Ammo = 0;
+                firearm.Ammo = 1;
                 Timing.CallDelayed(FireCooldown, () =>
                 {
                     cooldownedPlayers.Remove(ev.Player);

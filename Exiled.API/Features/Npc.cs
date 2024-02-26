@@ -5,27 +5,27 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-#nullable enable
 namespace Exiled.API.Features
 {
+#nullable enable
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
+    using CentralAuth;
     using CommandSystem;
-
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features.Components;
-
+    using Exiled.API.Features.Items;
     using Footprinting;
-
+    using InventorySystem.Items.Firearms.BasicMessages;
+    using InventorySystem.Items.Firearms.Modules;
     using MEC;
-
     using Mirror;
-
     using PlayerRoles;
-
+    using PlayerRoles.FirstPersonControl;
+    using RelativePositioning;
     using UnityEngine;
 
     using Object = UnityEngine.Object;
@@ -128,7 +128,7 @@ namespace Exiled.API.Features
         /// <param name="name">The name of the NPC.</param>
         /// <param name="role">The RoleTypeId of the NPC.</param>
         /// <param name="id">The Network ID of the NPC. If 0, one is made.</param>
-        /// <param name="userId">The userID of the NPC.</param>
+        /// <param name="userId">The userID of the NPC. Use "ID_Dedicated" for VSR Compliant NPCs.</param>
         /// <param name="position">The position to spawn the NPC.</param>
         /// <returns>The <see cref="Npc"/> spawned.</returns>
         public static Npc Spawn(string name, RoleTypeId role, int id = 0, string userId = "", Vector3? position = null)
@@ -136,7 +136,7 @@ namespace Exiled.API.Features
             GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
             Npc npc = new(newObject)
             {
-                IsVerified = true,
+                IsVerified = userId != "ID_Dedicated",
                 IsNPC = true,
             };
             try
@@ -163,6 +163,10 @@ namespace Exiled.API.Features
             try
             {
                 npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
+                if (userId == "ID_Dedicated")
+                {
+                    npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+                }
             }
             catch (Exception e)
             {
@@ -194,6 +198,16 @@ namespace Exiled.API.Features
             CustomNetworkManager.TypedSingleton.OnServerDisconnect(conn);
             Dictionary.Remove(GameObject);
             Object.Destroy(GameObject);
+        }
+
+        /// <summary>
+        /// Makes the NPC look at the specified position.
+        /// </summary>a
+        /// <param name="position">The position to look at.</param>
+        public void LookAt(Vector3 position)
+        {
+            if (RoleManager.CurrentRole is IFpcRole fpc)
+                fpc.LookAtPoint(position);
         }
     }
 }

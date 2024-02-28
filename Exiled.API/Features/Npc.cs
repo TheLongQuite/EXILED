@@ -138,11 +138,8 @@ namespace Exiled.API.Features
         {
             GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
 
-            userId = PlayerAuthenticationManager.DedicatedId;
-
             Npc npc = new(newObject)
             {
-                IsVerified = userId != PlayerAuthenticationManager.DedicatedId && userId != null,
                 IsNPC = true,
             };
 
@@ -220,12 +217,12 @@ namespace Exiled.API.Features
         /// <param name="position">The position to look at.</param>
         public void LookAt(Vector3 position)
         {
-            if (Role is not FpcRole)
-                return;
-
-            Vector3 direction = position - Position;
-            Quaternion quat = Quaternion.LookRotation(direction, Vector3.up);
-            LookAt(quat);
+            if (Role is FpcRole fpc)
+            {
+                Vector3 direction = position - Position;
+                Quaternion quat = Quaternion.LookRotation(direction, Vector3.up);
+                LookAt(quat);
+            }
         }
 
         /// <summary>

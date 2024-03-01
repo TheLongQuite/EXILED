@@ -496,22 +496,30 @@ namespace Exiled.CustomRoles.API.Features
         ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to add the role to.</param>
-        [Obsolete("Используй AddRole(player, SpawnReason), SpawnReason задай явно, по дефолту лучше ставить ForceClass")]
-        public virtual void AddRole(Player player) =>
-            AddRole(player, SpawnReason.ForceClass);
+        [Obsolete("Используй AddRole(player, SpawnReason, RoleSpawnFlags)", true)]
+        public virtual void AddRole(Player player) => AddRole(player, SpawnReason.ForceClass);
 
         /// <summary>
         ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to add the role to.</param>
         /// <param name="spawnReason">The <see cref="SpawnReason" /> to spawn player.</param>
-        public virtual void AddRole(Player player, SpawnReason spawnReason)
+        [Obsolete("Используй AddRole(player, SpawnReason, RoleSpawnFlags)", true)]
+        public virtual void AddRole(Player player, SpawnReason spawnReason) => AddRole(player, spawnReason, RoleSpawnFlags.All);
+
+        /// <summary>
+        ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
+        /// </summary>
+        /// <param name="player">The <see cref="Player" /> to add the role to.</param>
+        /// <param name="spawnReason">The <see cref="SpawnReason" /> to spawn player.</param>
+        /// <param name="spawnFlags">The <see cref="RoleSpawnFlags" /> to spawn player.</param>
+        public virtual void AddRole(Player player, SpawnReason spawnReason, RoleSpawnFlags spawnFlags)
         {
             Log.Debug($"{Name}: Adding role to {player.Nickname}.");
 
             Vector3 position = Vector3.zero;
             bool posAltered = false;
-            if (SpawnProperties.IsAny)
+            if (spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint) && SpawnProperties.IsAny)
             {
                 position = SpawnProperties.GetRandomPoint() + Vector3.up * 1.5f;
                 posAltered = true;
@@ -519,14 +527,12 @@ namespace Exiled.CustomRoles.API.Features
 
             if (Role != RoleTypeId.None)
             {
-                RoleSpawnFlags flags = RoleSpawnFlags.None;
-                if (!posAltered)
-                    flags |= RoleSpawnFlags.UseSpawnpoint;
+                RoleSpawnFlags flags = (!posAltered && spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint)) ? RoleSpawnFlags.UseSpawnpoint : RoleSpawnFlags.None;
                 player.Role.Set(Role, spawnReason, flags);
                 Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
             }
 
-            if (player.IsHuman)
+            if (player.IsHuman && spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
             {
                 Timing.CallDelayed(
                     0.25f,
@@ -927,7 +933,7 @@ namespace Exiled.CustomRoles.API.Features
                     {
                         if (!ev.Player.IsConnected || ev.Player.GetCustomRoles().Any() || ev.Player.Role != Role)
                             return;
-                        AddRole(ev.Player, SpawnReason.ForceClass);
+                        AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.All);
                     }
                     catch (Exception e)
                     {

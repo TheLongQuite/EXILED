@@ -21,7 +21,7 @@ namespace Exiled.CustomRoles.Commands.Admin
     using Exiled.API.Features.Pools;
 
     using Permissions.Extensions;
-
+    using PlayerRoles;
     using RemoteAdmin;
 
     /// <summary>
@@ -115,7 +115,7 @@ namespace Exiled.CustomRoles.Commands.Admin
             foreach (CustomRole? cRole in player.GetCustomRoles())
                 cRole?.RemoveRole(player);
 
-            customRole.AddRole(player, SpawnReason.ForceClass);
+            customRole.AddRole(player, SpawnReason.ForceClass, RoleSpawnFlags.All);
         }
     }
 }

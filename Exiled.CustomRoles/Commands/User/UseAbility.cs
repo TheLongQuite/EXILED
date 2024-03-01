@@ -4,18 +4,14 @@
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
-
 namespace Exiled.CustomRoles.Commands.User
 {
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using API;
     using API.Features;
-
     using CommandSystem;
-
     using Exiled.API.Features;
 
     /// <summary>
@@ -25,19 +21,11 @@ namespace Exiled.CustomRoles.Commands.User
     public class UseAbility : ICommand
     {
         /// <inheritdoc />
-        public string Command
-        {
-            get => "ability";
-        }
-
+        public string Command => "ability";
         /// <inheritdoc />
         public string[] Aliases { get; } = { "a" };
-
         /// <inheritdoc />
-        public string Description
-        {
-            get => "Использует спецспособность";
-        }
+        public string Description => "Использует спецспособность";
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
@@ -57,19 +45,18 @@ namespace Exiled.CustomRoles.Commands.User
                 return false;
             }
 
-            List<ActiveAbility> activeAbilities = new List<ActiveAbility>();
+            List<ActiveAbility> activeAbilities = new();
             foreach (CustomAbility? ability in role.CustomAbilities)
             {
                 if (ability is Scp079ActiveAbility scp079ActiveAbility)
                 {
                     if (!scp079ActiveAbility.IsAvailable(player))
                         continue;
+
                     activeAbilities.Add(scp079ActiveAbility);
                 }
                 else if (ability is ActiveAbility activeAbility)
-                {
                     activeAbilities.Add(activeAbility);
-                }
             }
 
             if (activeAbilities.IsEmpty())
@@ -80,11 +67,13 @@ namespace Exiled.CustomRoles.Commands.User
 
             int abilityNumber = 0;
             if (arguments.Count > 0)
+            {
                 if (!int.TryParse(arguments.At(0), out abilityNumber))
                 {
                     response = $"{arguments.At(0)} не является числом!";
                     return false;
                 }
+            }
 
             if (activeAbilities.Count < abilityNumber)
             {

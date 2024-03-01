@@ -88,7 +88,7 @@ namespace Exiled.CustomRoles.API.Features
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to check.</param>
         /// <returns>True if the player is actively using the ability.</returns>
-        public override bool Check(Player player) => ActivePlayers.Contains(player);
+        public override bool Check(Player player) => player is not null && ActivePlayers.Contains(player);
 
         /// <summary>
         ///     Checks to see if the ability is usable by the player.

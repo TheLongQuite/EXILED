@@ -104,7 +104,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <summary>
         ///     Gets or sets a list of the roles custom abilities.
         /// </summary>
-        public virtual List<CustomAbility> CustomAbilities { get; set; } = new();
+        public virtual List<CustomAbility>? CustomAbilities { get; set; } = new();
 
         /// <summary>
         ///     Gets or sets List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal.
@@ -515,21 +515,28 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="spawnFlags">The <see cref="RoleSpawnFlags" /> to spawn player.</param>
         public virtual void AddRole(Player player, SpawnReason spawnReason, RoleSpawnFlags spawnFlags)
         {
-            Log.Debug($"{Name}: Adding role to {player.Nickname}.");
+            Log.Debug($"{Name}: Adding role to {player.Nickname} with flags {spawnFlags}.");
 
             Vector3 position = Vector3.zero;
             bool posAltered = false;
-            if (spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint) && SpawnProperties.IsAny)
+            bool useSpawnpoint = spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint);
+            if (SpawnProperties.IsAny)
             {
-                position = SpawnProperties.GetRandomPoint() + Vector3.up * 1.5f;
+                position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
                 posAltered = true;
             }
 
             if (Role != RoleTypeId.None)
             {
-                RoleSpawnFlags flags = (!posAltered && spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint)) ? RoleSpawnFlags.UseSpawnpoint : RoleSpawnFlags.None;
+                RoleSpawnFlags flags = !posAltered && useSpawnpoint ? RoleSpawnFlags.UseSpawnpoint : RoleSpawnFlags.None;
                 player.Role.Set(Role, spawnReason, flags);
                 Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
+            }
+
+            if (posAltered && useSpawnpoint)
+            {
+                player.Position = position;
+                Log.Debug($"{Name}: Setting position to {position}.");
             }
 
             if (player.IsHuman && spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
@@ -550,18 +557,15 @@ namespace Exiled.CustomRoles.API.Features
                             foreach (KeyValuePair<string, byte> item in slot)
                             {
                                 byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
-                                Log.Debug($"Trying to add item {item.Key} with chance {chance} (buff: {itemsBuff}) to " + player.Nickname);
                                 if (!CommonExtensions.ChanceChecker(chance))
                                     continue;
                                 if (CustomItem.TryGet(item.Key, out CustomItem? customItem))
                                 {
                                     customItem?.Give(player, DisplayCustomItemMessages);
-                                    Log.Debug($"{Name}: Adding {customItem?.Name} to inventory.");
                                 }
                                 else if (Enum.TryParse(item.Key, out ItemType itemType))
                                 {
                                     player.AddItem(itemType);
-                                    Log.Debug($"{Name}: Adding {itemType} to inventory.");
                                 }
                                 else
                                 {
@@ -573,10 +577,7 @@ namespace Exiled.CustomRoles.API.Features
                         }
 
                         foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
-                        {
-                            Log.Debug($"{Name}: Setting {ammo.Value} to {ammo}.");
                             player.SetAmmo(ammo.Key, ammo.Value);
-                        }
                     });
             }
 
@@ -584,12 +585,6 @@ namespace Exiled.CustomRoles.API.Features
             player.Health = MaxHealth;
             player.MaxHealth = MaxHealth;
             player.Scale = Scale;
-
-            if (posAltered)
-            {
-                player.Position = position;
-                Log.Debug($"{Name}: Setting position to {position}.");
-            }
 
             Log.Debug($"{Name}: Setting player info");
             player.InfoArea &= ~PlayerInfoArea.Role;

@@ -138,6 +138,8 @@ namespace Exiled.API.Features
         {
             GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
 
+            userId = PlayerAuthenticationManager.DedicatedId;
+
             Npc npc = new(newObject)
             {
                 IsVerified = userId != PlayerAuthenticationManager.DedicatedId && userId != null,

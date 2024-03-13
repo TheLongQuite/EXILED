@@ -26,9 +26,7 @@ namespace Exiled.CustomItems.Events
         public void OnWaitingForPlayers()
         {
             foreach (CustomItem? customItem in CustomItem.Registered)
-            {
                 customItem.TrackedSerials.Clear();
-            }
         }
     }
 }

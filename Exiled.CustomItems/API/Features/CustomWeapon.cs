@@ -353,16 +353,28 @@ namespace Exiled.CustomItems.API.Features
             }
 
             Firearm firearm = ev.Firearm;
-            if (ev.Item.Type != ItemType.GunShotgun)
+            if (ev.Item.Type != ItemType.GunShotgun && AmmoUsage > 1)
             {
-                if (firearm.Ammo < AmmoUsage - 1)
+                if (firearm.Ammo < AmmoUsage)
                 {
                     ev.IsAllowed = false;
-                    Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo");
+                    Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo ({firearm.Ammo})");
                     return;
                 }
 
-                firearm.Ammo -= (byte)(AmmoUsage - 1);
+                checked
+                {
+                    try
+                    {
+                        firearm.Ammo -= (byte)(AmmoUsage - 1);
+                    }
+                    catch (OverflowException e)
+                    {
+                        Log.Error($"Failed to procced shot with custom ammo usage due to ArithmeticOverflow:\n{e}");
+                        ev.IsAllowed = false;
+                        return;
+                    }
+                }
             }
 
             if (FireCooldown > 0 && ClipSize > 1)
@@ -392,32 +404,8 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalHurting(HurtingEventArgs ev)
         {
-            if (ev.Attacker is null)
+            if (ev.Attacker is null || ev.Player is null || ev.Attacker == ev.Player || !Check(ev.Attacker.CurrentItem) || ev.DamageHandler == null)
                 return;
-
-            if (ev.Player is null)
-            {
-                Log.Debug($"{Name}: {nameof(OnInternalHurting)}: target null");
-                return;
-            }
-
-            if (!Check(ev.Attacker.CurrentItem))
-            {
-                Log.Debug($"{Name}: {nameof(OnInternalHurting)}: !Check()");
-                return;
-            }
-
-            if (ev.Attacker == ev.Player)
-            {
-                Log.Debug($"{Name}: {nameof(OnInternalHurting)}: attacker == target");
-                return;
-            }
-
-            if (ev.DamageHandler is null)
-            {
-                Log.Debug($"{Name}: {nameof(OnInternalHurting)}: Handler null");
-                return;
-            }
 
             if (!ev.DamageHandler.CustomBase.BaseIs(out FirearmDamageHandler firearmDamageHandler))
             {

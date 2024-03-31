@@ -52,6 +52,8 @@ namespace Exiled.API.Features
         /// </summary>
         public static new List<Npc> List => Player.List.OfType<Npc>().ToList();
 
+        internal static readonly List<Npc> ToDestroyOnDeath = new List<Npc>();
+
         /// <summary>
         /// Retrieves the NPC associated with the specified ReferenceHub.
         /// </summary>
@@ -122,69 +124,51 @@ namespace Exiled.API.Features
         /// <returns>The NPC associated with the NetworkConnection, or <c>null</c> if not found.</returns>
         public static new Npc? Get(NetworkConnection conn) => Player.Get(conn) as Npc;
 
+        [Obsolete("Use other overload", true)]
+        public static Npc Spawn(string name, RoleTypeId role, int id, string userId, Vector3? position = null) => Spawn(name, role, position);
+
         /// <summary>
         /// Spawns an NPC based on the given parameters.
         /// </summary>
         /// <param name="name">The name of the NPC.</param>
         /// <param name="role">The RoleTypeId of the NPC.</param>
-        /// <param name="id">The Network ID of the NPC. If 0, one is made.</param>
-        /// <param name="userId">The userID of the NPC. Use "ID_Dedicated" for VSR Compliant NPCs.</param>
         /// <param name="position">The position to spawn the NPC.</param>
+        /// <param name="destroyOnDeath">Will this NPC be deleted on death.</param>
         /// <returns>The <see cref="Npc"/> spawned.</returns>
-        public static Npc Spawn(string name, RoleTypeId role, int id = 0, string userId = "", Vector3? position = null)
+        public static Npc Spawn(string name, RoleTypeId role, Vector3? position = null, bool destroyOnDeath = true)
         {
             GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
             Npc npc = new(newObject)
             {
-                IsVerified = userId != "ID_Dedicated",
+                IsVerified = false,
                 IsNPC = true,
             };
+            ReferenceHub referenceHub = npc.ReferenceHub;
+            NetworkServer.AddPlayerForConnection(new FakeConnection(referenceHub._playerId.Value), newObject);
             try
             {
-                npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
+                referenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+                referenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
+                referenceHub.nicknameSync.Network_myNickSync = name;
             }
             catch (Exception e)
             {
                 Log.Debug($"Ignore: {e}");
             }
 
-            if (RecyclablePlayerId.FreeIds.Contains(id))
-            {
-                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
-            }
-            else if (RecyclablePlayerId._autoIncrement >= id)
-            {
-                RecyclablePlayerId._autoIncrement = id = RecyclablePlayerId._autoIncrement + 150;
-                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
-            }
-
-            NetworkServer.AddPlayerForConnection(new FakeConnection(id), newObject);
-
-            try
-            {
-                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
-                if (userId == "ID_Dedicated")
-                {
-                    npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Debug($"Ignore: {e}");
-            }
-
-            npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
             Dictionary.Add(newObject, npc);
+            if (destroyOnDeath)
+                ToDestroyOnDeath.Add(npc);
 
             Timing.CallDelayed(
                 0.3f,
                 () =>
                 {
                     npc.Role.Set(role, SpawnReason.RoundStart, position is null ? RoleSpawnFlags.All : RoleSpawnFlags.AssignInventory);
+                    if (position.HasValue)
+                        npc.Position = position.Value;
                 });
 
-            if (position is not null)
-                Timing.CallDelayed(0.5f, () => npc.Position = position.Value);
             return npc;
         }
 

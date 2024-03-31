@@ -8,7 +8,7 @@
 namespace Exiled.Events.Handlers.Internal
 {
     using System.Linq;
-
+    using API.Enums;
     using CentralAuth;
     using Exiled.API.Extensions;
     using Exiled.API.Features;
@@ -69,6 +69,8 @@ namespace Exiled.Events.Handlers.Internal
         {
             if (!ev.Player.IsHost && ev.NewRole == RoleTypeId.Spectator && ev.Reason != API.Enums.SpawnReason.Destroyed && ev.Reason != API.Enums.SpawnReason.Died && Events.Instance.Config.ShouldDropInventory)
                 ev.Player.Inventory.ServerDropEverything();
+            if (ev.Reason == SpawnReason.Died && ev.Player is Npc npc && Npc.ToDestroyOnDeath.Contains(npc))
+                npc.Destroy();
         }
 
         /// <inheritdoc cref="Scp049.OnActivatingSense(ActivatingSenseEventArgs)" />

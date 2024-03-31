@@ -900,7 +900,7 @@ namespace Exiled.CustomRoles.API.Features
         private void OnInternalChangingRole(ChangingRoleEventArgs ev)
         {
             if (Check(ev.Player) &&
-                (ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath || ev.NewRole != RoleTypeId.Spectator))
+                ((ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath) || ev.NewRole != RoleTypeId.Spectator))
             {
                 if (ev.Reason == SpawnReason.Destroyed)
                 {
@@ -916,23 +916,17 @@ namespace Exiled.CustomRoles.API.Features
 
             if (ReplacesBaseRole && Role != RoleTypeId.None && Role == ev.NewRole)
             {
-                if (ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
-                {
-                    Log.Debug("Skipping base role replace");
-                    return;
-                }
-
                 Timing.CallDelayed(1.1f, () =>
                 {
                     try
                     {
-                        if (!ev.Player.IsConnected || ev.Player.GetCustomRoles().Any() || ev.Player.Role != Role)
+                        if (!ev.Player.IsConnected || ev.Player.GetCustomRoles().Any() || ev.Player.Role != Role || ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
                             return;
                         AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.All);
                     }
                     catch (Exception e)
                     {
-                        Log.Error($"[{nameof(CustomRole)}.{nameof(OnInternalChangingRole)}] [{Name}] Failed to add customRole, replacing basic {Role}:\n{e}");
+                        Log.Error($"[{nameof(CustomRole)}.{nameof(OnInternalChangingRole)}] [{Name}] Failed to add customRole-replacer of basic {Role}:\n{e}");
                     }
                 });
             }

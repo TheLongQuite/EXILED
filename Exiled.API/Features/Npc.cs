@@ -144,7 +144,11 @@ namespace Exiled.API.Features
                 IsNPC = true,
             };
             ReferenceHub referenceHub = npc.ReferenceHub;
-            NetworkServer.AddPlayerForConnection(new FakeConnection(referenceHub._playerId.Value), newObject);
+            RecyclablePlayerId recyclablePlayerId = new RecyclablePlayerId(false);
+            if (Player.List.Any(x => x.Id == recyclablePlayerId.Value))
+                Log.Error($"Spawned NPC {name} with id unavailabale: {recyclablePlayerId.Value}");
+            referenceHub._playerId = recyclablePlayerId;
+            NetworkServer.AddPlayerForConnection(new FakeConnection(recyclablePlayerId.Value + 300), newObject);
             try
             {
                 referenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
@@ -153,7 +157,7 @@ namespace Exiled.API.Features
             }
             catch (Exception e)
             {
-                Log.Debug($"Ignore: {e}");
+                Log.Warn($"[{nameof(Npc)}.{nameof(Spawn)}] Ignore: {e}");
             }
 
             Dictionary.Add(newObject, npc);

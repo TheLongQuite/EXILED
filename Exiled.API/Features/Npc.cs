@@ -143,22 +143,39 @@ namespace Exiled.API.Features
                 IsVerified = false,
                 IsNPC = true,
             };
-            ReferenceHub referenceHub = npc.ReferenceHub;
-            RecyclablePlayerId recyclablePlayerId = new RecyclablePlayerId(false);
-            if (Player.List.Any(x => x.Id == recyclablePlayerId.Value))
-                Log.Error($"Spawned NPC {name} with id unavailabale: {recyclablePlayerId.Value}");
-            referenceHub._playerId = recyclablePlayerId;
-            NetworkServer.AddPlayerForConnection(new FakeConnection(recyclablePlayerId.Value + 300), newObject);
+
             try
             {
-                referenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
-                referenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
-                referenceHub.nicknameSync.Network_myNickSync = name;
+                npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
             }
             catch (Exception e)
             {
-                Log.Warn($"[{nameof(Npc)}.{nameof(Spawn)}] Ignore: {e}");
+                Log.Debug($"Ignore [InitializeNewRole]: {e}");
             }
+
+            int id = new RecyclablePlayerId(false).Value;
+            FakeConnection fakeConnection = new(id);
+            NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
+
+            try
+            {
+                npc.ReferenceHub.authManager.SyncedUserId = PlayerAuthenticationManager.DedicatedId;
+            }
+            catch (Exception e)
+            {
+                Log.Debug($"Ignore [SyncedUserId]: {e}");
+            }
+
+            try
+            {
+                npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
+            }
+            catch (Exception e)
+            {
+                Log.Debug($"Ignore [InstanceMode]: {e}");
+            }
+
+            npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
 
             Dictionary.Add(newObject, npc);
             if (destroyOnDeath)

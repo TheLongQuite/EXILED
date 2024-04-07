@@ -5,27 +5,27 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+#nullable enable
 namespace Exiled.API.Features
 {
-#nullable enable
     using System;
     using System.Collections.Generic;
     using System.Linq;
 
-    using CentralAuth;
     using CommandSystem;
+
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features.Components;
-    using Exiled.API.Features.Items;
+
     using Footprinting;
-    using InventorySystem.Items.Firearms.BasicMessages;
-    using InventorySystem.Items.Firearms.Modules;
+
     using MEC;
+
     using Mirror;
+
     using PlayerRoles;
-    using PlayerRoles.FirstPersonControl;
-    using RelativePositioning;
+
     using UnityEngine;
 
     using Object = UnityEngine.Object;
@@ -51,8 +51,6 @@ namespace Exiled.API.Features
         /// Gets a list of Npcs.
         /// </summary>
         public static new List<Npc> List => Player.List.OfType<Npc>().ToList();
-
-        internal static readonly List<Npc> ToDestroyOnDeath = new List<Npc>();
 
         /// <summary>
         /// Retrieves the NPC associated with the specified ReferenceHub.
@@ -124,72 +122,64 @@ namespace Exiled.API.Features
         /// <returns>The NPC associated with the NetworkConnection, or <c>null</c> if not found.</returns>
         public static new Npc? Get(NetworkConnection conn) => Player.Get(conn) as Npc;
 
-        [Obsolete("Use other overload", true)]
-        public static Npc Spawn(string name, RoleTypeId role, int id, string userId, Vector3? position = null) => Spawn(name, role, position);
-
         /// <summary>
         /// Spawns an NPC based on the given parameters.
         /// </summary>
         /// <param name="name">The name of the NPC.</param>
         /// <param name="role">The RoleTypeId of the NPC.</param>
+        /// <param name="id">The player ID of the NPC.</param>
+        /// <param name="userId">The userID of the NPC.</param>
         /// <param name="position">The position to spawn the NPC.</param>
-        /// <param name="destroyOnDeath">Will this NPC be deleted on death.</param>
         /// <returns>The <see cref="Npc"/> spawned.</returns>
-        public static Npc Spawn(string name, RoleTypeId role, Vector3? position = null, bool destroyOnDeath = true)
+        public static Npc Spawn(string name, RoleTypeId role, int id = 0, string userId = "", Vector3? position = null)
         {
             GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
             Npc npc = new(newObject)
             {
-                IsVerified = false,
+                IsVerified = true,
                 IsNPC = true,
             };
-
             try
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
             }
             catch (Exception e)
             {
-                Log.Debug($"Ignore [InitializeNewRole]: {e}");
+                Log.Debug($"Ignore: {e}");
             }
 
-            int id = new RecyclablePlayerId(false).Value;
+            if (RecyclablePlayerId.FreeIds.Contains(id))
+            {
+                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
+            }
+            else if (RecyclablePlayerId._autoIncrement >= id)
+            {
+                RecyclablePlayerId._autoIncrement = id = RecyclablePlayerId._autoIncrement + 1;
+            }
+
             FakeConnection fakeConnection = new(id);
             NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
-
             try
             {
-                npc.ReferenceHub.authManager.SyncedUserId = PlayerAuthenticationManager.DedicatedId;
+                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
             }
             catch (Exception e)
             {
-                Log.Debug($"Ignore [SyncedUserId]: {e}");
-            }
-
-            try
-            {
-                npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
-            }
-            catch (Exception e)
-            {
-                Log.Debug($"Ignore [InstanceMode]: {e}");
+                Log.Debug($"Ignore: {e}");
             }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-
             Dictionary.Add(newObject, npc);
-            if (destroyOnDeath)
-                ToDestroyOnDeath.Add(npc);
 
             Timing.CallDelayed(
                 0.3f,
                 () =>
                 {
                     npc.Role.Set(role, SpawnReason.RoundStart, position is null ? RoleSpawnFlags.All : RoleSpawnFlags.AssignInventory);
-                    if (position.HasValue)
-                        npc.Position = position.Value;
                 });
 
+            if (position is not null)
+                Timing.CallDelayed(0.5f, () => npc.Position = position.Value);
             return npc;
         }
 
@@ -199,20 +189,12 @@ namespace Exiled.API.Features
         public void Destroy()
         {
             NetworkConnectionToClient conn = ReferenceHub.connectionToClient;
+            if (ReferenceHub._playerId.Value <= RecyclablePlayerId._autoIncrement)
+                ReferenceHub._playerId.Destroy();
             ReferenceHub.OnDestroy();
             CustomNetworkManager.TypedSingleton.OnServerDisconnect(conn);
             Dictionary.Remove(GameObject);
             Object.Destroy(GameObject);
-        }
-
-        /// <summary>
-        /// Makes the NPC look at the specified position.
-        /// </summary>a
-        /// <param name="position">The position to look at.</param>
-        public void LookAt(Vector3 position)
-        {
-            if (RoleManager.CurrentRole is IFpcRole fpc)
-                fpc.LookAtPoint(position);
         }
     }
 }

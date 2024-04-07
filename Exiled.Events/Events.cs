@@ -54,7 +54,7 @@ namespace Exiled.Events
 
             watch.Stop();
 
-            Log.Info($"{(Config.UseDynamicPatching ? "Non-event" : "All")} patches completed in {watch.Elapsed}");
+            Log.Info($"{(Config.UseDynamicPatching ? "Non-event" : "All")} patches completed in {watch.Elapsed}.");
             PlayerAuthenticationManager.OnInstanceModeChanged -= RoleAssigner.CheckLateJoin;
 
             SceneManager.sceneUnloaded += Handlers.Internal.SceneUnloaded.OnSceneUnloaded;

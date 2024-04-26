@@ -7,7 +7,9 @@
 
 namespace Exiled.Events.Handlers
 {
-    using Exiled.API.Features.Pickups;
+    using System;
+
+    using API.Features;
 #pragma warning disable IDE0079
 #pragma warning disable IDE0060
 #pragma warning disable SA1623 // Property summary documentation should match accessors
@@ -944,12 +946,18 @@ namespace Exiled.Events.Handlers
         public static void OnItemAdded(ReferenceHub referenceHub, InventorySystem.Items.ItemBase itemBase, InventorySystem.Items.Pickups.ItemPickupBase pickupBase)
         {
             ItemAddedEventArgs ev = new(referenceHub, itemBase, pickupBase);
+            try
+            {
+                ev.Item.ReadPickupInfo(ev.Pickup);
 
-            ev.Item.ReadPickupInfo(ev.Pickup);
+                ev.Player.ItemsValue.Add(ev.Item);
 
-            ev.Player.ItemsValue.Add(ev.Item);
-
-            ItemAdded.InvokeSafely(ev);
+                ItemAdded.InvokeSafely(ev);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Failed to proceed OnItemAdded {ev.Item} | {ev.Pickup} | {ev.Player}:\n{e}");
+            }
         }
 
         /// <summary>
@@ -961,11 +969,18 @@ namespace Exiled.Events.Handlers
         public static void OnItemRemoved(ReferenceHub referenceHub, InventorySystem.Items.ItemBase itemBase, InventorySystem.Items.Pickups.ItemPickupBase pickupBase)
         {
             ItemRemovedEventArgs ev = new(referenceHub, itemBase, pickupBase);
-            ItemRemoved.InvokeSafely(ev);
+            try
+            {
+                ItemRemoved.InvokeSafely(ev);
 
-            ev.Player.ItemsValue.Remove(ev.Item);
+                ev.Player.ItemsValue.Remove(ev.Item);
 
-            API.Features.Items.Item.BaseToItem.Remove(itemBase);
+                API.Features.Items.Item.BaseToItem.Remove(itemBase);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Failed to proceed OnItemRemoved {ev.Item} | {ev.Pickup} | {ev.Player}:\n{e}");
+            }
         }
 
         /// <summary>

@@ -8,7 +8,7 @@
 namespace Exiled.Events.Handlers.Internal
 {
     using System.Linq;
-    using API.Enums;
+
     using CentralAuth;
     using Exiled.API.Extensions;
     using Exiled.API.Features;

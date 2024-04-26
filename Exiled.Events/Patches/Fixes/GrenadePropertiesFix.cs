@@ -21,6 +21,7 @@ namespace Exiled.Events.Patches.Fixes
     using UnityEngine;
 
     using static HarmonyLib.AccessTools;
+
     using Log = API.Features.Log;
 
     /// <summary>

@@ -944,21 +944,7 @@ namespace Exiled.Events.Handlers
         /// <param name="itemBase">The added <see cref="InventorySystem.Items.ItemBase"/>.</param>
         /// <param name="pickupBase">The <see cref="InventorySystem.Items.Pickups.ItemPickupBase"/> the <see cref="InventorySystem.Items.ItemBase"/> originated from, or <see langword="null"/> if the item was not picked up.</param>
         public static void OnItemAdded(ReferenceHub referenceHub, InventorySystem.Items.ItemBase itemBase, InventorySystem.Items.Pickups.ItemPickupBase pickupBase)
-        {
-            ItemAddedEventArgs ev = new(referenceHub, itemBase, pickupBase);
-            try
-            {
-                ev.Item.ReadPickupInfo(ev.Pickup);
-
-                ev.Player.ItemsValue.Add(ev.Item);
-
-                ItemAdded.InvokeSafely(ev);
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Failed to proceed OnItemAdded {ev.Item} | {ev.Pickup} | {ev.Player}:\n{e}");
-            }
-        }
+            => ItemAdded.InvokeSafely(new ItemAddedEventArgs(referenceHub, itemBase, pickupBase));
 
         /// <summary>
         /// Called after a <see cref="T:Exiled.API.Features.Player" /> has an item removed from their inventory.
@@ -967,21 +953,7 @@ namespace Exiled.Events.Handlers
         /// <param name="itemBase">The removed <see cref="InventorySystem.Items.ItemBase"/>.</param>
         /// <param name="pickupBase">The <see cref="InventorySystem.Items.Pickups.ItemPickupBase"/> the <see cref="InventorySystem.Items.ItemBase"/> originated from, or <see langword="null"/> if the item was not picked up.</param>
         public static void OnItemRemoved(ReferenceHub referenceHub, InventorySystem.Items.ItemBase itemBase, InventorySystem.Items.Pickups.ItemPickupBase pickupBase)
-        {
-            ItemRemovedEventArgs ev = new(referenceHub, itemBase, pickupBase);
-            try
-            {
-                ItemRemoved.InvokeSafely(ev);
-
-                ev.Player.ItemsValue.Remove(ev.Item);
-
-                API.Features.Items.Item.BaseToItem.Remove(itemBase);
-            }
-            catch (Exception e)
-            {
-                Log.Error($"Failed to proceed OnItemRemoved {ev.Item} | {ev.Pickup} | {ev.Player}:\n{e}");
-            }
-        }
+            => ItemRemoved.InvokeSafely(new ItemRemovedEventArgs(referenceHub, itemBase, pickupBase));
 
         /// <summary>
         /// Called before a <see cref="API.Features.Player"/> enters in an environmental hazard.

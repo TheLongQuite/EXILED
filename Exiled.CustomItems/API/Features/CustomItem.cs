@@ -815,7 +815,7 @@ namespace Exiled.CustomItems.API.Features
                 Log.Debug("Registered items doesn't contain this item yet..");
                 if (Registered.Any(customItem => customItem.Id == Id))
                 {
-                    Log.Warn($"{Name} has tried to register with the same custom item ID as another item: {Id}. It will not be registered.");
+                    Log.Error($"{Name} has tried to register with the same custom item ID as another item: {Id}. It will not be registered.");
 
                     return false;
                 }
@@ -830,7 +830,7 @@ namespace Exiled.CustomItems.API.Features
                 return true;
             }
 
-            Log.Warn($"Couldn't register {Name} ({Id}) [{Type}] as it already exists.");
+            Log.Error($"Couldn't register {Name} ({Id}) [{Type}] as it already exists.");
 
             return false;
         }

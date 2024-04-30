@@ -788,7 +788,7 @@ namespace Exiled.CustomRoles.API.Features
             {
                 if (Registered.Any(r => r.Id == Id))
                 {
-                    Log.Warn($"{Name} has tried to register with the same Role ID as another role: {Id}. It will not be registered!");
+                    Log.Error($"{Name} has tried to register with the same Role ID as another role: {Id}. It will not be registered!");
 
                     return false;
                 }
@@ -801,7 +801,7 @@ namespace Exiled.CustomRoles.API.Features
                 return true;
             }
 
-            Log.Warn($"Couldn't register {Name} ({Id}) [{Role}] as it already exists.");
+            Log.Error($"Couldn't register {Name} ({Id}) [{Role}] as it already exists.");
 
             return false;
         }

@@ -174,5 +174,55 @@ namespace Exiled.API.Extensions
             byte[] hash = Sha256.ComputeHash(textData);
             return BitConverter.ToString(hash).Replace("-", string.Empty);
         }
+
+        /// <summary>
+        /// Checks if custom info string valid for NW Client.
+        /// </summary>
+        /// <param name="customInfo">Custominfo string to check.</param>
+        /// <param name="denialReason">Info about denial reason.</param>
+        /// <returns>Is Custominfo valid.</returns>
+        public static bool IsCustomInfoValid(this string customInfo, out string denialReason)
+        {
+            denialReason = null;
+            if (customInfo == null || !customInfo.Contains('<'))
+                return true;
+
+            foreach (string token in customInfo.Split('<'))
+            {
+                if (token.StartsWith("/", StringComparison.Ordinal) ||
+                    token.StartsWith("b>", StringComparison.Ordinal) ||
+                    token.StartsWith("i>", StringComparison.Ordinal) ||
+                    token.StartsWith("size=", StringComparison.Ordinal) ||
+                    token.Length is 0)
+                    continue;
+
+                if (token.StartsWith("color=", StringComparison.Ordinal))
+                {
+                    if (token.Length < 14 || token[13] != '>')
+                        denialReason = $"(Bad text reject) \ntoken: {token} \nInfo: {customInfo}";
+                    else if (!Misc.AllowedColors.ContainsValue(token.Substring(6, 7)))
+                        denialReason = $"(Bad color reject) \ntoken: {token} \nInfo: {customInfo}";
+                    else
+                        continue;
+                }
+                else if (token.StartsWith("#", StringComparison.Ordinal))
+                {
+                    if (token.Length < 8 || token[7] != '>')
+                        denialReason = $"(Bad text reject) \ntoken: {token} \nInfo: {customInfo}";
+                    else if (!Misc.AllowedColors.ContainsValue(token.Substring(0, 7)))
+                        denialReason = $"(Bad color reject) \ntoken: {token} \nInfo: {customInfo}";
+                    else
+                        continue;
+                }
+                else
+                {
+                    denialReason = $"(Bad tag reject) \ntoken: {token} \nInfo: {customInfo}";
+                }
+
+                return false;
+            }
+
+            return true;
+        }
     }
 }

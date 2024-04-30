@@ -371,60 +371,15 @@ namespace Exiled.API.Features
             set
             {
                 // NW Client check.
-                if (!IsCustomInfoValid(value))
+                if (!value.IsCustomInfoValid(out string denialReason))
+                {
+                    Log.Error($"Invalid Custominfo:\n{denialReason}");
                     return;
+                }
 
                 InfoArea = string.IsNullOrEmpty(value) ? InfoArea & ~PlayerInfoArea.CustomInfo : InfoArea |= PlayerInfoArea.CustomInfo;
                 ReferenceHub.nicknameSync.Network_customPlayerInfoString = value;
             }
-        }
-
-        /// <summary>
-        /// Checks if custom info string valid for NW Client.
-        /// </summary>
-        /// <param name="customInfo">Custominfo string to check.</param>
-        /// <returns>Is Custominfo valid.</returns>
-        public bool IsCustomInfoValid(string customInfo)
-        {
-            if (customInfo == null || !customInfo.Contains('<'))
-                return true;
-
-            foreach (string token in customInfo.Split('<'))
-            {
-                if (token.StartsWith("/", StringComparison.Ordinal) ||
-                    token.StartsWith("b>", StringComparison.Ordinal) ||
-                    token.StartsWith("i>", StringComparison.Ordinal) ||
-                    token.StartsWith("size=", StringComparison.Ordinal) ||
-                    token.Length is 0)
-                    continue;
-
-                if (token.StartsWith("color=", StringComparison.Ordinal))
-                {
-                    if (token.Length < 14 || token[13] != '>')
-                        Log.Warn($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad text reject) \ntoken: {token} \nInfo: {customInfo}");
-                    else if (!Misc.AllowedColors.ContainsValue(token.Substring(6, 7)))
-                        Log.Warn($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {customInfo}");
-                    else
-                        continue;
-                }
-                else if (token.StartsWith("#", StringComparison.Ordinal))
-                {
-                    if (token.Length < 8 || token[7] != '>')
-                        Log.Warn($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad text reject) \ntoken: {token} \nInfo: {customInfo}");
-                    else if (!Misc.AllowedColors.ContainsValue(token.Substring(0, 7)))
-                        Log.Warn($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {customInfo}");
-                    else
-                        continue;
-                }
-                else
-                {
-                    Log.Warn($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad tag reject) \ntoken: {token} \nInfo: {customInfo}");
-                }
-
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>

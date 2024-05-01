@@ -81,11 +81,20 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Bgt_S, label),
                 });
 
-            offset = -1;
-            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))) + offset;
-
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
+            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(PrivateType, LeadingTeam));
+            newInstructions.InsertRange(index, new CodeInstruction[]
+            {
+                // this.leadingTeam = ev.LeadingTeam
+                new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
+                new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.LeadingTeam))),
+                new(OpCodes.Stfld, Field(PrivateType, LeadingTeam)),
+                new(OpCodes.Ldarg_0),
+            });
+
+            offset = -1;
+            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))) + offset;
             newInstructions.InsertRange(
                 index,
                 new CodeInstruction[]
@@ -112,12 +121,6 @@ namespace Exiled.Events.Patches.Events.Server
                     // Handlers.Server.OnEndingRound(evEndingRound);
                     new(OpCodes.Call, Method(typeof(Handlers.Server), nameof(Handlers.Server.OnEndingRound))),
                     new(OpCodes.Stloc_S, evEndingRound.LocalIndex),
-
-                    // this.leadingTeam = ev.LeadingTeam
-                    new(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.LeadingTeam))),
-                    new(OpCodes.Stfld, Field(PrivateType, LeadingTeam)),
 
                     // this._roundEnded = ev.IsForceEnded
                     new(OpCodes.Ldloc_1),

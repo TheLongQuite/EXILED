@@ -44,6 +44,9 @@ namespace Exiled.Events.Patches.Events.Server
 
             const string LeadingTeam = "<leadingTeam>5__9";
             const string NewList = "<newList>5__3";
+            const string SurvivedAnomalies = "<anomalies>5__6";
+            const string SurvivedChaos = "<chaosInsurgency>5__5";
+            const string survivedFacilityforces = "<facilityForces>5__4";
 
             int offset = -1;
             int index = newInstructions.FindIndex(x => x.Calls(Method(typeof(PlayerRolesUtils), nameof(PlayerRolesUtils.GetTeam), new Type[] { typeof(ReferenceHub), }))) + offset;
@@ -81,6 +84,11 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Bgt_S, label),
                 });
 
+            // Удаляем бейзгеймовое определение победителя, ибо засунули его в свой метод
+            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stfld && x.operand == (object)Field(PrivateType, LeadingTeam)) - 16;
+            int targetIndex = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(PrivateType, LeadingTeam)) - 1;
+            newInstructions.RemoveRange(index, targetIndex - index);
+
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
             index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(PrivateType, LeadingTeam));
@@ -99,9 +107,14 @@ namespace Exiled.Events.Patches.Events.Server
                 index,
                 new CodeInstruction[]
                 {
-                    // this.leadingTeam
+                    // RoundEnd.DefineBaseGameWinner(survivedFacilityforces, SurvivedChaos, SurvivedAnomalies)
                     new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Ldfld, Field(PrivateType, LeadingTeam)),
+                    new(OpCodes.Ldfld, Field(PrivateType, survivedFacilityforces)),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(PrivateType, SurvivedChaos)),
+                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(PrivateType, SurvivedAnomalies)),
+                    new(OpCodes.Call, Method(typeof(RoundEnd), nameof(DefineBaseGameWinner))),
 
                     // this.newList
                     new(OpCodes.Ldarg_0),
@@ -169,6 +182,22 @@ namespace Exiled.Events.Patches.Events.Server
                 yield return newInstructions[z];
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+
+        private static RoundSummary.LeadingTeam DefineBaseGameWinner(int facilityForces, int chaosInsurgency, int anomalies)
+        {
+            int num4 = facilityForces > 0 ? 1 : 0;
+            bool flag1 = chaosInsurgency > 0;
+            bool flag2 = anomalies > 0;
+            RoundSummary.LeadingTeam leadingTeam = RoundSummary.LeadingTeam.Draw;
+            if (num4 != 0)
+                leadingTeam = RoundSummary.EscapedScientists >= RoundSummary.EscapedClassD ? RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
+            else if (flag2)
+                leadingTeam = RoundSummary.EscapedClassD > RoundSummary.SurvivingSCPs ? RoundSummary.LeadingTeam.ChaosInsurgency : (RoundSummary.SurvivingSCPs > RoundSummary.EscapedScientists ? RoundSummary.LeadingTeam.Anomalies : RoundSummary.LeadingTeam.Draw);
+            else if (flag1)
+                leadingTeam = RoundSummary.EscapedClassD >= RoundSummary.EscapedScientists ? RoundSummary.LeadingTeam.ChaosInsurgency : RoundSummary.LeadingTeam.Draw;
+
+            return leadingTeam;
         }
     }
 }

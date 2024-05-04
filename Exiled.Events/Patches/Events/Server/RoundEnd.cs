@@ -91,16 +91,6 @@ namespace Exiled.Events.Patches.Events.Server
 
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
-            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(PrivateType, LeadingTeam));
-            newInstructions.InsertRange(index, new CodeInstruction[]
-            {
-                // this.leadingTeam = ev.LeadingTeam
-                new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.LeadingTeam))),
-                new(OpCodes.Stfld, Field(PrivateType, LeadingTeam)),
-                new(OpCodes.Ldarg_0),
-            });
-
             offset = -1;
             index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))) + offset;
             newInstructions.InsertRange(
@@ -145,6 +135,12 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.IsAllowed))),
                     new(OpCodes.Stloc_S, 4),
+
+                    // this.leadingTeam = ev.LeadingTeam
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
+                    new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.LeadingTeam))),
+                    new(OpCodes.Stfld, Field(PrivateType, LeadingTeam)),
                 });
 
             offset = 7;

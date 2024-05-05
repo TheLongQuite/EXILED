@@ -7,6 +7,8 @@
 
 namespace Exiled.Events.EventArgs.Player
 {
+    using API.Enums;
+    using API.Extensions;
     using API.Features;
     using Exiled.API.Features.Items;
     using Interfaces;
@@ -47,6 +49,8 @@ namespace Exiled.Events.EventArgs.Player
             {
                 Hitbox = identity;
                 Target = Player.Get(Hitbox.TargetHub);
+                if (Target != null)
+                    BoneType = Target.GetByMassCenter(Hitbox);
             }
         }
 
@@ -87,6 +91,11 @@ namespace Exiled.Events.EventArgs.Player
         /// Gets the raycast result.
         /// </summary>
         public RaycastHit RaycastHit { get; }
+
+        /// <summary>
+        /// Gets the damaged part of human body. Can be <see langword="null" /> if <see cref="Target"/> is null.
+        /// </summary>
+        public BoneType? BoneType { get; }
 
         /// <summary>
         /// Gets the target of the shot. Can be <see langword="null" />!.

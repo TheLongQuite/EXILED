@@ -545,39 +545,49 @@ namespace Exiled.CustomRoles.API.Features
                     0.25f,
                     () =>
                     {
-                        if (!KeepInventoryOnSpawn)
+                        try
                         {
-                            Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
-                            player.ClearInventory();
-                        }
-
-                        player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out byte itemsBuff);
-                        foreach (Dictionary<string, byte>? slot in Inventory)
-                        {
-                            foreach (KeyValuePair<string, byte> item in slot)
+                            if (!KeepInventoryOnSpawn)
                             {
-                                byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
-                                if (!CommonExtensions.ChanceChecker(chance))
-                                    continue;
-                                if (CustomItem.TryGet(item.Key, out CustomItem? customItem))
-                                {
-                                    customItem?.Give(player, DisplayCustomItemMessages);
-                                }
-                                else if (Enum.TryParse(item.Key, out ItemType itemType))
-                                {
-                                    player.AddItem(itemType);
-                                }
-                                else
-                                {
-                                    Log.Error($"Error at adding items to custom role {Name}. Wrong item: {item.Key}");
-                                }
-
-                                break;
+                                Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
+                                player.ClearInventory();
                             }
-                        }
 
-                        foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
-                            player.SetAmmo(ammo.Key, ammo.Value);
+                            player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out byte itemsBuff);
+                            foreach (Dictionary<string, byte>? slot in Inventory)
+                            {
+                                foreach (KeyValuePair<string, byte> item in slot)
+                                {
+                                    byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
+                                    if (!CommonExtensions.ChanceChecker(chance))
+                                        continue;
+
+                                    try
+                                    {
+                                        if (CustomItem.TryGet(item.Key, out CustomItem? customItem))
+                                            customItem?.Give(player, DisplayCustomItemMessages);
+                                        else if (Enum.TryParse(item.Key, out ItemType itemType))
+                                            player.AddItem(itemType);
+                                        else
+                                            Log.Error($"Error at adding items to custom role {Name}. Wrong item: {item.Key}");
+                                    }
+                                    catch (Exception e)
+                                    {
+                                        Log.Error($"Failed to give item {item.Key} to {player}!\n{e}");
+                                    }
+
+                                    break;
+                                }
+                            }
+
+                            foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
+                                player.SetAmmo(ammo.Key, ammo.Value);
+
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error($"Exception in customrole {Name} inventory delayed process for player {player}:\n{e}");
+                        }
                     });
             }
 

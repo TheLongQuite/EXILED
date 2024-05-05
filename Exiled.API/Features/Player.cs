@@ -2577,6 +2577,13 @@ namespace Exiled.API.Features
         {
             try
             {
+                if (!itemBase)
+                {
+                    Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) called with itemBase == null!\n" +
+                              $"**Called from**: {new StackTrace()}");
+                    return null;
+                }
+
                 item ??= Item.Get(itemBase);
 
                 Inventory.UserInventory.Items[item.Serial] = itemBase;

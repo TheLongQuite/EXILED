@@ -566,7 +566,7 @@ namespace Exiled.CustomRoles.API.Features
                                     {
                                         if (CustomItem.TryGet(item.Key, out CustomItem? customItem))
                                             customItem?.Give(player, DisplayCustomItemMessages);
-                                        else if (Enum.TryParse(item.Key, out ItemType itemType))
+                                        else if (!uint.TryParse(item.Key, out _) && Enum.TryParse(item.Key, out ItemType itemType)) // Чтобы числа могли обозначать только кастомпредметы
                                             player.AddItem(itemType);
                                         else
                                             Log.Error($"Error at adding items to custom role {Name}. Wrong item: {item.Key}");

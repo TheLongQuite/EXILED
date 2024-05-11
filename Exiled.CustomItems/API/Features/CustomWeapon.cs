@@ -117,6 +117,9 @@ namespace Exiled.CustomItems.API.Features
             { RoleTypeId.Scp173, 1 },
         };
 
+        [Description("Будет ли оружие убрано-возвращено в руки после выстрела")]
+        public bool ForceResetWeaponOnShot { get; set; } = false;
+
         /// <inheritdoc />
         public override Pickup? Spawn(Vector3 position, Player? previousOwner = null)
         {
@@ -396,10 +399,26 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalShot(ShotEventArgs ev)
         {
-            if (!Check(ev.Player.CurrentItem))
+            Item curItem = ev.Player.CurrentItem;
+            if (!Check(curItem))
                 return;
 
             OnShot(ev);
+            if (ForceResetWeaponOnShot)
+            {
+                ev.Player.CurrentItem = null;
+                Timing.CallDelayed(0.1f, () =>
+                {
+                    try
+                    {
+                        ev.Player.CurrentItem = curItem;
+                    }
+                    catch (Exception e)
+                    {
+                        Log.Error($"Failed to reset weapon {Name}:\n{e}");
+                    }
+                });
+            }
         }
 
         private void OnInternalHurting(HurtingEventArgs ev)

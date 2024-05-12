@@ -405,20 +405,16 @@ namespace Exiled.CustomItems.API.Features
 
             OnShot(ev);
             if (ForceResetWeaponOnShot)
-            {
-                ev.Player.CurrentItem = null;
-                Timing.CallDelayed(0.1f, () =>
-                {
-                    try
-                    {
-                        ev.Player.CurrentItem = curItem;
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error($"Failed to reset weapon {Name}:\n{e}");
-                    }
-                });
-            }
+                Timing.RunCoroutine(ResetWeapon(ev.Player));
+        }
+
+        private static IEnumerator<float> ResetWeapon(Player player)
+        {
+            Item curItem = player.CurrentItem;
+            yield return Timing.WaitForSeconds(0.04f);
+            player.CurrentItem = null;
+            yield return Timing.WaitForSeconds(0.08f);
+            player.CurrentItem = curItem;
         }
 
         private void OnInternalHurting(HurtingEventArgs ev)

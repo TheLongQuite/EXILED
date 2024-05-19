@@ -411,7 +411,7 @@ namespace Exiled.CustomItems.API.Features
         private static IEnumerator<float> ResetWeapon(Player player)
         {
             Item curItem = player.CurrentItem;
-            yield return Timing.WaitForSeconds(0.04f);
+            yield return Timing.WaitForSeconds(0.01f);
             player.CurrentItem = null;
             yield return Timing.WaitForSeconds(0.08f);
             player.CurrentItem = curItem;

@@ -120,21 +120,7 @@ namespace Exiled.API.Features
                         if (!typeCommands.TryGetValue(type, out ICommand command))
                             command = (ICommand)Activator.CreateInstance(type);
 
-                        try
-                        {
-                            if (commandType == typeof(RemoteAdminCommandHandler))
-                                CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(command);
-                            else if (commandType == typeof(GameConsoleCommandHandler))
-                                GameCore.Console.singleton.ConsoleCommandHandler.RegisterCommand(command);
-                            else if (commandType == typeof(ClientCommandHandler))
-                                QueryProcessor.DotCommandHandler.RegisterCommand(command);
-                        }
-                        catch (ArgumentException e)
-                        {
-                            Log.Error($"An error has occurred while registering a command: {e}");
-                        }
-
-                        Commands[commandType][type] = command;
+                        RegisterCommand(commandType, command);
                     }
                     catch (Exception exception)
                     {
@@ -142,6 +128,30 @@ namespace Exiled.API.Features
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Удобно регистрирует команду с заносом в важные словарики. Не регистрируйте команды вручную, используйте это.
+        /// </summary>
+        /// <param name="commandHandlerType">В какой тип консоли будет зарегистрирована команда</param>
+        /// <param name="command">Команда для регистрации</param>
+        public void RegisterCommand(Type commandHandlerType, ICommand command)
+        {
+            try
+            {
+                if (commandHandlerType == typeof(RemoteAdminCommandHandler))
+                    CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(command);
+                else if (commandHandlerType == typeof(GameConsoleCommandHandler))
+                    GameCore.Console.singleton.ConsoleCommandHandler.RegisterCommand(command);
+                else if (commandHandlerType == typeof(ClientCommandHandler))
+                    QueryProcessor.DotCommandHandler.RegisterCommand(command);
+            }
+            catch (ArgumentException e)
+            {
+                Log.Error($"An error has occurred while registering a command: {e}");
+            }
+
+            Commands[commandHandlerType][command.GetType()] = command;
         }
 
         /// <inheritdoc/>

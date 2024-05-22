@@ -22,6 +22,7 @@ namespace Exiled.CustomItems.API.Features
     using Exiled.API.Features.Spawn;
     using Exiled.API.Interfaces;
     using Exiled.CustomItems.API.EventArgs;
+    using Exiled.Events.EventArgs.Map;
     using Exiled.Events.EventArgs.Player;
     using Exiled.Events.EventArgs.Scp914;
     using Exiled.Loader;
@@ -869,6 +870,7 @@ namespace Exiled.CustomItems.API.Features
             Exiled.Events.Handlers.Player.Handcuffing += OnInternalOwnerHandcuffing;
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalOwnerChangingRole;
             Exiled.Events.Handlers.Scp914.UpgradingInventoryItem += OnInternalUpgradingInventoryItem;
+            Exiled.Events.Handlers.Map.PickupAdded += OnInternalPickupAdded;
         }
 
         /// <summary>
@@ -887,6 +889,7 @@ namespace Exiled.CustomItems.API.Features
             Exiled.Events.Handlers.Player.Handcuffing -= OnInternalOwnerHandcuffing;
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalOwnerChangingRole;
             Exiled.Events.Handlers.Scp914.UpgradingInventoryItem -= OnInternalUpgradingInventoryItem;
+            Exiled.Events.Handlers.Map.PickupAdded -= OnInternalPickupAdded;
         }
 
         /// <summary>
@@ -1095,6 +1098,14 @@ namespace Exiled.CustomItems.API.Features
             ev.IsAllowed = false;
 
             OnUpgrading(new UpgradingEventArgs(ev.Pickup.Base, ev.OutputPosition, ev.KnobSetting));
+        }
+
+        private void OnInternalPickupAdded(PickupAddedEventArgs ev)
+        {
+            if (!Check(ev.Pickup))
+                return;
+
+            ev.Pickup.Weight = Weight;
         }
     }
 }

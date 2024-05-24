@@ -2579,8 +2579,14 @@ namespace Exiled.API.Features
             {
                 if (!itemBase)
                 {
-                    Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) called with itemBase == null!\n" +
+                    Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) called with itemBase == null (item: {item}, player: {this})!\n" +
                               $"**Called from**: {new StackTrace()}");
+                    return null;
+                }
+
+                if (itemBase.ItemTypeId == ItemType.SCP330)
+                {
+                    Log.Warn($"We don't give people SCP330, it's buggy - KrisPrs.");
                     return null;
                 }
 

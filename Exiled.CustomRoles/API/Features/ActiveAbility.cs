@@ -9,7 +9,7 @@ namespace Exiled.CustomRoles.API.Features
 {
     using System;
     using System.Collections.Generic;
-
+    using AudioSystem.Models.SoundConfigs;
     using Exiled.API.Features;
 
     using MEC;
@@ -30,6 +30,11 @@ namespace Exiled.CustomRoles.API.Features
         ///     Gets or sets how long must go between ability uses.
         /// </summary>
         public abstract float Cooldown { get; set; }
+
+        /// <summary>
+        ///     Gets or sets sound activated for user with ability.
+        /// </summary>
+        public virtual GlobalSoundConfig? SoundOnActivated { get; set; }
 
         /// <summary>
         ///     Gets the last time this ability was used.
@@ -56,6 +61,7 @@ namespace Exiled.CustomRoles.API.Features
             Timing.CallDelayed(Cooldown, () => RemindAbility(player));
             if (Duration > 0)
                 Timing.CallDelayed(Duration, () => EndAbility(player));
+            SoundOnActivated?.PlayPreset(new HashSet<Player> { player });
         }
 
         /// <summary>

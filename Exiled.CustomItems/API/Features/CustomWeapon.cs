@@ -120,6 +120,9 @@ namespace Exiled.CustomItems.API.Features
         [Description("Будет ли оружие убрано-возвращено в руки после выстрела")]
         public bool ForceResetWeaponOnShot { get; set; } = false;
 
+        [Description("При использовании КД выстрелов, разрешать ли двойной")]
+        public bool AllowDoubleShot { get; set; } = false;
+
         /// <inheritdoc />
         public override Pickup? Spawn(Vector3 position, Player? previousOwner = null)
         {
@@ -382,15 +385,29 @@ namespace Exiled.CustomItems.API.Features
 
             if (FireCooldown > 0 && ClipSize > 1)
             {
-                cooldownedPlayers.Add(ev.Player);
-                byte remainingAmmo = (byte)(firearm.Ammo - 1);
+                const string toReturnKey = "toReturnAmmo";
+                if (!AllowDoubleShot)
+                    cooldownedPlayers.Add(ev.Player);
+                byte? remainingAmmo = firearm.Ammo != 0 ? (byte)(firearm.Ammo - 1) : null;
+                if (ev.Player.TryGetSessionVariable(toReturnKey, out byte remAmmo))
+                    ev.Player.SessionVariables[toReturnKey] = --remAmmo;
+                else if (remainingAmmo.HasValue)
+                    ev.Player.SessionVariables[toReturnKey] = remainingAmmo.Value;
+
                 firearm.Ammo = 1;
-                Timing.CallDelayed(FireCooldown, () =>
+                if (remainingAmmo.HasValue)
                 {
-                    cooldownedPlayers.Remove(ev.Player);
-                    firearm.Ammo = remainingAmmo;
-                    Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
-                });
+                    Timing.CallDelayed(FireCooldown, () =>
+                    {
+                        if (!ev.Player.TryGetSessionVariable(toReturnKey, out byte toRet))
+                            return;
+
+                        cooldownedPlayers.Remove(ev.Player);
+                        firearm.Ammo = toRet;
+                        ev.Player.SessionVariables.Remove(toReturnKey);
+                        Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
+                    });
+                }
             }
 
             ShotAudio?.PlayPreset(ev.Player.Transform);

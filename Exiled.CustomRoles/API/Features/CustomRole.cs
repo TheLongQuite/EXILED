@@ -110,7 +110,7 @@ namespace Exiled.CustomRoles.API.Features
         ///     Gets or sets List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal.
         /// </summary>
         [Description("List {Dictionary {Item, Chance}}. Supports CustomItems by IDs. Chance can't be decimal. Max slots: 8")]
-        public virtual List<Dictionary<string, byte>> Inventory { get; set; } =
+        public virtual List<Dictionary<string, short>> Inventory { get; set; } =
             new();
 
         /// <summary>
@@ -553,10 +553,10 @@ namespace Exiled.CustomRoles.API.Features
                                 player.ClearInventory();
                             }
 
-                            player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out byte itemsBuff);
-                            foreach (Dictionary<string, byte>? slot in Inventory)
+                            player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out short itemsBuff);
+                            foreach (Dictionary<string, short> slot in Inventory)
                             {
-                                foreach (KeyValuePair<string, byte> item in slot)
+                                foreach (KeyValuePair<string, short> item in slot)
                                 {
                                     byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
                                     if (!CommonExtensions.ChanceChecker(chance))

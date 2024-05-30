@@ -2579,7 +2579,7 @@ namespace Exiled.API.Features
             {
                 if (!itemBase)
                 {
-                    Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) called with itemBase == null (item: {item}, player: {this})!\n" +
+                    Log.Warn($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) called with itemBase == null (item: {item}, player: {this})!\n" +
                               $"**Called from**: {new StackTrace()}");
                     return null;
                 }

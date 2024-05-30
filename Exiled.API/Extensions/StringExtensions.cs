@@ -187,7 +187,7 @@ namespace Exiled.API.Extensions
             if (customInfo == null || !customInfo.Contains('<'))
                 return true;
 
-            foreach (string token in customInfo.Split('<'))
+            foreach (string token in customInfo.Split('<').Skip(1))
             {
                 if (token.StartsWith("/", StringComparison.Ordinal) ||
                     token.StartsWith("b>", StringComparison.Ordinal) ||

@@ -378,7 +378,7 @@ namespace Exiled.API.Features
                 }
 
                 if (value != null && value.Contains('<'))
-                    value = $"<size=100%>{value}</size>";
+                    value = $"<size=17>{value}</size>";
 
                 InfoArea = string.IsNullOrEmpty(value) ? InfoArea & ~PlayerInfoArea.CustomInfo : InfoArea |= PlayerInfoArea.CustomInfo;
                 ReferenceHub.nicknameSync.Network_customPlayerInfoString = value;

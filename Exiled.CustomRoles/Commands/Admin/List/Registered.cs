@@ -41,6 +41,9 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         public string Description { get; } = "Список всех кастомных ролей.";
 
         /// <inheritdoc />
+        public bool SanitizeResponse { get; }
+
+        /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.list.registered"))

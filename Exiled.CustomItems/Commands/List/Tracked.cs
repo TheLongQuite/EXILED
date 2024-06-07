@@ -41,6 +41,9 @@ namespace Exiled.CustomItems.Commands.List
         /// <inheritdoc/>
         public string Description { get; } = "Получает все предметы которые лежат в инвенторях игроков.";
 
+        /// <inheritdoc />
+        public bool SanitizeResponse { get; }
+
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

@@ -9,9 +9,11 @@ namespace Exiled.API.Extensions
 {
     using System;
     using System.Collections.Generic;
+    using System.Collections.ObjectModel;
     using System.Linq;
 
     using CustomPlayerEffects;
+    using CustomRendering;
     using Enums;
     using InventorySystem.Items.MarshmallowMan;
     using InventorySystem.Items.Usables.Scp244.Hypothermia;
@@ -25,7 +27,7 @@ namespace Exiled.API.Extensions
         /// <summary>
         /// Gets a dictionary that maps each <see cref="EffectType"/> to its corresponding <see cref="System.Type"/>.
         /// </summary>
-        public static Dictionary<EffectType, Type> EffectTypeToType { get; } = new(35)
+        public static ReadOnlyDictionary<EffectType, Type> EffectTypeToType { get; } = new(new Dictionary<EffectType, Type>(45)
         {
             { EffectType.AmnesiaItems, typeof(AmnesiaItems) },
             { EffectType.AmnesiaVision, typeof(AmnesiaVision) },
@@ -70,12 +72,14 @@ namespace Exiled.API.Extensions
 #pragma warning restore CS0618
             { EffectType.Strangled, typeof(Strangled) },
             { EffectType.Ghostly, typeof(Ghostly) },
-        };
+            { EffectType.FogControl, typeof(FogControl) },
+            { EffectType.Slowness, typeof(Slowness) },
+        });
 
         /// <summary>
         /// Gets a dictionary that maps each <see cref="System.Type"/> to its corresponding <see cref="EffectType"/>.
         /// </summary>
-        public static Dictionary<Type, EffectType> TypeToEffectType { get; } = EffectTypeToType.ToDictionary(x => x.Value, y => y.Key);
+        public static ReadOnlyDictionary<Type, EffectType> TypeToEffectType { get; } = new(EffectTypeToType.ToDictionary(x => x.Value, y => y.Key));
 
         /// <summary>
         /// Gets an instance of <see cref="System.Type"/> points to an effect.
@@ -120,6 +124,13 @@ namespace Exiled.API.Extensions
         }
 
         /// <summary>
+        /// Sets the <see cref="FogType"/> of the specified <see cref="FogControl"/>.
+        /// </summary>
+        /// <param name="fogControl">The <see cref="FogControl"/> effect.</param>
+        /// <param name="fogType">The <see cref="FogType"/> applied.</param>
+        public static void SetFogType(this FogControl fogControl, FogType fogType) => fogControl.Intensity = (byte)(fogType + 1);
+
+        /// <summary>
         /// Returns whether or not the provided <paramref name="effect"/> drains health over time.
         /// </summary>
         /// <param name="effect">The <see cref="EffectType"/>.</param>
@@ -146,7 +157,7 @@ namespace Exiled.API.Extensions
         public static bool IsNegative(this EffectType effect) => IsHarmful(effect) || effect is EffectType.AmnesiaItems
             or EffectType.AmnesiaVision or EffectType.Blinded or EffectType.Burned or EffectType.Concussed or EffectType.Deafened
             or EffectType.Disabled or EffectType.Ensnared or EffectType.Exhausted or EffectType.Flashed or EffectType.SinkHole
-            or EffectType.Stained or EffectType.InsufficientLighting or EffectType.SoundtrackMute or EffectType.Scanned;
+            or EffectType.Stained or EffectType.InsufficientLighting or EffectType.SoundtrackMute or EffectType.Scanned or EffectType.Slowness;
 
         /// <summary>
         /// Returns whether or not the provided <paramref name="effect"/> is a positive effect.

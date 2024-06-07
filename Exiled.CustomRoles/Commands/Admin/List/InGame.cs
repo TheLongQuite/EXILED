@@ -42,6 +42,9 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         public string Description { get; } = "Получает все кастомные роли которые сейчас учавствуют в раунде.";
 
         /// <inheritdoc />
+        public bool SanitizeResponse { get; }
+
+        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.list.ingame"))

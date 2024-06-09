@@ -15,6 +15,7 @@ namespace Exiled.API.Extensions
     using PlayerRoles;
 
     using UnityEngine;
+    using Random = UnityEngine.Random;
 
     /// <summary>
     /// A set of extensions for common things.
@@ -27,7 +28,7 @@ namespace Exiled.API.Extensions
         /// <param name="enumerable"><see cref="IEnumerable{T}"/> to be used to get a random value.</param>
         /// <typeparam name="T">Type of <see cref="IEnumerable{T}"/> elements.</typeparam>
         /// <returns>Returns a random value from <see cref="IEnumerable{T}"/>.</returns>
-        public static T GetRandomValue<T>(this IEnumerable<T> enumerable) => enumerable is null || enumerable.Count() == 0 ? default : enumerable.ElementAt(UnityEngine.Random.Range(0, enumerable.Count()));
+        public static T GetRandomValue<T>(this IEnumerable<T> enumerable) => enumerable is null || enumerable.Count() == 0 ? default : enumerable.ElementAt(Random.Range(0, enumerable.Count()));
 
         /// <summary>
         /// Gets a random value from an <see cref="IEnumerable{T}"/> that matches the provided condition.

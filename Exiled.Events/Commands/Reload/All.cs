@@ -31,7 +31,7 @@ namespace Exiled.Events.Commands.Reload
         public string Description { get; } = "Reload all configs and plugins.";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; }
+        public bool SanitizeResponse { get; } = false;
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

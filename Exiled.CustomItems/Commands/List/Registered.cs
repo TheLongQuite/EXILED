@@ -36,7 +36,7 @@ namespace Exiled.CustomItems.Commands.List
         public string[] Aliases { get; } = { "r", "reg" };
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; }
+        public bool SanitizeResponse { get; } = false;
 
         /// <inheritdoc/>
         public string Description { get; } = "Получает все зарегистрированные кастомные предметы.";

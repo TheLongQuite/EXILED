@@ -37,7 +37,7 @@ namespace Exiled.Events.Commands.Config
         public string Description { get; } = "Splits your configs into the separated config distribution.";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; }
+        public bool SanitizeResponse { get; } = false;
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

@@ -30,7 +30,7 @@ namespace Exiled.Example.Commands
         public string Description { get; } = "A simple test command.";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; }
+        public bool SanitizeResponse { get; } = false;
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

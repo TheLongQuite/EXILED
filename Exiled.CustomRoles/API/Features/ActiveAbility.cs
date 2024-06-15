@@ -9,6 +9,7 @@ namespace Exiled.CustomRoles.API.Features
 {
     using System;
     using System.Collections.Generic;
+
     using AudioSystem.Models.SoundConfigs;
     using Exiled.API.Features;
 

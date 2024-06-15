@@ -5,35 +5,34 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.API.Features.Parsers
+namespace Exiled.Loader.Features.AbstractClassResolver.Parsers
 {
-#pragma warning disable CS8602
-#pragma warning disable CS8604
     using System;
     using System.Collections.Generic;
     using System.ComponentModel.DataAnnotations;
     using System.Linq;
 
     using Interfaces;
-
     using YamlDotNet.Core;
     using YamlDotNet.Core.Events;
     using YamlDotNet.Serialization;
 
+#pragma warning disable CS8602
+#pragma warning disable CS8604
     /// <summary>
     ///     A node resolver for <see cref="CustomAbility" />.
     /// </summary>
     public class AbstractClassNodeTypeResolver : INodeDeserializer
     {
         private readonly INodeDeserializer original;
-        private readonly ITypeDiscriminator[] typeDiscriminators;
+        private readonly IEnumerable<ITypeDiscriminator> typeDiscriminators;
 
         /// <summary>
         ///     Initializes a new instance of the <see cref="AbstractClassNodeTypeResolver" /> class.
         /// </summary>
         /// <param name="original">The <see cref="INodeDeserializer" /> original deserializer.</param>
         /// <param name="discriminators">The <see cref="ITypeDiscriminator" /> array of discriminators.</param>
-        public AbstractClassNodeTypeResolver(INodeDeserializer original, params ITypeDiscriminator[] discriminators)
+        public AbstractClassNodeTypeResolver(INodeDeserializer original, IEnumerable<ITypeDiscriminator> discriminators)
         {
             this.original = original;
             typeDiscriminators = discriminators;
@@ -91,6 +90,7 @@ namespace Exiled.CustomRoles.API.Features.Parsers
             foreach (ITypeDiscriminator discriminator in supportedTypes)
             {
                 buffer.Reset();
+
                 if (!discriminator.TryResolve(buffer, out Type? actualType))
                     continue;
 

@@ -5,12 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.API.Features.Extensions
+namespace Exiled.Loader.Features.AbstractClassResolver.Extensions
 {
     using System;
 
     using Parsers;
-
     using YamlDotNet.Core;
     using YamlDotNet.Core.Events;
 

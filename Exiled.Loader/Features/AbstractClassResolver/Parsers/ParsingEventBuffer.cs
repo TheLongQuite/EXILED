@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.API.Features.Parsers
+namespace Exiled.Loader.Features.AbstractClassResolver.Parsers
 {
     using System.Collections.Generic;
 

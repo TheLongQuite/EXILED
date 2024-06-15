@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.API.Features.Interfaces
+namespace Exiled.Loader.Features.AbstractClassResolver.Interfaces
 {
     using System;
 

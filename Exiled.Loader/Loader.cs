@@ -5,6 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+#nullable enable
+using Exiled.CustomRoles.API.Features.Interfaces;
+using Exiled.Loader.Features.AbstractClassResolver.Parsers;
+using Mono.CompilerServices.SymbolWriter;
+
 namespace Exiled.Loader
 {
     using System;
@@ -19,15 +24,13 @@ namespace Exiled.Loader
 
     using API.Enums;
     using API.Interfaces;
-
     using CommandSystem.Commands.Shared;
-
     using Exiled.API.Features;
-
+    using Exiled.API.Interfaces;
     using Features;
+    using Features.AbstractClassResolver.Interfaces;
     using Features.Configs;
     using Features.Configs.CustomConverters;
-
     using YamlDotNet.Serialization;
     using YamlDotNet.Serialization.NodeDeserializers;
 
@@ -109,7 +112,7 @@ namespace Exiled.Loader
             .WithTypeConverter(new ColorConverter())
             .WithTypeConverter(new AttachmentIdentifiersConverter())
             .WithNamingConvention(UnderscoredNamingConvention.Instance)
-            .WithNodeDeserializer(inner => new ValidatingNodeDeserializer(inner), deserializer => deserializer.InsteadOf<ObjectNodeDeserializer>())
+            .WithNodeDeserializer(inner => new AbstractClassNodeTypeResolver(inner, GetResolvableAbstractClasses(UnderscoredNamingConvention.Instance)), s => s.InsteadOf<ObjectNodeDeserializer>())
             .IgnoreFields()
             .IgnoreUnmatchedProperties()
             .Build();
@@ -617,6 +620,29 @@ namespace Exiled.Loader
             {
                 Log.Error($"An error has occurred while loading dependencies! {exception}");
             }
+        }
+
+        /// <summary>
+        /// Gets all abstract classes which use IAbstractResolvable.
+        /// </summary>
+        private static IEnumerable<ITypeDiscriminator> GetResolvableAbstractClasses(INamingConvention namingConvention)
+        {
+            List<ITypeDiscriminator> buffer = new List<ITypeDiscriminator>();
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                try
+                {
+                    foreach (Type? type in assembly.GetTypes().Where(t => t.IsClass && t.IsAbstract && t.IsAssignableFrom(typeof(IAbstractResolvabel))))
+                        buffer.Add(new AggregateExpectationTypeResolver(namingConvention, type));
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"Error loading types for {assembly.FullName}.");
+                    Log.Debug(e);
+                }
+            }
+
+            return buffer.AsEnumerable();
         }
     }
 }

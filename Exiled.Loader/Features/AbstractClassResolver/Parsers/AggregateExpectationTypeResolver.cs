@@ -5,7 +5,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.CustomRoles.API.Features.Parsers
+#nullable enable
+
+namespace Exiled.Loader.Features.AbstractClassResolver.Parsers
 {
     using System;
     using System.Collections.Generic;
@@ -13,57 +15,55 @@ namespace Exiled.CustomRoles.API.Features.Parsers
     using System.Reflection;
 
     using Exiled.API.Features;
-
+    using Exiled.CustomRoles.API.Features.Interfaces;
     using Extensions;
-
     using Interfaces;
-
     using YamlDotNet.Core.Events;
     using YamlDotNet.Serialization;
 
     /// <inheritdoc />
-    public class AggregateExpectationTypeResolver<T> : ITypeDiscriminator
-        where T : class
+    public class AggregateExpectationTypeResolver : ITypeDiscriminator
     {
-        private const string TargetKey = nameof(CustomAbility.AbilityType);
+        private const string NamingKey = nameof(IAbstractResolvabel.DeriveClassName);
+
         private readonly string targetKey;
         private readonly Dictionary<string, Type?> typeLookup;
 
         /// <summary>
-        ///     Initializes a new instance of the <see cref="AggregateExpectationTypeResolver{T}" /> class.
+        ///     Initializes a new instance of the <see cref="AggregateExpectationTypeResolver"/> class.
         /// </summary>
         /// <param name="namingConvention">The <see cref="INamingConvention" /> instance.</param>
-        public AggregateExpectationTypeResolver(INamingConvention namingConvention)
+        /// <param name="type">Abstract type which resolver will resolve.</param>
+        public AggregateExpectationTypeResolver(INamingConvention namingConvention, Type type)
         {
-            targetKey = namingConvention.Apply(TargetKey);
+            targetKey = namingConvention.Apply(NamingKey);
             typeLookup = new Dictionary<string, Type?>();
+            BaseType = type;
+
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
                 {
-                    foreach (Type? t in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(typeof(T))))
+                    foreach (Type? t in assembly.GetTypes().Where(t => t.IsClass && !t.IsAbstract && t.IsSubclassOf(type)))
                         typeLookup.Add(t.Name, t);
                 }
                 catch (Exception e)
                 {
-                    Log.Error($"Error loading types for {assembly.FullName}. It can be ignored if it's not using Exiled.CustomRoles.");
+                    Log.Error($"Error loading types for {assembly.FullName}.");
                     Log.Debug(e);
                 }
             }
         }
 
         /// <inheritdoc />
-        public Type BaseType
-        {
-            get => typeof(CustomAbility);
-        }
+        public Type BaseType { get; }
 
         /// <inheritdoc />
         public bool TryResolve(ParsingEventBuffer buffer, out Type? suggestedType)
         {
             if (buffer.TryFindMappingEntry(
                 scalar => targetKey == scalar.Value,
-                out Scalar? key,
+                out Scalar? _,
                 out ParsingEvent? value))
             {
                 if (value is Scalar valueScalar)

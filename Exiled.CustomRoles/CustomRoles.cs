@@ -5,11 +5,11 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
+using Exiled.Loader.Features.AbstractClassResolver.Parsers;
+
 namespace Exiled.CustomRoles
 {
     using API.Features;
-    using API.Features.Parsers;
-
     using Events;
 
     using Exiled.API.Features;
@@ -35,15 +35,6 @@ namespace Exiled.CustomRoles
         /// </summary>
         public CustomRoles()
         {
-            Loader.Deserializer = new DeserializerBuilder()
-                .WithTypeConverter(new VectorsConverter())
-                .WithTypeConverter(new ColorConverter())
-                .WithTypeConverter(new AttachmentIdentifiersConverter())
-                .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .WithNodeDeserializer(inner => new AbstractClassNodeTypeResolver(inner, new AggregateExpectationTypeResolver<CustomAbility>(UnderscoredNamingConvention.Instance)), s => s.InsteadOf<ObjectNodeDeserializer>())
-                .IgnoreFields()
-                .IgnoreUnmatchedProperties()
-                .Build();
         }
 
         /// <summary>

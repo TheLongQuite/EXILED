@@ -545,6 +545,9 @@ namespace Exiled.CustomRoles.API.Features
                     0.25f,
                     () =>
                     {
+                        if (!player.IsConnected)
+                            return;
+
                         try
                         {
                             if (!KeepInventoryOnSpawn)
@@ -613,6 +616,9 @@ namespace Exiled.CustomRoles.API.Features
 
             Timing.CallDelayed(CustomRoles.Instance!.Config.CustomRolesSpectatorDisplayDelay, () =>
             {
+                if (!player.IsConnected)
+                    return;
+
                 foreach (Player? pl in Player.List)
                 {
                     if (pl.Role.Type != RoleTypeId.Spectator)

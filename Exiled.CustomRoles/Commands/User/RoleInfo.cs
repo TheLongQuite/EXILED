@@ -60,7 +60,7 @@ namespace Exiled.CustomRoles.Commands.User
             List<ActiveAbility> activeAbilities = new();
             List<Scp079ActiveAbility> scp079ActiveAbilities = new();
             StringBuilder? stringBuilder = StringBuilderPool.Shared.Rent();
-            foreach (CustomAbility? ability in customRole.CustomAbilities)
+            foreach (CustomAbility? ability in customRole.CustomAbilities!)
             {
                 switch (ability)
                 {
@@ -73,7 +73,7 @@ namespace Exiled.CustomRoles.Commands.User
                     case ActiveAbility activeAbility:
                         activeAbilities.Add(activeAbility);
                         break;
-                    case PassiveAbility passiveAbility when includePassive:
+                    case PassiveAbility { IsHidden: false } passiveAbility when includePassive:
                         passiveAbilities.Add(passiveAbility);
                         break;
                 }

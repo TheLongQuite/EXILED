@@ -5,17 +5,17 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-#nullable enable
-
 namespace Exiled.Loader.Features.AbstractClassResolver.Parsers
 {
+#nullable enable
+
     using System;
     using System.Collections.Generic;
     using System.Linq;
     using System.Reflection;
 
     using Exiled.API.Features;
-    using Exiled.CustomRoles.API.Features.Interfaces;
+    using Exiled.API.Interfaces;
     using Extensions;
     using Interfaces;
     using YamlDotNet.Core.Events;
@@ -24,7 +24,7 @@ namespace Exiled.Loader.Features.AbstractClassResolver.Parsers
     /// <inheritdoc />
     public class AggregateExpectationTypeResolver : ITypeDiscriminator
     {
-        private const string NamingKey = nameof(IAbstractResolvabel.DeriveClassName);
+        private const string NamingKey = nameof(IAbstractResolvable.AbilityType);
 
         private readonly string targetKey;
         private readonly Dictionary<string, Type?> typeLookup;

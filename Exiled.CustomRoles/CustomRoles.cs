@@ -5,21 +5,10 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-using Exiled.Loader.Features.AbstractClassResolver.Parsers;
-
 namespace Exiled.CustomRoles
 {
-    using API.Features;
     using Events;
-
     using Exiled.API.Features;
-
-    using Loader;
-    using Loader.Features.Configs.CustomConverters;
-
-    using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NamingConventions;
-    using YamlDotNet.Serialization.NodeDeserializers;
 
     using Player = Exiled.Events.Handlers.Player;
 

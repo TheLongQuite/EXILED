@@ -5,13 +5,9 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-#nullable enable
-using Exiled.CustomRoles.API.Features.Interfaces;
-using Exiled.Loader.Features.AbstractClassResolver.Parsers;
-using Mono.CompilerServices.SymbolWriter;
-
 namespace Exiled.Loader
 {
+#nullable enable
     using System;
     using System.Collections.Generic;
     using System.IO;
@@ -26,9 +22,9 @@ namespace Exiled.Loader
     using API.Interfaces;
     using CommandSystem.Commands.Shared;
     using Exiled.API.Features;
-    using Exiled.API.Interfaces;
     using Features;
     using Features.AbstractClassResolver.Interfaces;
+    using Features.AbstractClassResolver.Parsers;
     using Features.Configs;
     using Features.Configs.CustomConverters;
     using YamlDotNet.Serialization;
@@ -107,15 +103,7 @@ namespace Exiled.Loader
         /// <summary>
         /// Gets or sets the deserializer for configs and translations.
         /// </summary>
-        public static IDeserializer Deserializer { get; set; } = new DeserializerBuilder()
-            .WithTypeConverter(new VectorsConverter())
-            .WithTypeConverter(new ColorConverter())
-            .WithTypeConverter(new AttachmentIdentifiersConverter())
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
-            .WithNodeDeserializer(inner => new AbstractClassNodeTypeResolver(inner, GetResolvableAbstractClasses(UnderscoredNamingConvention.Instance)), s => s.InsteadOf<ObjectNodeDeserializer>())
-            .IgnoreFields()
-            .IgnoreUnmatchedProperties()
-            .Build();
+        public static IDeserializer Deserializer { get; set; }
 
         /// <summary>
         /// Loads all plugins.
@@ -375,6 +363,16 @@ namespace Exiled.Loader
             LoadDependencies();
             LoadPlugins();
 
+            Deserializer = new DeserializerBuilder()
+                .WithTypeConverter(new VectorsConverter())
+                .WithTypeConverter(new ColorConverter())
+                .WithTypeConverter(new AttachmentIdentifiersConverter())
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .WithNodeDeserializer(inner => new AbstractClassNodeTypeResolver(inner, GetResolvableAbstractClasses(UnderscoredNamingConvention.Instance)), s => s.InsteadOf<ObjectNodeDeserializer>())
+                .IgnoreFields()
+                .IgnoreUnmatchedProperties()
+                .Build();
+
             ConfigManager.Reload();
             TranslationManager.Reload();
 
@@ -632,8 +630,11 @@ namespace Exiled.Loader
             {
                 try
                 {
-                    foreach (Type? type in assembly.GetTypes().Where(t => t.IsClass && t.IsAbstract && t.IsAssignableFrom(typeof(IAbstractResolvabel))))
+                    foreach (Type? type in assembly.GetTypes().Where(t => t.IsClass && t.IsAbstract && typeof(IAbstractResolvable).IsAssignableFrom(t)))
+                    {
+                        Log.Info($"{type.Name}");
                         buffer.Add(new AggregateExpectationTypeResolver(namingConvention, type));
+                    }
                 }
                 catch (Exception e)
                 {
@@ -641,7 +642,6 @@ namespace Exiled.Loader
                     Log.Debug(e);
                 }
             }
-
             return buffer.AsEnumerable();
         }
     }

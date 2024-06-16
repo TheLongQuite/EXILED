@@ -9,17 +9,16 @@ namespace Exiled.CustomRoles.API.Features
 {
     using System;
     using System.Collections.Generic;
-    using System.ComponentModel;
     using System.Linq;
 
     using Exiled.API.Features;
-
+    using Exiled.API.Interfaces;
     using YamlDotNet.Serialization;
 
     /// <summary>
     ///     The custom ability base class.
     /// </summary>
-    public abstract class CustomAbility
+    public abstract class CustomAbility : IAbstractResolvable
     {
         /// <summary>
         ///     Initializes a new instance of the <see cref="CustomAbility" /> class.
@@ -50,12 +49,6 @@ namespace Exiled.CustomRoles.API.Features
         ///     Gets or sets the description of the ability.
         /// </summary>
         public abstract string Description { get; set; }
-
-        /// <summary>
-        ///     Gets the <see cref="Type" /> for this ability.
-        /// </summary>
-        [Description("Changing this will likely break your config.")]
-        public string AbilityType { get; }
 
         /// <summary>
         ///     Gets a <see cref="CustomAbility" /> by name.
@@ -169,5 +162,7 @@ namespace Exiled.CustomRoles.API.Features
         protected virtual void AbilityRemoved(Player player)
         {
         }
+
+        public string AbilityType { get; set; }
     }
 }

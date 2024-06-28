@@ -45,9 +45,8 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
 
-                // Player.Get(ICommandSender);
+                // sender
                 new(OpCodes.Ldarg_1),
-                new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ICommandSender) })),
 
                 // reason
                 new(OpCodes.Ldarg_2),
@@ -58,7 +57,7 @@ namespace Exiled.Events.Patches.Events.Player
                 // true
                 new(OpCodes.Ldc_I4_1),
 
-                // KickingEventArgs ev = new(Player, Player, string, string, bool)
+                // KickingEventArgs ev = new(Player, sender, string, string, bool)
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(KickingEventArgs))[0]),
                 new(OpCodes.Dup),
                 new(OpCodes.Dup),

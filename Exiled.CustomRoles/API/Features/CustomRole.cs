@@ -345,8 +345,7 @@ namespace Exiled.CustomRoles.API.Features
             {
                 if (type.BaseType != typeof(CustomItem) ||
                     type.GetCustomAttribute(typeof(CustomRoleAttribute)) is null ||
-                    isIgnored && targetTypes.Contains(type) ||
-                    !isIgnored && !targetTypes.Contains(type))
+                    (isIgnored == targetTypes.Contains(type)))
                 {
                     continue;
                 }
@@ -417,7 +416,7 @@ namespace Exiled.CustomRoles.API.Features
 
             foreach (CustomRole customRole in Registered)
             {
-                if (targetTypes.Contains(customRole.GetType()) && isIgnored || !targetTypes.Contains(customRole.GetType()) && !isIgnored)
+                if (targetTypes.Contains(customRole.GetType()) == isIgnored)
                     continue;
 
                 customRole.TryUnregister();
@@ -545,6 +544,9 @@ namespace Exiled.CustomRoles.API.Features
                     0.25f,
                     () =>
                     {
+                        if (!player.IsConnected)
+                            return;
+
                         try
                         {
                             if (!KeepInventoryOnSpawn)
@@ -582,7 +584,6 @@ namespace Exiled.CustomRoles.API.Features
 
                             foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
                                 player.SetAmmo(ammo.Key, ammo.Value);
-
                         }
                         catch (Exception e)
                         {
@@ -613,6 +614,9 @@ namespace Exiled.CustomRoles.API.Features
 
             Timing.CallDelayed(CustomRoles.Instance!.Config.CustomRolesSpectatorDisplayDelay, () =>
             {
+                if (!player.IsConnected)
+                    return;
+
                 foreach (Player? pl in Player.List)
                 {
                     if (pl.Role.Type != RoleTypeId.Spectator)

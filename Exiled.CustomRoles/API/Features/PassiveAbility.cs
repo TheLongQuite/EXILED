@@ -12,5 +12,9 @@ namespace Exiled.CustomRoles.API.Features
     /// </summary>
     public abstract class PassiveAbility : CustomAbility
     {
+        /// <summary>
+        ///     Gets or sets a value indicating whether ability will be dispayed in .roleinfo or not.
+        /// </summary>
+        public virtual bool IsHidden { get; set; } = false;
     }
 }

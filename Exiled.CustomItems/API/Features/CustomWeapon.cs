@@ -9,6 +9,7 @@ namespace Exiled.CustomItems.API.Features
     using System;
     using System.Collections.Generic;
     using System.ComponentModel;
+    using System.Linq;
     using AudioSystem.Models.SoundConfigs;
     using CustomPlayerEffects;
     using Exiled.API.Enums;
@@ -17,6 +18,7 @@ namespace Exiled.CustomItems.API.Features
     using Exiled.API.Features.DamageHandlers;
     using Exiled.API.Features.Items;
     using Exiled.API.Features.Pickups;
+    using Exiled.API.Structs;
     using Exiled.Events.EventArgs.Item;
     using Exiled.Events.EventArgs.Player;
     using InventorySystem.Items.Firearms.Attachments;
@@ -48,6 +50,7 @@ namespace Exiled.CustomItems.API.Features
         ///     Gets or sets value indicating what <see cref="Attachment" />s the weapon will have.
         /// </summary>
         public virtual AttachmentName[] Attachments { get; set; } = { };
+        public virtual AttachmentName[] BannedAttachments { get; set; } = { };
         /// <summary>
         ///     Gets or sets the weapon damage.
         /// </summary>
@@ -279,7 +282,11 @@ namespace Exiled.CustomItems.API.Features
 
         private void OnInternalChangingAttachments(ChangingAttachmentsEventArgs ev)
         {
-            if (Check(ev.Player.CurrentItem) && !AllowAttachmentsChange)
+            if (!Check(ev.Player.CurrentItem))
+                return;
+
+            IEnumerable<AttachmentIdentifier> newAttachments = ev.NewAttachmentIdentifiers.Except(ev.CurrentAttachmentIdentifiers);
+            if (!AllowAttachmentsChange || newAttachments.Any(x => BannedAttachments.Contains(x.Name)))
                 ev.IsAllowed = false;
         }
 

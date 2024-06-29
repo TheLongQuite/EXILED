@@ -372,14 +372,16 @@ namespace Exiled.Loader
 
             HashSet<Type> abstractTypeDerives = new HashSet<Type>();
 
-            foreach (Type abstractType in GetResolvableAbstractClasses())
+            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
-                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+                foreach (Type type in
+                         assembly.GetTypes()
+                             .Where(myType => myType.BaseType != null
+                                              && myType is { IsClass: true, IsAbstract: false } && myType.BaseType.IsAbstract
+                                              && typeof(IAbstractResolvable).IsAssignableFrom(myType)))
                 {
-                    foreach (Type type in
-                             assembly.GetTypes()
-                                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(abstractType)))
-                        abstractTypeDerives.Add(type);
+                    Log.Debug($"Found subclass for tagging: {type.Name}");
+                    abstractTypeDerives.Add(type);
                 }
             }
 
@@ -637,28 +639,6 @@ namespace Exiled.Loader
             {
                 Log.Error($"An error has occurred while loading dependencies! {exception}");
             }
-        }
-
-        /// <summary>
-        /// Gets all abstract classes which use IAbstractResolvable.
-        /// </summary>
-        private static IEnumerable<Type> GetResolvableAbstractClasses()
-        {
-            List<Type> buffer = new List<Type>();
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
-            {
-                try
-                {
-                    foreach (Type? type in assembly.GetTypes().Where(t => t.IsClass && t.IsAbstract && typeof(IAbstractResolvable).IsAssignableFrom(t)))
-                        buffer.Add(type);
-                }
-                catch (Exception e)
-                {
-                    Log.Error($"Error loading types for {assembly.FullName}.");
-                    Log.Debug(e);
-                }
-            }
-            return buffer.AsEnumerable();
         }
     }
 }

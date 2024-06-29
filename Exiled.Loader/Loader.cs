@@ -377,7 +377,7 @@ namespace Exiled.Loader
                 foreach (Type type in
                          assembly.GetTypes()
                              .Where(myType => myType.BaseType != null
-                                              && myType is { IsClass: true, IsAbstract: false } && myType.BaseType.IsAbstract
+                                              && myType is { IsClass: true, IsAbstract: false } && CheckForAbstractParents(myType)
                                               && typeof(IAbstractResolvable).IsAssignableFrom(myType)))
                 {
                     Log.Debug($"Found subclass for tagging: {type.Name}");
@@ -639,6 +639,24 @@ namespace Exiled.Loader
             {
                 Log.Error($"An error has occurred while loading dependencies! {exception}");
             }
+        }
+
+        /// <summary>
+        /// Check if the type has an abstract class somewhere in it's hierarchy.
+        /// </summary>
+        private bool CheckForAbstractParents(Type type)
+        {
+            Type buffer = type.BaseType;
+
+            while (buffer != null)
+            {
+                if (buffer.IsAbstract)
+                    return true;
+
+                buffer = buffer.BaseType;
+            }
+
+            return false;
         }
     }
 }

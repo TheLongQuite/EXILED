@@ -23,8 +23,6 @@ namespace Exiled.Loader
     using CommandSystem.Commands.Shared;
     using Exiled.API.Features;
     using Features;
-    using Features.AbstractClassResolver.Interfaces;
-    using Features.AbstractClassResolver.Parsers;
     using Features.Configs;
     using Features.Configs.CustomConverters;
     using YamlDotNet.Serialization;
@@ -90,15 +88,7 @@ namespace Exiled.Loader
         /// <summary>
         /// Gets or sets the serializer for configs and translations.
         /// </summary>
-        public static ISerializer Serializer { get; set; } = new SerializerBuilder()
-            .WithTypeConverter(new VectorsConverter())
-            .WithTypeConverter(new ColorConverter())
-            .WithTypeConverter(new AttachmentIdentifiersConverter())
-            .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
-            .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
-            .WithNamingConvention(UnderscoredNamingConvention.Instance)
-            .IgnoreFields()
-            .Build();
+        public static ISerializer Serializer { get; set; }
 
         /// <summary>
         /// Gets or sets the deserializer for configs and translations.
@@ -363,15 +353,44 @@ namespace Exiled.Loader
             LoadDependencies();
             LoadPlugins();
 
-            Deserializer = new DeserializerBuilder()
+            SerializerBuilder serializerBuilder = new SerializerBuilder()
+                .WithTypeConverter(new VectorsConverter())
+                .WithTypeConverter(new ColorConverter())
+                .WithTypeConverter(new AttachmentIdentifiersConverter())
+                .WithTypeInspector(inner => new CommentGatheringTypeInspector(inner))
+                .WithEmissionPhaseObjectGraphVisitor(args => new CommentsObjectGraphVisitor(args.InnerVisitor))
+                .WithNamingConvention(UnderscoredNamingConvention.Instance)
+                .IgnoreFields();
+
+            DeserializerBuilder deserializerBuilder = new DeserializerBuilder()
                 .WithTypeConverter(new VectorsConverter())
                 .WithTypeConverter(new ColorConverter())
                 .WithTypeConverter(new AttachmentIdentifiersConverter())
                 .WithNamingConvention(UnderscoredNamingConvention.Instance)
-                .WithNodeDeserializer(inner => new AbstractClassNodeTypeResolver(inner, GetResolvableAbstractClasses(UnderscoredNamingConvention.Instance)), s => s.InsteadOf<ObjectNodeDeserializer>())
                 .IgnoreFields()
-                .IgnoreUnmatchedProperties()
-                .Build();
+                .IgnoreUnmatchedProperties();
+
+            HashSet<Type> abstractTypeDerives = new HashSet<Type>();
+
+            foreach (Type abstractType in GetResolvableAbstractClasses())
+            {
+                foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+                {
+                    foreach (Type type in
+                             assembly.GetTypes()
+                                 .Where(myType => myType.IsClass && !myType.IsAbstract && myType.IsSubclassOf(abstractType)))
+                        abstractTypeDerives.Add(type);
+                }
+            }
+
+            foreach (Type type in abstractTypeDerives)
+                serializerBuilder.WithTagMapping($"!{type.Name}", type);
+
+            foreach (Type type in abstractTypeDerives)
+                deserializerBuilder.WithTagMapping($"!{type.Name}", type);
+
+            Serializer = serializerBuilder.Build();
+            Deserializer = deserializerBuilder.Build();
 
             ConfigManager.Reload();
             TranslationManager.Reload();
@@ -623,18 +642,15 @@ namespace Exiled.Loader
         /// <summary>
         /// Gets all abstract classes which use IAbstractResolvable.
         /// </summary>
-        private static IEnumerable<ITypeDiscriminator> GetResolvableAbstractClasses(INamingConvention namingConvention)
+        private static IEnumerable<Type> GetResolvableAbstractClasses()
         {
-            List<ITypeDiscriminator> buffer = new List<ITypeDiscriminator>();
+            List<Type> buffer = new List<Type>();
             foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
                 try
                 {
                     foreach (Type? type in assembly.GetTypes().Where(t => t.IsClass && t.IsAbstract && typeof(IAbstractResolvable).IsAssignableFrom(t)))
-                    {
-                        Log.Info($"{type.Name}");
-                        buffer.Add(new AggregateExpectationTypeResolver(namingConvention, type));
-                    }
+                        buffer.Add(type);
                 }
                 catch (Exception e)
                 {

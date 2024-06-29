@@ -51,10 +51,6 @@
       </Compile>
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Features\AbstractClassResolver" />
-    </ItemGroup>
-
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
         <PostBuildEvent>if not "$(EXILED_DEV_PLUGINAPI_REFERENCE)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_DEV_PLUGINAPI_REFERENCE)\"</PostBuildEvent>
     </PropertyGroup>

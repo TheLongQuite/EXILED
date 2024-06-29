@@ -23,11 +23,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <summary>
         ///     Initializes a new instance of the <see cref="CustomAbility" /> class.
         /// </summary>
-        public CustomAbility()
-        {
-            AbilityType = GetType().Name;
-            Init();
-        }
+        public CustomAbility() => Init();
 
         /// <summary>
         ///     Gets a list of all registered custom abilities.
@@ -162,7 +158,5 @@ namespace Exiled.CustomRoles.API.Features
         protected virtual void AbilityRemoved(Player player)
         {
         }
-
-        public string AbilityType { get; set; }
     }
 }

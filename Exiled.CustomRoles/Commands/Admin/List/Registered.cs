@@ -39,7 +39,6 @@ namespace Exiled.CustomRoles.Commands.Admin.List
 
         /// <inheritdoc />
         public string Description { get; } = "Список всех кастомных ролей.";
-
         /// <inheritdoc />
         public bool SanitizeResponse { get; } = false;
 

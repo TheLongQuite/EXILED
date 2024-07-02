@@ -98,7 +98,7 @@ namespace Exiled.Events.EventArgs.Map
             Player = thrower ?? Server.Host;
             Projectile = (EffectGrenadeProjectile)Pickup.Get(grenade);
             Position = Projectile.Position;
-            TargetsToAffect = Player.List.ToList();
+            TargetsToAffect = ListPool<Player>.Pool.Get(targetsToAffect ?? new());
             IsAllowed = isAllowed;
         }
 

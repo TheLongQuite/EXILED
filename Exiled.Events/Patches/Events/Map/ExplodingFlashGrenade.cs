@@ -81,6 +81,8 @@ namespace Exiled.Events.Patches.Events.Map
 
             ExplodingGrenadeEventArgs explodingGrenadeEvent = new(Player.Get(instance.PreviousOwner.Hub), instance, targetToAffect);
             Map.OnExplodingGrenade(explodingGrenadeEvent);
+
+            ListPool<Player>.Pool.Return(targetToAffect);
             if (!explodingGrenadeEvent.IsAllowed)
                 return;
 

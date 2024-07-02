@@ -29,7 +29,7 @@ namespace Exiled.CreditTags.Commands
         public string Description { get; } = "Shows your EXILED Credits tag, if available.";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
+        public bool SanitizeResponse { get; }
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

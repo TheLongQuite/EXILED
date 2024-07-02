@@ -40,7 +40,6 @@ namespace Exiled.CustomRoles.Commands.Admin
 
         /// <inheritdoc />
         public string Description { get; } = "Информация про кастомную роль.";
-
         /// <inheritdoc />
         public bool SanitizeResponse { get; } = false;
 

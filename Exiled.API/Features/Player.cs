@@ -17,7 +17,6 @@ namespace Exiled.API.Features
     using Core;
 
     using CustomPlayerEffects;
-
     using CustomPlayerEffects.Danger;
     using DamageHandlers;
 
@@ -69,7 +68,6 @@ namespace Exiled.API.Features
     using PlayerRoles.Voice;
 
     using PlayerStatsSystem;
-
     using PluginAPI.Core;
     using RelativePositioning;
 
@@ -1985,7 +1983,8 @@ namespace Exiled.API.Features
                     Inventory.NetworkCurItem = ItemIdentifier.None;
 
                 Inventory.UserInventory.Items.Remove(item.Serial);
-                ItemsValue.Remove(item);
+                typeof(InventoryExtensions).InvokeStaticEvent(nameof(InventoryExtensions.OnItemRemoved), new object[] { ReferenceHub, item.Base, null });
+
                 Inventory.SendItemsNextFrame = true;
             }
 
@@ -2624,8 +2623,6 @@ namespace Exiled.API.Features
                 }
 
                 typeof(InventoryExtensions).InvokeStaticEvent(nameof(InventoryExtensions.OnItemAdded), new object[] { ReferenceHub, itemBase, null });
-
-                ItemsValue.Add(item);
 
                 Inventory.SendItemsNextFrame = true;
                 return item;

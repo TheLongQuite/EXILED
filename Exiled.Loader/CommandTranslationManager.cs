@@ -102,7 +102,7 @@ namespace Exiled.Loader
 
             Type commandType = command.GetType();
             string commandName = commandType.FullName ?? "N/D";
-            List<PropertyInfo> props = commandType.GetProperties().Where(x => x.CanWrite).ToList();
+            List<PropertyInfo> props = commandType.GetProperties().Where(x => x.CanWrite && x.PropertyType == typeof(string)).ToList();
 
             if (!rawTranslations.TryGetValue(commandName, out CommandTranslation translation))
             {
@@ -111,29 +111,33 @@ namespace Exiled.Loader
                 {
                     Properties = props.ToDictionary(x => x.Name, _ => DefaultValue),
                 };
-
-                return translation;
             }
-
-            Dictionary<string, string> translationProperties = translation.Properties;
-            foreach (PropertyInfo propertyInfo in props)
+            else
             {
-                if (translationProperties.TryGetValue(propertyInfo.Name, out string configValue))
+                Dictionary<string, string> translationProperties = translation.Properties;
+                foreach (PropertyInfo propertyInfo in props)
                 {
-                    if (configValue == DefaultValue)
-                        continue;
+                    if (translationProperties.TryGetValue(propertyInfo.Name, out string configValue))
+                    {
+                        if (configValue == DefaultValue)
+                        {
+                            if (LoaderPlugin.Config.PrintFullCommandProps)
+                                translationProperties[propertyInfo.Name] = propertyInfo.GetValue(command) as string;
+                            continue;
+                        }
 
-                    propertyInfo.SetValue(command, configValue);
+                        propertyInfo.SetValue(command, configValue);
+                    }
+                    else
+                    {
+                        translationProperties[propertyInfo.Name] = LoaderPlugin.Config.PrintFullCommandProps ? propertyInfo.GetValue(command) as string : DefaultValue;
+                    }
                 }
-                else
-                {
-                    translationProperties[propertyInfo.Name] = DefaultValue;
-                }
+
+                List<string> validPropertyNames = props.Select(x => x.Name).ToList();
+                foreach (string configuredPropsKey in translationProperties.Keys.Where(x => !validPropertyNames.Contains(x)).ToList())
+                    translationProperties.Remove(configuredPropsKey);
             }
-
-            List<string> validPropertyNames = props.Select(x => x.Name).ToList();
-            foreach (string configuredPropsKey in translationProperties.Keys.Where(x => !validPropertyNames.Contains(x)).ToList())
-                translationProperties.Remove(configuredPropsKey);
 
             return translation;
         }

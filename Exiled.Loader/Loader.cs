@@ -398,6 +398,7 @@ namespace Exiled.Loader
             TranslationManager.Reload();
 
             EnablePlugins();
+            CommandTranslationManager.Reload();
 
             BuildInfoCommand.ModDescription = string.Join(
                 "\n",

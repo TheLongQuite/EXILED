@@ -48,15 +48,15 @@ namespace Exiled.Loader
         public string ExiledDirectoryPath { get; set; } = Path.Combine(Paths.AppData, "EXILED");
 
         /// <summary>
-        /// Gets or sets the environment type.
-        /// </summary>
-        [Description("The working environment type (Development, Testing, Production, Ptb, ProductionDebug).")]
-        public EnvironmentType Environment { get; set; } = EnvironmentType.Production;
-
-        /// <summary>
         /// Gets or sets the config files distribution type.
         /// </summary>
         [Description("The config files distribution type (Default, Separated)")]
         public ConfigType ConfigType { get; set; } = ConfigType.Default;
+
+        /// <summary>
+        /// Gets or sets the command translation config display type.
+        /// </summary>
+        [Description("Should the loader replace 'default' tags with real values in command translations.")]
+        public bool PrintFullCommandProps { get; set; } = false;
     }
 }

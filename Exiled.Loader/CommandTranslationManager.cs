@@ -115,10 +115,10 @@ namespace Exiled.Loader
                 return translation;
             }
 
+            Dictionary<string, string> translationProperties = translation.Properties;
             foreach (PropertyInfo propertyInfo in props)
             {
-                Dictionary<string, string> other = translation.Properties;
-                if (other.TryGetValue(propertyInfo.Name, out string configValue))
+                if (translationProperties.TryGetValue(propertyInfo.Name, out string configValue))
                 {
                     if (configValue == DefaultValue)
                         continue;
@@ -127,9 +127,13 @@ namespace Exiled.Loader
                 }
                 else
                 {
-                    other[propertyInfo.Name] = DefaultValue;
+                    translationProperties[propertyInfo.Name] = DefaultValue;
                 }
             }
+
+            List<string> validPropertyNames = props.Select(x => x.Name).ToList();
+            foreach (string configuredPropsKey in translationProperties.Keys.Where(x => !validPropertyNames.Contains(x)).ToList())
+                translationProperties.Remove(configuredPropsKey);
 
             return translation;
         }

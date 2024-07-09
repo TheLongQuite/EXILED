@@ -42,7 +42,6 @@ namespace Exiled.Events.Patches.Events.Player
             Label cnt = generator.DefineLabel();
 
             LocalBuilder ev = generator.DeclareLocal(typeof(SpawningRagdollEventArgs));
-            LocalBuilder targetScale = generator.DeclareLocal(typeof(Vector3));
 
             int offset = 0;
             int index = newInstructions.FindIndex(instruction => instruction.Calls(PropertySetter(typeof(BasicRagdoll), nameof(BasicRagdoll.NetworkInfo)))) + offset;
@@ -76,10 +75,13 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Ldnull),
                 new(OpCodes.Ret),
 
-                // ragdoll localScale
+                // ragdoll transform
                 new CodeInstruction(OpCodes.Ldloc_1).WithLabels(cnt),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(BasicRagdoll), nameof(BasicRagdoll.gameObject))),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(GameObject), nameof(GameObject.transform))),
+
+                // ragdoll localScale
+                new(OpCodes.Dup),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(Transform), nameof(Transform.localScale))),
 
                 // ev.Scale
@@ -88,16 +90,11 @@ namespace Exiled.Events.Patches.Events.Player
 
                 // newScale = Vector3.Scale(ragdollScale, ev.Scale);
                 new(OpCodes.Callvirt, Method(typeof(Vector3), nameof(Vector3.Scale), new[] { typeof(Vector3), typeof(Vector3) })),
-                new(OpCodes.Stloc_S, targetScale.LocalIndex),
 
                 // ragdoll.gameObject.transform.localScale = targetScale
-                new(OpCodes.Ldloc_1),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(BasicRagdoll), nameof(BasicRagdoll.gameObject))),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(GameObject), nameof(GameObject.transform))),
-                new(OpCodes.Ldloc_S, targetScale.LocalIndex),
                 new(OpCodes.Callvirt, PropertySetter(typeof(Transform), nameof(Transform.localScale))),
 
-                // load ragdoll info into stack*/
+                // load ragdollInfo into stack*/
                 new CodeInstruction(OpCodes.Ldloc_S, ev.LocalIndex),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Info))),
             });

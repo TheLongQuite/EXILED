@@ -152,7 +152,7 @@ namespace Exiled.CustomItems.API.Features
                 return null;
             }
 
-            pickup.Weight = Weight;
+            pickup.Weight = Weight < 0 ? pickup.Weight : Weight;
             pickup.Scale = Scale;
             if (previousOwner is not null)
                 pickup.PreviousOwner = previousOwner;

@@ -60,7 +60,7 @@ namespace Exiled.CustomItems.API.Features
         {
             Armor armor = (Armor)Item.Create(Type);
 
-            armor.Weight = Weight;
+            armor.Weight = Weight < 0 ? armor.Weight : Weight;
             armor.StaminaUseMultiplier = StaminaUseMultiplier;
 
             armor.VestEfficacy = VestEfficacy;

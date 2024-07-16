@@ -597,7 +597,7 @@ namespace Exiled.CustomItems.API.Features
         {
             Pickup? pickup = item.CreatePickup(position);
             pickup.Scale = Scale;
-            pickup.Weight = Weight;
+            pickup.Weight = Weight < 0 ? pickup.Weight : Weight;
 
             if (previousOwner is not null)
                 pickup.PreviousOwner = previousOwner;
@@ -1105,7 +1105,7 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(ev.Pickup))
                 return;
 
-            ev.Pickup.Weight = Weight;
+            ev.Pickup.Weight = Weight < 0 ? ev.Pickup.Weight : Weight;
         }
     }
 }

@@ -2,10 +2,14 @@ name: Exiled Programs CI
 
 on: [push, pull_request]
 
+defaults:
+  run:
+    working-directory: ./EXILED
+
 jobs:
   build:
     # Prevent double running for push & pull_request events from the main repo
-    if: github.event_name == 'push' || github.event.pull_request.head.repo.full_name != 'Exiled-Team/Exiled'
+    if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.event.pull_request.base.repo.full_name
 
     name: .Net Core ${{ matrix.framework }} on ${{ matrix.os }} for ${{ matrix.proj_name }}
     runs-on: ${{ matrix.os }}
@@ -35,4 +39,4 @@ jobs:
       uses: actions/upload-artifact@v2
       with:
         name: ${{ matrix.proj_name }}-${{ matrix.target }}
-        path: builds/${{ matrix.target }}
+        path: EXILED/builds/${{ matrix.target }}

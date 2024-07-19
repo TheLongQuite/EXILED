@@ -88,12 +88,12 @@ namespace Exiled.Loader
         /// <summary>
         /// Gets or sets the serializer for configs and translations.
         /// </summary>
-        public static ISerializer Serializer { get; set; }
+        public static ISerializer Serializer { get; set; } = null!;
 
         /// <summary>
         /// Gets or sets the deserializer for configs and translations.
         /// </summary>
-        public static IDeserializer Deserializer { get; set; }
+        public static IDeserializer Deserializer { get; set; } = null!;
 
         /// <summary>
         /// Loads all plugins.
@@ -104,7 +104,7 @@ namespace Exiled.Loader
 
             foreach (string assemblyPath in Directory.GetFiles(Paths.Plugins, "*.dll"))
             {
-                Assembly assembly = LoadAssembly(assemblyPath);
+                Assembly? assembly = LoadAssembly(assemblyPath);
 
                 if (assembly is null)
                     continue;
@@ -117,7 +117,7 @@ namespace Exiled.Loader
                 if (Locations[assembly].Contains("dependencies"))
                     continue;
 
-                IPlugin<IConfig> plugin = CreatePlugin(assembly);
+                IPlugin<IConfig>? plugin = CreatePlugin(assembly);
 
                 if (plugin is null)
                     continue;
@@ -136,7 +136,7 @@ namespace Exiled.Loader
         /// </summary>
         /// <param name="path">The path to load the assembly from.</param>
         /// <returns>Returns the loaded assembly or <see langword="null"/>.</returns>
-        public static Assembly LoadAssembly(string path)
+        public static Assembly? LoadAssembly(string path)
         {
             try
             {
@@ -159,7 +159,7 @@ namespace Exiled.Loader
         /// </summary>
         /// <param name="assembly">The plugin assembly.</param>
         /// <returns>Returns the created plugin instance or <see langword="null"/>.</returns>
-        public static IPlugin<IConfig> CreatePlugin(Assembly assembly)
+        public static IPlugin<IConfig>? CreatePlugin(Assembly assembly)
         {
             try
             {
@@ -179,7 +179,7 @@ namespace Exiled.Loader
 
                     Log.Debug($"Loading type {type.FullName}");
 
-                    IPlugin<IConfig> plugin = null;
+                    IPlugin<IConfig>? plugin = null;
 
                     ConstructorInfo constructor = type.GetConstructor(Type.EmptyTypes);
                     if (constructor is not null)
@@ -192,7 +192,7 @@ namespace Exiled.Loader
                     {
                         Log.Debug($"Constructor wasn't found, searching for a property with the {type.FullName} type...");
 
-                        object value = Array.Find(type.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public), property => property.PropertyType == type)?.GetValue(null);
+                        object? value = Array.Find(type.GetProperties(BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public), property => property.PropertyType == type)?.GetValue(null);
 
                         if (value is not null)
                             plugin = value as IPlugin<IConfig>;
@@ -339,7 +339,7 @@ namespace Exiled.Loader
         /// Runs the plugin manager, by loading all dependencies, plugins, configs and then enables all plugins.
         /// </summary>
         /// <param name="dependencies">The dependencies that could have been loaded by Exiled.Bootstrap.</param>
-        public void Run(Assembly[] dependencies = null)
+        public void Run(Assembly[] dependencies)
         {
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? CheckUAC() : geteuid() == 0)
             {
@@ -450,7 +450,7 @@ namespace Exiled.Loader
                 {
                     Log.Error(
                         $"You're running an older version of Exiled ({Version.ToString(3)})! {plugin.Name} won't be loaded! " +
-                        $"Required version to load it: {plugin.RequiredExiledVersion.ToString(3)}");
+                        $"Required version to load it: {plugin.RequiredExiledVersion?.ToString(3)}");
 
                     return true;
                 }
@@ -622,7 +622,7 @@ namespace Exiled.Loader
 
                 foreach (string dependency in Directory.GetFiles(Paths.Dependencies, "*.dll"))
                 {
-                    Assembly assembly = LoadAssembly(dependency);
+                    Assembly? assembly = LoadAssembly(dependency);
 
                     if (assembly is null)
                         continue;

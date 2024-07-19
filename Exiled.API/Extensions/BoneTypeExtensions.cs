@@ -1,6 +1,7 @@
-﻿namespace Exiled.API.Extensions
+namespace Exiled.API.Extensions
 {
     using System;
+
     using Exiled.API.Enums;
     using Exiled.API.Features;
     using UnityEngine;
@@ -14,7 +15,7 @@
         /// Определяет точку попадания в игрока по конкретному хитбоксу.
         /// </summary>
         /// <param name="target">Игрок, попадание в которого рассчитывется.</param>
-        /// <param name="hitboxIdentity">Хитбокс, попадание в которого</param>
+        /// <param name="hitboxIdentity">Хитбокс, попадание в которого.</param>
         /// <returns>Точная зона попадания в игрока.</returns>
         public static BoneType GetByMassCenter(this Player target, HitboxIdentity hitboxIdentity)
         {

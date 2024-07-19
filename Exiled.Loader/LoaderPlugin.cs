@@ -73,7 +73,7 @@ namespace Exiled.Loader
                 return;
             }
 
-            new Loader().Run();
+            new Loader().Run(Array.Empty<Assembly>());
         }
     }
 }

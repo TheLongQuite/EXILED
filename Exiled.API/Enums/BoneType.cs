@@ -1,4 +1,11 @@
-﻿namespace Exiled.API.Enums
+// -----------------------------------------------------------------------
+// <copyright file="BoneType.cs" company="Exiled Team">
+// Copyright (c) Exiled Team. All rights reserved.
+// Licensed under the CC BY-SA 3.0 license.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace Exiled.API.Enums
 {
     /// <summary>
     /// Более подробная чем <see cref="HitboxType"/> точка попадания в игрока.

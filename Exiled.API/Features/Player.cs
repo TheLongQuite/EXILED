@@ -2609,7 +2609,7 @@ namespace Exiled.API.Features
                               $"**Called from**: {new StackTrace()}");
                     return null;
                 }
-                
+
                 item ??= Item.Get(itemBase);
 
                 Inventory.UserInventory.Items[item.Serial] = itemBase;

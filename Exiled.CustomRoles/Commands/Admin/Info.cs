@@ -40,6 +40,7 @@ namespace Exiled.CustomRoles.Commands.Admin
 
         /// <inheritdoc />
         public string Description { get; } = "Информация про кастомную роль.";
+
         /// <inheritdoc />
         public bool SanitizeResponse { get; } = false;
 
@@ -58,7 +59,7 @@ namespace Exiled.CustomRoles.Commands.Admin
                 return false;
             }
 
-            if (!(uint.TryParse(arguments.At(0), out uint id) && CustomRole.TryGet(id, out CustomRole? role)) && !CustomRole.TryGet(arguments.At(0), out role) || role is null)
+            if ((!(uint.TryParse(arguments.At(0), out uint id) && CustomRole.TryGet(id, out CustomRole? role)) && !CustomRole.TryGet(arguments.At(0), out role)) || role is null)
             {
                 response = $"{arguments.At(0)} не идентификатор кастомной роли.";
                 return false;

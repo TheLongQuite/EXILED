@@ -133,8 +133,8 @@ namespace Exiled.API.Features
         /// <summary>
         /// Удобно регистрирует команду с заносом в важные словарики. Не регистрируйте команды вручную, используйте это.
         /// </summary>
-        /// <param name="commandHandlerType">В какой тип консоли будет зарегистрирована команда</param>
-        /// <param name="command">Команда для регистрации</param>
+        /// <param name="commandHandlerType">В какой тип консоли будет зарегистрирована команда.</param>
+        /// <param name="command">Команда для регистрации.</param>
         public void RegisterCommand(Type commandHandlerType, ICommand command)
         {
             try

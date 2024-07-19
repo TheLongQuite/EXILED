@@ -15,6 +15,7 @@ namespace Exiled.API.Extensions
     using PlayerRoles;
 
     using UnityEngine;
+
     using Random = UnityEngine.Random;
 
     /// <summary>

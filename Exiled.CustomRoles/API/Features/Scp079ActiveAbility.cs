@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="Scp079ActiveAbility.cs" company="Exiled Team">
 // Copyright (c) Exiled Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
@@ -75,6 +75,14 @@ namespace Exiled.CustomRoles.API.Features
             return base.CanUseAbility(player, out response);
         }
 
+        /// <summary>
+        /// Checks if current <see cref="Player"/> is avaible for something krisprs mmnt.
+        /// </summary>
+        /// <param name="player">Target <see cref="Player"/>.</param>
+        /// <returns>skibidi ohio rizz.</returns>
+        internal bool IsAvailable(Player player) =>
+            player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel && (!CustomRoles.Instance!.Config.HideUnavailableHighLevelAbilities || scp079Role.Level >= MinRequiredLevel);
+
         /// <inheritdoc />
         protected override void AbilityAdded(Player player)
         {
@@ -88,7 +96,5 @@ namespace Exiled.CustomRoles.API.Features
             if (player.Role.Is(out Scp079Role role))
                 role.Energy -= EnergyUsage;
         }
-
-        internal bool IsAvailable(Player player) => player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel && (!CustomRoles.Instance!.Config.HideUnavailableHighLevelAbilities || scp079Role.Level >= MinRequiredLevel);
     }
 }

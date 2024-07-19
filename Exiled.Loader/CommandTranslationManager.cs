@@ -1,5 +1,5 @@
 // -----------------------------------------------------------------------
-// <copyright file="TranslationManager.cs" company="Exiled Team">
+// <copyright file="CommandTranslationManager.cs" company="Exiled Team">
 // Copyright (c) Exiled Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
@@ -12,6 +12,7 @@ namespace Exiled.Loader
     using System.IO;
     using System.Linq;
     using System.Reflection;
+
     using API.Enums;
     using API.Extensions;
     using API.Interfaces;
@@ -31,17 +32,6 @@ namespace Exiled.Loader
         /// Default value for translated command.
         /// </summary>
         public const string DefaultValue = "default";
-
-        /// <summary>
-        /// Has all information about translated command.
-        /// </summary>
-        public class CommandTranslation
-        {
-            /// <summary>
-            /// Gets or sets dictionary of property names and their translations.
-            /// </summary>
-            public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
-        }
 
         /// <summary>
         /// Loads all of the plugin's translations.
@@ -211,6 +201,17 @@ namespace Exiled.Loader
             }
 
             return string.Empty;
+        }
+
+        /// <summary>
+        /// Has all information about translated command.
+        /// </summary>
+        public class CommandTranslation
+        {
+            /// <summary>
+            /// Gets or sets dictionary of property names and their translations.
+            /// </summary>
+            public Dictionary<string, string> Properties { get; set; } = new Dictionary<string, string>();
         }
     }
 }

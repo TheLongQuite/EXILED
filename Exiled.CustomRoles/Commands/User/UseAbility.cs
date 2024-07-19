@@ -9,6 +9,7 @@ namespace Exiled.CustomRoles.Commands.User
     using System;
     using System.Collections.Generic;
     using System.Linq;
+
     using API;
     using API.Features;
     using CommandSystem;
@@ -22,8 +23,10 @@ namespace Exiled.CustomRoles.Commands.User
     {
         /// <inheritdoc />
         public string Command => "ability";
+
         /// <inheritdoc />
         public string[] Aliases { get; } = { "a" };
+
         /// <inheritdoc />
         public string Description => "Использует спецспособность";
 
@@ -48,6 +51,12 @@ namespace Exiled.CustomRoles.Commands.User
                 return false;
             }
 
+            if (role.CustomAbilities == null)
+            {
+                response = "У вашей спецроли нет спецспособностей!";
+                return false;
+            }
+
             List<ActiveAbility> activeAbilities = new();
             foreach (CustomAbility? ability in role.CustomAbilities)
             {
@@ -59,7 +68,9 @@ namespace Exiled.CustomRoles.Commands.User
                     activeAbilities.Add(scp079ActiveAbility);
                 }
                 else if (ability is ActiveAbility activeAbility)
+                {
                     activeAbilities.Add(activeAbility);
+                }
             }
 
             if (activeAbilities.IsEmpty())

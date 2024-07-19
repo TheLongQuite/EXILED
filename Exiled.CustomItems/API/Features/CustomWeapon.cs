@@ -10,6 +10,7 @@ namespace Exiled.CustomItems.API.Features
     using System.Collections.Generic;
     using System.ComponentModel;
     using System.Linq;
+
     using AudioSystem.Models.SoundConfigs;
     using CustomPlayerEffects;
     using Exiled.API.Enums;
@@ -34,6 +35,7 @@ namespace Exiled.CustomItems.API.Features
     public abstract class CustomWeapon : CustomItem
     {
         private readonly HashSet<Player> cooldownedPlayers = new();
+
         /// <inheritdoc />
         public override ItemType Type
         {
@@ -46,45 +48,59 @@ namespace Exiled.CustomItems.API.Features
                 base.Type = value;
             }
         }
+
         /// <summary>
-        ///     Gets or sets value indicating what <see cref="Attachment" />s the weapon will have.
+        /// Gets or sets value indicating what <see cref="Attachment" />s the weapon will have.
         /// </summary>
         public virtual AttachmentName[] Attachments { get; set; } = { };
+
+        /// <summary>
+        /// Gets or sets value indicating what <see cref="AttachmentName" />s the weapon wont have.
+        /// </summary>
         public virtual AttachmentName[] BannedAttachments { get; set; } = { };
+
         /// <summary>
         ///     Gets or sets the weapon damage.
         /// </summary>
         public abstract float Damage { get; set; }
+
         /// <summary>
         ///     Gets or sets a value indicating how big of a clip the weapon will have.
         /// </summary>
         public virtual byte ClipSize { get; set; }
+
         /// <summary>
         ///     Gets or sets a value indicating how many ammo will be spent per shot.
         /// </summary>
         public virtual byte AmmoUsage { get; set; } = 1;
+
         /// <summary>
         ///     Gets or sets a value indicating whether firearm can be unloaded.
         /// </summary>
         public virtual bool CanUnload { get; set; } = true;
+
         /// <summary>
         ///     Gets or sets a value indicating whether firearm's attachments can be modified.
         /// </summary>
         public bool AllowAttachmentsChange { get; set; } = true;
+
         /// <summary>
         ///     Gets or sets a value indicating what sound will be played on shot.
         /// </summary>
         public LocalSoundConfig? ShotAudio { get; set; }
+
         /// <summary>
         ///     Gets or sets a value indicating shot cooldown.
         /// </summary>
         [Description("Кулдаун на выстрелы. Работает только при ClipSize > 1 и FireCooldown > 0. -1 для отключения.")]
         public float FireCooldown { get; set; } = -1;
+
         /// <summary>
         ///     Gets or sets a value indicating message, displayed to players, trying to reload cooldowned weapon.
         /// </summary>
         [Description("Сообщение при попытке перезарядить оружие под кулдауном. {0} - кулдаун из конфига")]
         public string WeaponNotReady { get; set; } = "Оружие ещё не готово к выстрелу! Оно может стрелять только раз в {0} секунд.";
+
         /// <summary>
         ///     Gets or sets a value indicating damage multipliers by ArmorType and HitboxType.
         /// </summary>
@@ -110,6 +126,7 @@ namespace Exiled.CustomItems.API.Features
                 [HitboxType.Headshot] = 1,
             },
         };
+
         /// <summary>
         ///     Gets or sets a value indicating  damage multipliers by target RoleTypeId.
         /// </summary>
@@ -120,9 +137,15 @@ namespace Exiled.CustomItems.API.Features
             { RoleTypeId.Scp173, 1 },
         };
 
+        /// <summary>
+        /// Gets or sets a value indicating whether firearm's will be reset after shot.
+        /// </summary>
         [Description("Будет ли оружие убрано-возвращено в руки после выстрела")]
         public bool ForceResetWeaponOnShot { get; set; } = false;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether firearm's will be double shot.
+        /// </summary>
         [Description("При использовании КД выстрелов, разрешать ли двойной")]
         public bool AllowDoubleShot { get; set; } = false;
 
@@ -432,7 +455,7 @@ namespace Exiled.CustomItems.API.Features
                 Timing.RunCoroutine(ResetWeapon(ev.Player));
         }
 
-        private static IEnumerator<float> ResetWeapon(Player player)
+        private IEnumerator<float> ResetWeapon(Player player)
         {
             Item curItem = player.CurrentItem;
             yield return Timing.WaitForSeconds(0.01f);

@@ -33,43 +33,43 @@ namespace Exiled.CustomRoles
         public bool Debug { get; set; } = false;
 
         /// <summary>
-        ///     Gets the hint that is shown when someone gets a <see cref="CustomRole" />.
+        ///     Gets or sets the hint that is shown when someone gets a <see cref="CustomRole" />.
         /// </summary>
         [Description("The hint that is shown when someone gets a custom role.")]
         public Hint GotRoleHint { get; set; } = new("You have spawned as a {0}\n{1}", 6);
 
         /// <summary>
-        ///     Gets the hint that is shown when someone used a <see cref="CustomAbility" />.
+        ///     Gets or sets  the hint that is shown when someone used a <see cref="CustomAbility" />.
         /// </summary>
         [Description("The hint that is shown when someone used a custom ability.")]
         public Hint UsedAbilityHint { get; set; } = new("Ability {0} has been activated.\n{1}", 5);
 
         /// <summary>
-        ///     Gets the hint that is shown when someone used a <see cref="CustomAbility" />.
+        ///     Gets or sets  the hint that is shown when someone used a <see cref="CustomAbility" />.
         /// </summary>
         [Description("The hint that is shown when someone's custom ability is ready.")]
         public Hint AbilityReadyHint { get; set; } = new("Ability {0} is ready.\n{1}", 5);
 
         /// <summary>
-        ///     Gets the hint that is shown when someone used a cooldowned <see cref="CustomAbility" />.
+        ///     Gets or sets  the hint that is shown when someone used a cooldowned <see cref="CustomAbility" />.
         /// </summary>
         [Description("The hint that is shown when someone tries to use cooldowned ability. Also used in console respond. {0} - remaining cooldown, {1} - ability name")]
         public Hint AbilityOnCooldownHint { get; set; } = new("Способность на перезарядке!\nПодождите ещё {0} секунд перед использованием.", 5);
 
         /// <summary>
-        ///     Gets the hint that is shown when someone tries to use <see cref="CustomAbility" /> without required energy.
+        ///     Gets or sets  the hint that is shown when someone tries to use <see cref="CustomAbility" /> without required energy.
         /// </summary>
         [Description("The hint that is shown when someone tries to use ability without required energy. Also used in console respond. {0} - current energy, {1} - required energy")]
         public Hint InsufficientEnergyHint { get; set; } = new("Недостаточно энергии!\nУ вас {0}/{1}", 5);
 
         /// <summary>
-        ///     Gets the hint that is shown when someone tries to use <see cref="CustomAbility" /> without required level.
+        ///     Gets or sets  the hint that is shown when someone tries to use <see cref="CustomAbility" /> without required level.
         /// </summary>
         [Description("The hint that is shown when someone tries to use ability without required level. Also used in console respond. {0} - current level, {1} - required level")]
         public Hint InsufficientLevelHint { get; set; } = new("Недостаточный уровень!\nУ вас {0}/{1}", 5);
 
         /// <summary>
-        ///     Gets the hint that is shown when someone tries to use <see cref="CustomAbility" /> with too high level.
+        ///     Gets or sets  the hint that is shown when someone tries to use <see cref="CustomAbility" /> with too high level.
         /// </summary>
         [Description("The hint that is shown when someone tries to use ability with too high level. Also used in console respond. {0} - current level, {1} - required level")]
         public Hint RedundantLevelHint { get; set; } = new("Избыточный уровень!\nУ вас {0}/{1}", 5);

@@ -48,7 +48,7 @@ namespace Exiled.CustomRoles.API.Features
         /// </summary>
         public const string SkipBaseRoleReplaceKey = "skipRoleReplace";
 
-        private static readonly Dictionary<uint, CustomRole?> idLookupTable = new();
+        private static readonly Dictionary<uint, CustomRole?> IdLookupTable = new();
 
         /// <summary>
         ///     Gets a list of all registered custom roles.
@@ -157,9 +157,9 @@ namespace Exiled.CustomRoles.API.Features
         /// <returns>The role, or <see langword="null" /> if it doesn't exist.</returns>
         public static CustomRole? Get(uint id)
         {
-            if (!idLookupTable.ContainsKey(id))
-                idLookupTable.Add(id, Registered?.FirstOrDefault(r => r.Id == id));
-            return idLookupTable[id];
+            if (!IdLookupTable.ContainsKey(id))
+                IdLookupTable.Add(id, Registered?.FirstOrDefault(r => r.Id == id));
+            return IdLookupTable[id];
         }
 
         /// <summary>
@@ -478,7 +478,7 @@ namespace Exiled.CustomRoles.API.Features
         /// </summary>
         public virtual void Init()
         {
-            idLookupTable.Add(Id, this);
+            IdLookupTable.Add(Id, this);
             SubscribeEvents();
         }
 
@@ -487,7 +487,7 @@ namespace Exiled.CustomRoles.API.Features
         /// </summary>
         public virtual void Destroy()
         {
-            idLookupTable.Remove(Id);
+            IdLookupTable.Remove(Id);
             UnsubscribeEvents();
         }
 

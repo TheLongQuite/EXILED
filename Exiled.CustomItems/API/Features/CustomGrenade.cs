@@ -22,6 +22,7 @@ namespace Exiled.CustomItems.API.Features
     using InventorySystem.Items.ThrowableProjectiles;
     using Mirror;
     using UnityEngine;
+
     using Map = Exiled.Events.Handlers.Map;
     using Object = UnityEngine.Object;
 
@@ -44,41 +45,22 @@ namespace Exiled.CustomItems.API.Features
                 base.Type = value;
             }
         }
+
         /// <summary>
         ///     Gets or sets a value indicating whether or not the grenade should explode immediately when contacting any surface.
         /// </summary>
         public abstract bool ExplodeOnCollision { get; set; }
+
         /// <summary>
         ///     Gets or sets a value indicating how long grenate will not detonate when contacting any surface is you use
         ///     <see cref="ExplodeOnCollision" />.
         /// </summary>
         public virtual float ExplodeOnCollisionFuseTime { get; set; } = 0.15f;
+
         /// <summary>
         ///     Gets or sets a value indicating how long the grenade's fuse time should be.
         /// </summary>
         public abstract float FuseTime { get; set; }
-
-        /// <inheritdoc />
-        protected override void SubscribeEvents()
-        {
-            Exiled.Events.Handlers.Player.ThrowingRequest += OnInternalThrowingRequest;
-            Exiled.Events.Handlers.Player.ThrownProjectile += OnInternalThrownProjectile;
-            Map.ExplodingGrenade += OnInternalExplodingGrenade;
-            Map.ChangedIntoGrenade += OnInternalChangedIntoGrenade;
-
-            base.SubscribeEvents();
-        }
-
-        /// <inheritdoc />
-        protected override void UnsubscribeEvents()
-        {
-            Exiled.Events.Handlers.Player.ThrowingRequest -= OnInternalThrowingRequest;
-            Exiled.Events.Handlers.Player.ThrownProjectile -= OnInternalThrownProjectile;
-            Map.ExplodingGrenade -= OnInternalExplodingGrenade;
-            Map.ChangedIntoGrenade -= OnInternalChangedIntoGrenade;
-
-            base.UnsubscribeEvents();
-        }
 
         /// <summary>
         ///     Throw the CustomGrenade object.
@@ -128,6 +110,28 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="grenade">The <see cref="Projectile">grenade</see> to check.</param>
         /// <returns>True if it is a custom grenade.</returns>
         public virtual bool Check(Projectile grenade) => grenade != null && TrackedSerials.Contains(grenade.Serial);
+
+        /// <inheritdoc />
+        protected override void SubscribeEvents()
+        {
+            Exiled.Events.Handlers.Player.ThrowingRequest += OnInternalThrowingRequest;
+            Exiled.Events.Handlers.Player.ThrownProjectile += OnInternalThrownProjectile;
+            Map.ExplodingGrenade += OnInternalExplodingGrenade;
+            Map.ChangedIntoGrenade += OnInternalChangedIntoGrenade;
+
+            base.SubscribeEvents();
+        }
+
+        /// <inheritdoc />
+        protected override void UnsubscribeEvents()
+        {
+            Exiled.Events.Handlers.Player.ThrowingRequest -= OnInternalThrowingRequest;
+            Exiled.Events.Handlers.Player.ThrownProjectile -= OnInternalThrownProjectile;
+            Map.ExplodingGrenade -= OnInternalExplodingGrenade;
+            Map.ChangedIntoGrenade -= OnInternalChangedIntoGrenade;
+
+            base.UnsubscribeEvents();
+        }
 
         /// <summary>
         ///     Handles tracking thrown requests by custom grenades.

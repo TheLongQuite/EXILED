@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="RoleInfo.cs" company="Exiled Team">
 // Copyright (c) Exiled Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
@@ -11,6 +11,7 @@ namespace Exiled.CustomRoles.Commands.User
     using System.Globalization;
     using System.Linq;
     using System.Text;
+
     using API;
     using API.Features;
     using CommandSystem;
@@ -25,8 +26,10 @@ namespace Exiled.CustomRoles.Commands.User
     {
         /// <inheritdoc />
         public string Command => "roleinfo";
+
         /// <inheritdoc />
         public string[] Aliases { get; } = { "rinfo" };
+
         /// <inheritdoc />
         public string Description => "Даёт справку по вашей текущей особой роли и её способностях.";
 
@@ -54,6 +57,13 @@ namespace Exiled.CustomRoles.Commands.User
             return true;
         }
 
+        /// <summary>
+        /// Get <see cref="Player"/> abilities information.
+        /// </summary>
+        /// <param name="player">Target <see cref="Player"/>.</param>
+        /// <param name="customRole">Target <see cref="CustomRole"/>.</param>
+        /// <param name="includePassive"><see cref="PassiveAbility"/>.</param>
+        /// <returns><see cref="string"/> represents abilities info.</returns>
         internal static string GetAbilitiesInfo(Player player, CustomRole customRole, bool includePassive = true)
         {
             List<PassiveAbility> passiveAbilities = new();
@@ -96,8 +106,7 @@ namespace Exiled.CustomRoles.Commands.User
 
                 for (int i = 0; i < scp079ActiveAbilities.Count; i++)
                 {
-                    stringBuilder.AppendFormat(CustomRoles.Instance!.Config.Active079AbilityLineFormat + '\n', i + 1, scp079ActiveAbilities[i].Name, scp079ActiveAbilities[i].Description, GetAbilityDuration(scp079ActiveAbilities[i]),
-                        scp079ActiveAbilities[i].Cooldown, scp079ActiveAbilities[i].MinRequiredLevel, scp079ActiveAbilities[i].EnergyUsage);
+                    stringBuilder.AppendFormat(CustomRoles.Instance!.Config.Active079AbilityLineFormat + '\n', i + 1, scp079ActiveAbilities[i].Name, scp079ActiveAbilities[i].Description, GetAbilityDuration(scp079ActiveAbilities[i]), scp079ActiveAbilities[i].Cooldown, scp079ActiveAbilities[i].MinRequiredLevel, scp079ActiveAbilities[i].EnergyUsage);
                 }
             }
 

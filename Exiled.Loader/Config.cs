@@ -54,7 +54,7 @@ namespace Exiled.Loader
         public ConfigType ConfigType { get; set; } = ConfigType.Default;
 
         /// <summary>
-        /// Gets or sets the command translation config display type.
+        /// Gets or sets a value indicating whether the command translation config display type.
         /// </summary>
         [Description("Should the loader replace 'default' tags with real values in command translations.")]
         public bool PrintFullCommandProps { get; set; } = false;

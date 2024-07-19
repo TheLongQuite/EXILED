@@ -32,15 +32,10 @@
         /// <inheritdoc/>
         public bool SanitizeResponse { get; } = false;
 
-        /// <summary>
-        /// Gets HashSet of subcommands to register.
-        /// </summary>
-        protected abstract HashSet<Type> CommandsToRegister { get; }
-
         /// <inheritdoc/>
         public override sealed void LoadGeneratedCommands()
         {
-            foreach (Type commandType in CommandsToRegister)
+            foreach (Type commandType in CommandsToRegister())
             {
                 if (commandType.GetInterface(nameof(ICommand)) != typeof(ICommand))
                 {
@@ -60,6 +55,12 @@
                 ? command.Execute(new ArraySegment<string>(arguments.Array, arguments.Offset + 1, arguments.Count - 1), sender, out response)
                 : ExecuteParent(arguments, sender, out response);
         }
+
+        /// <summary>
+        /// Gets HashSet of subcommands to register.
+        /// </summary>
+        /// <returns>IEnumerable of commands to register.</returns>
+        protected abstract IEnumerable<Type> CommandsToRegister();
 
         /// <summary>
         /// Executes parent comand without subcommands.

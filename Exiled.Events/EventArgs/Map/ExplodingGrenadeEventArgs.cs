@@ -8,16 +8,18 @@
 namespace Exiled.Events.EventArgs.Map
 {
     using System.Collections.Generic;
-    using System.Linq;
 
     using Exiled.API.Features;
     using Exiled.API.Features.Pickups;
     using Exiled.API.Features.Pickups.Projectiles;
     using Exiled.API.Features.Pools;
     using Exiled.Events.EventArgs.Interfaces;
+    using Exiled.Events.Patches.Generic;
+
     using Footprinting;
+
     using InventorySystem.Items.ThrowableProjectiles;
-    using Patches.Generic;
+
     using UnityEngine;
 
     /// <summary>
@@ -26,7 +28,7 @@ namespace Exiled.Events.EventArgs.Map
     public class ExplodingGrenadeEventArgs : IPlayerEvent, IDeniableEvent
     {
         /// <summary>
-        /// Initializes a new instance of the <see cref="ExplodingGrenadeEventArgs" /> class.
+        /// Initializes a new instance of the <see cref="ExplodingGrenadeEventArgs"/> class.
         /// </summary>
         /// <param name="thrower"><inheritdoc cref="Player"/></param>
         /// <param name="position"><inheritdoc cref="Position"/></param>
@@ -38,7 +40,6 @@ namespace Exiled.Events.EventArgs.Map
             Projectile = (EffectGrenadeProjectile)Pickup.Get(grenade);
             Position = position;
             TargetsToAffect = ListPool<Player>.Pool.Get();
-            IsAllowed = true;
 
             if (Projectile.Base is not ExplosionGrenade)
                 return;
@@ -128,7 +129,7 @@ namespace Exiled.Events.EventArgs.Map
         /// <summary>
         /// Gets or sets a value indicating whether or not the grenade can be thrown.
         /// </summary>
-        public bool IsAllowed { get; set; }
+        public bool IsAllowed { get; set; } = true;
 
         /// <summary>
         /// Gets the player who thrown the grenade.

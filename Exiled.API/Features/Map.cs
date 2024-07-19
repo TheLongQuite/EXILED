@@ -28,7 +28,6 @@ namespace Exiled.API.Features
     using MapGeneration;
     using MapGeneration.Distributors;
     using Mirror;
-    using Mirror.LiteNetLib4Mirror;
     using PlayerRoles;
     using PlayerRoles.PlayableScps.Scp173;
     using PlayerRoles.PlayableScps.Scp939;
@@ -402,11 +401,12 @@ namespace Exiled.API.Features
         /// </summary>
         internal static void ClearCache()
         {
+            Item.BaseToItem.Clear();
+
             LockersValue.RemoveAll(locker => locker == null);
 
-            Item.BaseToItem.Clear();
-            Pickup.BaseToPickup.Clear();
             Ragdoll.BasicRagdollToRagdoll.Clear();
+
             Firearm.ItemTypeToFirearmInstance.Clear();
             Firearm.BaseCodesValue.Clear();
             Firearm.AvailableAttachmentsValue.Clear();

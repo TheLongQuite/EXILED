@@ -8,12 +8,14 @@
 namespace Exiled.Events.Patches.Events.Scp079
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Reflection.Emit;
 
     using API.Features.Pools;
     using Exiled.Events.Attributes;
     using Exiled.Events.EventArgs.Scp079;
     using HarmonyLib;
+    using Mirror;
     using PlayerRoles.PlayableScps.Scp079;
     using PlayerRoles.PlayableScps.Scp079.Pinging;
     using PlayerRoles.Subroutines;

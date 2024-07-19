@@ -8,6 +8,7 @@
 namespace Exiled.Events.Patches.Events.Scp106
 {
     using System.Collections.Generic;
+    using System.Reflection;
     using System.Reflection.Emit;
 
     using API.Features;
@@ -46,10 +47,7 @@ namespace Exiled.Events.Patches.Events.Scp106
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Scp106HuntersAtlasAbility), nameof(Scp106HuntersAtlasAbility.Owner))),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
 
-                    // is entering false
-                    new(OpCodes.Ldc_I4_0),
-
-                    // is enabled true
+                    // true
                     new(OpCodes.Ldc_I4_1),
 
                     // StalkingEventArgs ev = new(Player, isAllowed)
@@ -58,7 +56,7 @@ namespace Exiled.Events.Patches.Events.Scp106
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, ev.LocalIndex),
 
-                    // Handlers.Scp106.OnStalking(ev)
+                    // Handlers.Scp106.OnFinishingRecall(ev)
                     new(OpCodes.Call, Method(typeof(Handlers.Scp106), nameof(Handlers.Scp106.OnStalking))),
 
                     // if (!ev.IsAllowed)
@@ -78,10 +76,7 @@ namespace Exiled.Events.Patches.Events.Scp106
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Scp106HuntersAtlasAbility), nameof(Scp106HuntersAtlasAbility.Owner))),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
 
-                    // is entering true
-                    new(OpCodes.Ldc_I4_1),
-
-                    // is enabled true
+                    // true
                     new(OpCodes.Ldc_I4_1),
 
                     // StalkingEventArgs ev = new(Player, isAllowed)
@@ -100,7 +95,8 @@ namespace Exiled.Events.Patches.Events.Scp106
                 });
 
             // replace "base.Vigor.VigorAmount < 0.25f" with "base.Vigor.VigorAmount < ev.MinimumVigor"
-            index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Ldc_R4);
+            offset = 0;
+            index = newInstructions.FindIndex(instruction => instruction.opcode == OpCodes.Ldc_R4) + offset;
             newInstructions.RemoveAt(index);
 
             newInstructions.InsertRange(

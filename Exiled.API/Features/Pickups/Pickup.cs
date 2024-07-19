@@ -581,6 +581,17 @@ namespace Exiled.API.Features.Pickups
         public void Destroy() => Base.DestroySelf();
 
         /// <summary>
+        /// Clones the current pickup with a different serial.
+        /// </summary>
+        /// <returns> Cloned pickup object. </returns>
+        public virtual Pickup Clone() => new(Type)
+        {
+            Scale = Scale,
+            PreviousOwner = PreviousOwner,
+            Info = Info,
+        };
+
+        /// <summary>
         /// Returns the Pickup in a human readable format.
         /// </summary>
         /// <returns>A string containing Pickup-related data.</returns>

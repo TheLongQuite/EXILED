@@ -1,4 +1,4 @@
-// -----------------------------------------------------------------------
+﻿// -----------------------------------------------------------------------
 // <copyright file="TantrumHazard.cs" company="Exiled Team">
 // Copyright (c) Exiled Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
@@ -8,7 +8,6 @@
 namespace Exiled.API.Features.Hazards
 {
     using global::Hazards;
-    using PlayerRoles;
     using RelativePositioning;
     using UnityEngine;
 

@@ -64,6 +64,16 @@ namespace Exiled.Events.Handlers
         public static Event<LocalReportingEventArgs> LocalReporting { get; set; } = new();
 
         /// <summary>
+        /// Invoked before choosing the Team than player will get.
+        /// </summary>
+        public static Event<ChoosingStartTeamQueueEventArgs> ChoosingStartTeamQueue { get; set; } = new();
+
+        /// <summary>
+        /// Invoked before selecting the team that will respawn.
+        /// </summary>
+        public static Event<SelectingRespawnTeamEventArgs> SelectingRespawnTeam { get; set; } = new();
+
+        /// <summary>
         /// Invoked after the "reload configs" command is ran.
         /// </summary>
         public static Event ReloadedConfigs { get; set; } = new();
@@ -145,6 +155,12 @@ namespace Exiled.Events.Handlers
         public static void OnLocalReporting(LocalReportingEventArgs ev) => LocalReporting.InvokeSafely(ev);
 
         /// <summary>
+        /// Called before a <see cref="Player"/>'s custom display name is changed.
+        /// </summary>
+        /// <param name="ev">The <see cref="ChoosingStartTeamQueueEventArgs"/> instance.</param>
+        public static void OnChoosingStartTeam(ChoosingStartTeamQueueEventArgs ev) => ChoosingStartTeamQueue.InvokeSafely(ev);
+
+        /// <summary>
         /// Called after the "reload configs" command is ran.
         /// </summary>
         public static void OnReloadedConfigs() => ReloadedConfigs.InvokeSafely();
@@ -173,5 +189,11 @@ namespace Exiled.Events.Handlers
         /// Called after the "reload permissions" command is ran.
         /// </summary>
         public static void OnReloadedPermissions() => ReloadedPermissions.InvokeSafely();
+
+        /// <summary>
+        /// Called before selecting the team that will respawn next.
+        /// </summary>
+        /// <param name="ev">The <see cref="SelectingRespawnTeamEventArgs"/> instance.</param>
+        public static void OnSelectingRespawnTeam(SelectingRespawnTeamEventArgs ev) => SelectingRespawnTeam.InvokeSafely(ev);
     }
 }

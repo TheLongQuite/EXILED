@@ -31,17 +31,11 @@ namespace Exiled.API.Features
     using Exiled.API.Features.Roles;
     using Exiled.API.Interfaces;
     using Exiled.API.Structs;
-
     using Extensions;
-
     using Footprinting;
-
     using global::Scp914;
-
     using Hints;
-
     using Interactables.Interobjects;
-
     using InventorySystem;
     using InventorySystem.Disarming;
     using InventorySystem.Items;
@@ -51,37 +45,25 @@ namespace Exiled.API.Features
     using InventorySystem.Items.Firearms.BasicMessages;
     using InventorySystem.Items.Usables;
     using InventorySystem.Items.Usables.Scp330;
-
     using MapGeneration.Distributors;
-
     using MEC;
-
     using Mirror;
     using Mirror.LiteNetLib4Mirror;
-
     using NorthwoodLib;
-
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
     using PlayerRoles.RoleAssign;
     using PlayerRoles.Spectating;
     using PlayerRoles.Voice;
-
     using PlayerStatsSystem;
     using PluginAPI.Core;
     using RelativePositioning;
-
     using RemoteAdmin;
-
     using Respawning.NamingRules;
-
     using RoundRestarting;
-
     using UnityEngine;
-
     using Utils;
     using Utils.Networking;
-
     using VoiceChat;
     using VoiceChat.Playbacks;
 
@@ -369,14 +351,37 @@ namespace Exiled.API.Features
             set
             {
                 // NW Client check.
-                if (!value.IsCustomInfoValid(out string denialReason))
+                if (value.Contains('<'))
                 {
-                    Log.Error($"Invalid Custominfo:\n{denialReason}");
-                    return;
-                }
+                    foreach (string token in value.Split('<'))
+                    {
+                        if (token.StartsWith("/", StringComparison.Ordinal) ||
+                            token.StartsWith("b>", StringComparison.Ordinal) ||
+                            token.StartsWith("i>", StringComparison.Ordinal) ||
+                            token.StartsWith("size=", StringComparison.Ordinal) ||
+                            token.Length is 0)
+                            continue;
 
-                if (value != null && value.Contains('<'))
-                    value = $"<size=17>{value}</size>";
+                        if (token.StartsWith("color=", StringComparison.Ordinal))
+                        {
+                            if (token.Length < 14 || token[13] != '>')
+                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad text reject) \ntoken: {token} \nInfo: {value}");
+                            else if (!Misc.AllowedColors.ContainsValue(token.Substring(6, 7)))
+                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {value}");
+                        }
+                        else if (token.StartsWith("#", StringComparison.Ordinal))
+                        {
+                            if (token.Length < 8 || token[7] != '>')
+                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad text reject) \ntoken: {token} \nInfo: {value}");
+                            else if (!Misc.AllowedColors.ContainsValue(token.Substring(0, 7)))
+                                Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {value}");
+                        }
+                        else
+                        {
+                            Log.Error($"Custom info of player {Nickname} has been REJECTED. \nreason: (Bad color reject) \ntoken: {token} \nInfo: {value}");
+                        }
+                    }
+                }
 
                 InfoArea = string.IsNullOrEmpty(value) ? InfoArea & ~PlayerInfoArea.CustomInfo : InfoArea |= PlayerInfoArea.CustomInfo;
                 ReferenceHub.nicknameSync.Network_customPlayerInfoString = value;
@@ -2604,13 +2609,7 @@ namespace Exiled.API.Features
                               $"**Called from**: {new StackTrace()}");
                     return null;
                 }
-
-                if (itemBase.ItemTypeId == ItemType.SCP330)
-                {
-                    Log.Warn($"We don't give people SCP330, it's buggy - KrisPrs.");
-                    return null;
-                }
-
+                
                 item ??= Item.Get(itemBase);
 
                 Inventory.UserInventory.Items[item.Serial] = itemBase;
@@ -2629,7 +2628,7 @@ namespace Exiled.API.Features
             }
             catch (Exception exception)
             {
-                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]) args: ply: {this} | {item}:\n{exception}\n\n\n**Called from**: {new StackTrace()}");
+                Log.Error($"{nameof(Player)}.{nameof(AddItem)}(ItemBase, [Item]): {exception}");
             }
 
             return null;

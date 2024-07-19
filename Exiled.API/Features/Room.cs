@@ -137,7 +137,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets or sets the color of the room's lights by changing the warhead color.
         /// </summary>
-        /// <remarks>Will return Color.clear when <see cref="RoomLightController"/> is <see langword="null"/>.</remarks>
+        /// <remarks>Will return <see cref="Color.clear"/> when <see cref="RoomLightController"/> is <see langword="null"/>.</remarks>
         public Color Color
         {
             get => RoomLightController == null ? Color.clear : RoomLightController.NetworkOverrideColor;

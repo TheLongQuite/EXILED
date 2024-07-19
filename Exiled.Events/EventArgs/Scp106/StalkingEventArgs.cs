@@ -16,7 +16,7 @@ namespace Exiled.Events.EventArgs.Scp106
     using Scp106Role = API.Features.Roles.Scp106Role;
 
     /// <summary>
-    ///     Contains all information before SCP-106 uses the stalk ability or exits it. Does not called if ability cooldowned.
+    /// Contains all information before SCP-106 uses the stalk ability.
     /// </summary>
     public class StalkingEventArgs : IScp106Event, IDeniableEvent
     {
@@ -24,14 +24,12 @@ namespace Exiled.Events.EventArgs.Scp106
         /// Initializes a new instance of the <see cref="StalkingEventArgs"/> class.
         /// </summary>
         /// <param name="player"><inheritdoc cref="Player"/></param>
-        /// <param name="isEntering">Is Scp106 entering his ability or exits it.</param>
         /// <param name="isAllowed"><inheritdoc cref="IsAllowed"/></param>
-        public StalkingEventArgs(Player player, bool isEntering = true, bool isAllowed = true)
+        public StalkingEventArgs(Player player, bool isAllowed = true)
         {
             Player = player;
             Scp106 = player.Role.As<Scp106Role>();
             IsAllowed = isAllowed;
-            IsEntering = isEntering;
             MinimumVigor = Scp106StalkAbility.MinVigorToSubmerge;
         }
 
@@ -56,11 +54,6 @@ namespace Exiled.Events.EventArgs.Scp106
         /// Gets or sets the required minimum vigor to stalk.
         /// </summary>
         public float MinimumVigor { get; set; }
-
-        /// <summary>
-        /// Gets or sets a value indicating whether SCP-106 entering stalk or exits it.
-        /// </summary>
-        public bool IsEntering { get; set; }
 
         /// <summary>
         /// Gets the player who's controlling SCP-106.

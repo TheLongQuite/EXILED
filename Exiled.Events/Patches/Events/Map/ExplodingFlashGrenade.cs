@@ -16,13 +16,11 @@ namespace Exiled.Events.Patches.Events.Map
     using Exiled.Events.Patches.Generic;
     using HarmonyLib;
     using InventorySystem.Items.ThrowableProjectiles;
-    using PlayerRoles;
     using UnityEngine;
 
     using static HarmonyLib.AccessTools;
 
     using ExiledEvents = Exiled.Events.Events;
-    using Map = Handlers.Map;
 
     /// <summary>
     /// Patches <see cref="FlashbangGrenade.ServerFuseEnd()"/>.
@@ -80,9 +78,11 @@ namespace Exiled.Events.Patches.Events.Map
             }
 
             ExplodingGrenadeEventArgs explodingGrenadeEvent = new(Player.Get(instance.PreviousOwner.Hub), instance, targetToAffect);
-            Map.OnExplodingGrenade(explodingGrenadeEvent);
 
             ListPool<Player>.Pool.Return(targetToAffect);
+
+            Handlers.Map.OnExplodingGrenade(explodingGrenadeEvent);
+
             if (!explodingGrenadeEvent.IsAllowed)
                 return;
 

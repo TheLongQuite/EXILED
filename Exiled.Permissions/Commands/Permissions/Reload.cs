@@ -28,7 +28,7 @@ namespace Exiled.Permissions.Commands.Permissions
         public string Description { get; } = "Reloads all permissions";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
+        public bool SanitizeResponse { get; }
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

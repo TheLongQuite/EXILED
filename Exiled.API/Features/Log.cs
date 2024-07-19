@@ -41,6 +41,7 @@ namespace Exiled.API.Features
         public static void Debug(object message)
         {
             Assembly callingAssembly = Assembly.GetCallingAssembly();
+
 #if DEBUG
             if (callingAssembly.GetName().Name is "Exiled.API")
             {

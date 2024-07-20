@@ -48,16 +48,8 @@ namespace Exiled.API.Features.Items
         /// <inheritdoc/>
         public override Vector3 Scale
         {
-            get
-            {
-                return base.Scale;
-            }
-
-            set
-            {
-                base.Scale = value;
-                Projectile.Scale = value;
-            }
+            get => base.Scale;
+            set => Projectile.Scale = base.Scale = value;
         }
 
         /// <summary>

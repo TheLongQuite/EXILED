@@ -38,6 +38,11 @@ namespace Exiled.Events.Handlers
         public static Event<PlayingVoiceEventArgs> PlayingVoice { get; set; } = new();
 
         /// <summary>
+        /// Invoked before footstep displayed to SCP-939.
+        /// </summary>
+        public static Event<PlayingFootstepEventArgs> PlayingFootstep { get; set; } = new();
+
+        /// <summary>
         /// Invoked before SCP-939 will save Human voice.
         /// </summary>
         public static Event<SavingVoiceEventArgs> SavingVoice { get; set; } = new();
@@ -93,6 +98,12 @@ namespace Exiled.Events.Handlers
         /// </summary>
         /// <param name="ev">The <see cref="PlayingSoundEventArgs"/> instance.</param>
         public static void OnPlayingSound(PlayingSoundEventArgs ev) => PlayingSound.InvokeSafely(ev);
+
+        /// <summary>
+        /// Called before footstep displayed to SCP-939.
+        /// </summary>
+        /// <param name="ev">The <see cref="PlayingFootstepEventArgs" /> instance.</param>
+        public static void OnPlayingFootstep(PlayingFootstepEventArgs ev) => PlayingFootstep.InvokeSafely(ev);
 
         /// <summary>
         /// Called after SCP-939 attacks.

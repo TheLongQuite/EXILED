@@ -1,4 +1,11 @@
-﻿namespace Exiled.API.Features
+// -----------------------------------------------------------------------
+// <copyright file="ParentCommand.cs" company="Exiled Team">
+// Copyright (c) Exiled Team. All rights reserved.
+// Licensed under the CC BY-SA 3.0 license.
+// </copyright>
+// -----------------------------------------------------------------------
+
+namespace Exiled.API.Features
 {
     using System;
     using System.Collections.Generic;
@@ -28,9 +35,6 @@
 
         /// <inheritdoc/>
         public abstract string Description { get; set; }
-
-        /// <inheritdoc/>
-        public bool SanitizeResponse { get; } = false;
 
         /// <inheritdoc/>
         public override sealed void LoadGeneratedCommands()

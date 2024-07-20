@@ -48,9 +48,6 @@ namespace Exiled.CustomRoles.Commands.Admin
         public string Description { get; } = "Gives the specified custom role to the indicated player(s).";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
-
-        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.give"))

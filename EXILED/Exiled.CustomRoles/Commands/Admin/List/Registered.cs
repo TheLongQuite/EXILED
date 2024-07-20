@@ -37,15 +37,9 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         /// <inheritdoc />
         public string[] Aliases { get; } = { "r", "reg" };
 
-<<<<<<<< HEAD:Exiled.CustomRoles/Commands/Admin/List/Registered.cs
         /// <inheritdoc />
         public string Description { get; } = "Список всех кастомных ролей.";
 
-        /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
-
-========
->>>>>>>> dev:EXILED/Exiled.CustomRoles/Commands/List/Registered.cs
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

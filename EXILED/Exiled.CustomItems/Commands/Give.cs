@@ -42,9 +42,6 @@ namespace Exiled.CustomItems.Commands
         /// <inheritdoc/>
         public string Description { get; } = "Дает кастомный предмет.";
 
-        /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
-
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

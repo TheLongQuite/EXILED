@@ -41,12 +41,6 @@ namespace Exiled.CustomRoles.Commands.Admin
         /// <inheritdoc />
         public string Description { get; } = "Информация про кастомную роль.";
 
-<<<<<<<< HEAD:Exiled.CustomRoles/Commands/Admin/Info.cs
-        /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
-
-========
->>>>>>>> dev:EXILED/Exiled.CustomRoles/Commands/Info.cs
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {

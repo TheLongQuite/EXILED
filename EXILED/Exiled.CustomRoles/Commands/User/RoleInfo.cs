@@ -34,9 +34,6 @@ namespace Exiled.CustomRoles.Commands.User
         public string Description => "Даёт справку по вашей текущей особой роли и её способностях.";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
-
-        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             Player player = Player.Get(sender);

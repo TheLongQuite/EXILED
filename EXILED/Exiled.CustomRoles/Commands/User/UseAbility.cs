@@ -31,9 +31,6 @@ namespace Exiled.CustomRoles.Commands.User
         public string Description => "Использует спецспособность";
 
         /// <inheritdoc />
-        public bool SanitizeResponse { get; } = false;
-
-        /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             Player player = Player.Get((CommandSender)sender);

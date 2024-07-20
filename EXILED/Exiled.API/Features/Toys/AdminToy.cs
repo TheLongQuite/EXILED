@@ -70,7 +70,11 @@ namespace Exiled.API.Features.Toys
         public Vector3 Position
         {
             get => AdminToyBase.transform.position;
-            set => AdminToyBase.transform.position = value;
+            set
+            {
+                AdminToyBase.transform.position = value;
+                AdminToyBase.NetworkPosition = value;
+            }
         }
 
         /// <summary>
@@ -79,7 +83,11 @@ namespace Exiled.API.Features.Toys
         public Quaternion Rotation
         {
             get => AdminToyBase.transform.rotation;
-            set => AdminToyBase.transform.rotation = value;
+            set
+            {
+                AdminToyBase.transform.rotation = value;
+                AdminToyBase.NetworkRotation = new LowPrecisionQuaternion(value);
+            }
         }
 
         /// <summary>
@@ -88,7 +96,11 @@ namespace Exiled.API.Features.Toys
         public Vector3 Scale
         {
             get => AdminToyBase.transform.localScale;
-            set => AdminToyBase.transform.localScale = value;
+            set
+            {
+                AdminToyBase.transform.localScale = value;
+                AdminToyBase.NetworkScale = value;
+            }
         }
 
         /// <summary>
@@ -110,7 +122,7 @@ namespace Exiled.API.Features.Toys
         public bool IsStatic
         {
             get => AdminToyBase.IsStatic;
-            set => AdminToyBase.IsStatic = value;
+            set => AdminToyBase.NetworkIsStatic = value;
         }
 
         /// <summary>

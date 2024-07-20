@@ -11,11 +11,13 @@ namespace Exiled.Events.Patches.Events.Player
     using System.Reflection.Emit;
 
     using API.Features.Pools;
+
     using Exiled.API.Features;
     using Exiled.Events.Attributes;
     using Exiled.Events.EventArgs.Player;
 
     using HarmonyLib;
+
     using PlayerRoles.Ragdolls;
 
     using PlayerStatsSystem;
@@ -89,13 +91,13 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Scale))),
 
                 // newScale = Vector3.Scale(ragdollScale, ev.Scale);
-                new(OpCodes.Callvirt, Method(typeof(Vector3), nameof(Vector3.Scale), new[] { typeof(Vector3), typeof(Vector3) })),
+                new(OpCodes.Call, Method(typeof(Vector3), nameof(Vector3.Scale), new[] { typeof(Vector3), typeof(Vector3) })),
 
                 // ragdoll.gameObject.transform.localScale = targetScale
                 new(OpCodes.Callvirt, PropertySetter(typeof(Transform), nameof(Transform.localScale))),
 
                 // load ragdollInfo into stack*/
-                new CodeInstruction(OpCodes.Ldloc_S, ev.LocalIndex),
+                new(OpCodes.Ldloc_S, ev.LocalIndex),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(SpawningRagdollEventArgs), nameof(SpawningRagdollEventArgs.Info))),
             });
 

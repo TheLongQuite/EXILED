@@ -669,6 +669,7 @@ namespace Exiled.API.Features
         /// Gets a value indicating whether or not the player's <see cref="RoleTypeId"/> is any NTF rank.
         /// Equivalent to checking the player's <see cref="Team"/>.
         /// </summary>
+        // TODO: Change logic for FacilityGuard in next major update
         public bool IsNTF => Role?.Team is Team.FoundationForces;
 
         /// <summary>

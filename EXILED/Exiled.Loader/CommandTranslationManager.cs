@@ -54,7 +54,7 @@ namespace Exiled.Loader
                         return; // Так происходит, если команда есть в нескольких хэндлерах
                     }
 
-                    if (command is ParentCommand parentCommand)
+                    if (command is CommandHandler parentCommand)
                     {
                         foreach (ICommand childCommand in parentCommand.AllCommands)
                             LoadCommand(childCommand);

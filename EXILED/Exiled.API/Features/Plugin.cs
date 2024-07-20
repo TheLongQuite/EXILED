@@ -140,15 +140,27 @@ namespace Exiled.API.Features
             try
             {
                 if (commandHandlerType == typeof(RemoteAdminCommandHandler))
+                {
                     CommandProcessor.RemoteAdminCommandHandler.RegisterCommand(command);
+                }
                 else if (commandHandlerType == typeof(GameConsoleCommandHandler))
+                {
                     GameCore.Console.singleton.ConsoleCommandHandler.RegisterCommand(command);
+                }
                 else if (commandHandlerType == typeof(ClientCommandHandler))
+                {
                     QueryProcessor.DotCommandHandler.RegisterCommand(command);
+                }
+                else
+                {
+                    Log.Error($"Invalid command handler type provided for command {command.Command}: {commandHandlerType}");
+                    return;
+                }
             }
             catch (ArgumentException e)
             {
                 Log.Error($"An error has occurred while registering a command: {e}");
+                return;
             }
 
             Commands[commandHandlerType][command.GetType()] = command;

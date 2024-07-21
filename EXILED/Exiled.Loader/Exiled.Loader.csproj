@@ -53,8 +53,7 @@
     </ItemGroup>
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
-        <PostBuildEvent>if not "$(EXILED_DEV_PLUGINAPI_REFERENCE)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_DEV_PLUGINAPI_REFERENCE)\"</PostBuildEvent>
-        <PostBuildEvent>if not "$(EXILED_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_REFERENCES)\" &amp;&amp; if not "$(EXILED_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).xml" "$(EXILED_REFERENCES)\"</PostBuildEvent>
+        <PostBuildEvent>if not "$(EXILED_DEV_PLUGINAPI_REFERENCE)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_DEV_PLUGINAPI_REFERENCE)\"&amp;&amp; if not "$(EXILED_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_REFERENCES)\" &amp;&amp; if not "$(EXILED_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).xml" "$(EXILED_REFERENCES)\"</PostBuildEvent>
     </PropertyGroup>
     <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
         <PostBuildEvent>if [[ ! -z "$EXILED_DEV_PLUGINAPI_REFERENCE" ]]; then cp "$(OutputPath)$(AssemblyName).dll" "$EXILED_DEV_PLUGINAPI_REFERENCE/"; fi</PostBuildEvent>

@@ -104,7 +104,11 @@ namespace Exiled.API.Extensions
             .Replace("{scps}", Player.List.Count(x => x.Role.Team == Team.SCPs).ToString())
             .Replace("{scpsno079}", Player.List.Count(x => x.Role.Team == Team.SCPs && x.Role.Type != RoleTypeId.Scp079).ToString())
             .Replace("{scientists}", Player.List.Count(x => x.Role.Team == Team.Scientists).ToString())
-            .Replace("{mtf}", Player.List.Count(x => x.Role.Team == Team.FoundationForces).ToString())
+
+            .Replace("{mtf}", Player.List.Count(x => x.Role.Team == Team.FoundationForces && x.Role.Type != RoleTypeId.FacilityGuard).ToString())
+            .Replace("{guards}", Player.List.Count(x => x.Role.Type == RoleTypeId.FacilityGuard).ToString())
+            .Replace("{facilityforces}", Player.List.Count(x => x.Role.Team == Team.FoundationForces).ToString())
+
             .Replace("{ci}", Player.List.Count(x => x.Role.Team == Team.ChaosInsurgency).ToString())
             .Replace("{human}", Player.List.Count(x => x.IsHuman).ToString());
     }

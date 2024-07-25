@@ -107,7 +107,7 @@ namespace Exiled.API.Extensions
 
             .Replace("{mtf}", Player.List.Count(x => x.Role.Team == Team.FoundationForces && x.Role.Type != RoleTypeId.FacilityGuard).ToString())
             .Replace("{guards}", Player.List.Count(x => x.Role.Type == RoleTypeId.FacilityGuard).ToString())
-            .Replace("{facilityforces}", Player.List.Count(x => x.Role.Team == Team.FoundationForces).ToString())
+            .Replace("{foundationforces}", Player.List.Count(x => x.Role.Team == Team.FoundationForces).ToString())
 
             .Replace("{ci}", Player.List.Count(x => x.Role.Team == Team.ChaosInsurgency).ToString())
             .Replace("{human}", Player.List.Count(x => x.IsHuman).ToString());

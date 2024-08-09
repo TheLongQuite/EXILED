@@ -114,7 +114,7 @@ namespace Exiled.Events
         /// Gets or sets a default value for reseting <see cref="PlayerInfoArea"/>.
         /// </summary>
         [Description("Default player info for player, resets on spawn.")]
-        public PlayerInfoArea DefaultPlayerInfoArea { get; set; } = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.UnitName | PlayerInfoArea.PowerStatus;
+        public PlayerInfoArea DefaultPlayerInfoArea { get; set; } = PlayerInfoArea.Nickname | PlayerInfoArea.Badge | PlayerInfoArea.CustomInfo | PlayerInfoArea.Role | PlayerInfoArea.UnitName | PlayerInfoArea.PowerStatus;
 
         /// <summary>
         /// Gets or sets a value indicating whether custom info will reload on spawning.

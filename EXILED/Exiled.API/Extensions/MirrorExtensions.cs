@@ -350,6 +350,7 @@ namespace Exiled.API.Extensions
         /// <param name="targetType"><see cref="NetworkBehaviour"/>'s type.</param>
         /// <param name="propertyName">Property name starting with Network.</param>
         /// <param name="value">Value of send to target.</param>
+        [Obsolete("Используй перегрузку с шаблоном💀😱")]
         public static void SendFakeSyncVar(this Player target, NetworkIdentity behaviorOwner, Type targetType, string propertyName, object value)
         {
             if (!target.IsConnected)

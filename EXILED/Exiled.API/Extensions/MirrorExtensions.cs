@@ -374,6 +374,38 @@ namespace Exiled.API.Extensions
         }
 
         /// <summary>
+        /// Send fake values to client's <see cref="SyncVarAttribute"/>.
+        /// </summary>
+        /// <typeparam name="T">Target SyncVar property type.</typeparam>
+        /// <param name="target">Target to send.</param>
+        /// <param name="behaviorOwner"><see cref="NetworkIdentity"/> of object that owns <see cref="NetworkBehaviour"/>.</param>
+        /// <param name="targetType"><see cref="NetworkBehaviour"/>'s type.</param>
+        /// <param name="propertyName">Property name starting with Network.</param>
+        /// <param name="value">Value of send to target.</param>
+        public static void SendFakeSyncVar<T>(this Player target, NetworkIdentity behaviorOwner, Type targetType, string propertyName, T value)
+        {
+            if (!target.IsConnected)
+                return;
+
+            NetworkWriterPooled writer = NetworkWriterPool.Get();
+            NetworkWriterPooled writer2 = NetworkWriterPool.Get();
+            MakeCustomSyncWriter(behaviorOwner, targetType, null, CustomSyncVarGenerator, writer, writer2);
+            target.Connection.Send(new EntityStateMessage
+            {
+                netId = behaviorOwner.netId,
+                payload = writer.ToArraySegment(),
+            });
+
+            NetworkWriterPool.Return(writer);
+            NetworkWriterPool.Return(writer2);
+            void CustomSyncVarGenerator(NetworkWriter targetWriter)
+            {
+                targetWriter.WriteULong(SyncVarDirtyBits[$"{targetType.Name}.{propertyName}"]);
+                WriterExtensions[typeof(T)]?.Invoke(null, new object[2] { targetWriter, value });
+            }
+        }
+
+        /// <summary>
         /// Force resync to client's <see cref="SyncVarAttribute"/>.
         /// </summary>
         /// <param name="behaviorOwner"><see cref="NetworkIdentity"/> of object that owns <see cref="NetworkBehaviour"/>.</param>

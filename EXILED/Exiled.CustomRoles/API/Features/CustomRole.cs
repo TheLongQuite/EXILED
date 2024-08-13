@@ -183,6 +183,17 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
+        /// Gets a <see cref="CustomRole"/> by type.
+        /// </summary>
+        /// <typeparam name="T">The specified <see cref="CustomRole"/> type.</typeparam>
+        /// <returns>The role, or <see langword="null"/> if it doesn't exist.</returns>
+        public static CustomRole? Get<T>()
+            where T : CustomRole
+        {
+            return Get(typeof(T));
+        }
+
+        /// <summary>
         ///     Tries to get a <see cref="CustomRole" /> by <inheritdoc cref="Id" />.
         /// </summary>
         /// <param name="id">The ID of the role to get.</param>
@@ -246,6 +257,20 @@ namespace Exiled.CustomRoles.API.Features
             ListPool<CustomRole>.Pool.Return(tempList);
 
             return customRoles?.Count > 0;
+        }
+
+        /// <summary>
+        /// Tries to get a <see cref="CustomRole"/> by name.
+        /// </summary>
+        /// <param name="customRole">The custom role.</param>
+        /// <typeparam name="T">The specified <see cref="CustomRole"/> type.</typeparam>
+        /// <returns>True if the role exists.</returns>
+        public static bool TryGet<T>(out CustomRole? customRole)
+            where T : CustomRole
+        {
+            customRole = Get<T>();
+
+            return customRole is not null;
         }
 
         /// <summary>

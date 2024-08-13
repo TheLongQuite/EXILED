@@ -25,6 +25,7 @@ namespace Exiled.CustomRoles.API
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to check for roles.</param>
         /// <returns>A <see cref="ReadOnlyCollection{T}" /> of all current custom roles.</returns>
+        [Obsolete("Для ФЛХ используйте GetCustomRole!!!", true)]
         public static ReadOnlyCollection<CustomRole> GetCustomRoles(this Player player)
         {
             List<CustomRole> roles = new();
@@ -36,6 +37,35 @@ namespace Exiled.CustomRoles.API
             }
 
             return roles.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Gets a <see cref="CustomRole"/> of the player.
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> to check for role.</param>
+        /// <returns>A target <see cref="CustomRole"/> (can be null).</returns>
+        public static CustomRole? GetCustomRole(this Player player)
+        {
+            foreach (CustomRole customRole in CustomRole.Registered)
+            {
+                if (customRole.Check(player))
+                {
+                    return customRole;
+                }
+            }
+
+            return null;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="CustomRole"/> of the player.
+        /// </summary>
+        /// <param name="player">The <see cref="Player"/> to check for role.</param>
+        /// <param name="customRole">A target <see cref="CustomRole"/>.</param>
+        /// <returns>A boolean indicating whether or not a custom role was found.</returns>
+        public static bool TryGetCustomRole(this Player player, out CustomRole? customRole)
+        {
+            return (customRole = GetCustomRole(player)) is not null;
         }
 
         /// <summary>

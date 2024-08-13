@@ -43,8 +43,7 @@ namespace Exiled.CustomRoles.Commands.User
                 return false;
             }
 
-            CustomRole? customRole = player.GetCustomRoles().FirstOrDefault();
-            if (customRole == null)
+            if (!player.TryGetCustomRole(out CustomRole? customRole))
             {
                 response = "У вас нет особых ролей!";
                 return false;

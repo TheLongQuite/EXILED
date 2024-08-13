@@ -1,4 +1,4 @@
-﻿// -----------------------------------------------------------------------
+// -----------------------------------------------------------------------
 // <copyright file="PlayerHandler.cs" company="Exiled Team">
 // Copyright (c) Exiled Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
@@ -33,7 +33,7 @@ namespace Exiled.CustomRoles.Events
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole" />
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
-            if (ev.Player.GetCustomRoles().FirstOrDefault() is CustomRole customRole)
+            if (ev.Player.TryGetCustomRole(out CustomRole customRole))
                 ev.Player.SessionVariables[LastCustomRoleKey] = customRole;
             else
                 ev.Player.SessionVariables.Remove(LastCustomRoleKey);
@@ -48,7 +48,7 @@ namespace Exiled.CustomRoles.Events
                     Log.Debug("Player is now a spectrator. Sending data of CustomRoles...");
                     foreach (Player? player in Player.List)
                     {
-                        if (player.GetCustomRoles().FirstOrDefault() is not CustomRole role)
+                        if (!player.TryGetCustomRole(out CustomRole role))
                             continue;
                         ev.Player.SetDispayNicknameForTargetOnly(player, role.GetSpectatorText(player));
                         Log.Debug($"[Name sync] Sent name of {player.Nickname} to {ev.Player.Nickname}");
@@ -59,7 +59,7 @@ namespace Exiled.CustomRoles.Events
                     Log.Debug("Player is a regular player. Sending real data of names");
                     foreach (Player? player in Player.List)
                     {
-                        if (player.GetCustomRoles().IsEmpty())
+                        if (player.TryGetCustomRole(out _))
                             continue;
                         Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {player.Nickname}.");
                         ev.Player.SetDispayNicknameForTargetOnly(player, player.CustomName);

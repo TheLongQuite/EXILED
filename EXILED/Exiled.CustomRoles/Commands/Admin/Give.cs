@@ -114,8 +114,7 @@ namespace Exiled.CustomRoles.Commands.Admin
 
         private void TryAddRole(Player player, CustomRole customRole)
         {
-            foreach (CustomRole? cRole in player.GetCustomRoles())
-                cRole?.RemoveRole(player);
+            player.GetCustomRole()?.RemoveRole(player);
 
             customRole.AddRole(player, SpawnReason.ForceClass, RoleSpawnFlags.All);
         }

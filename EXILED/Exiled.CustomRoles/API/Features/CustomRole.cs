@@ -158,18 +158,28 @@ namespace Exiled.CustomRoles.API.Features
         public static CustomRole? Get(uint id)
         {
             if (!IdLookupTable.ContainsKey(id))
-                IdLookupTable.Add(id, Registered?.FirstOrDefault(r => r.Id == id));
+                IdLookupTable.Add(id, Registered.FirstOrDefault(r => r.Id == id));
             return IdLookupTable[id];
         }
 
         /// <summary>
-        ///     Gets a <see cref="CustomRole" /> by type.
+        /// Gets a <see cref="CustomRole" /> by type.
         /// </summary>
         /// <param name="t">The <see cref="Type" /> to get.</param>
         /// <returns>The role, or <see langword="null" /> if it doesn't exist.</returns>
         public static CustomRole? Get(Type t)
         {
-            return Registered?.FirstOrDefault(r => r.GetType() == t);
+            return Registered.FirstOrDefault(r => r.GetType() == t);
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> by type.
+        /// </summary>
+        /// <param name="t">The <see cref="Type" /> to get.</param>
+        /// <returns>The <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/>.</returns>
+        public static IEnumerable<CustomRole> GetMany(Type t)
+        {
+            return Registered.Where(r => r.GetType() == t);
         }
 
         /// <summary>
@@ -179,7 +189,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <returns>The role, or <see langword="null" /> if it doesn't exist.</returns>
         public static CustomRole? Get(string name)
         {
-            return Registered?.FirstOrDefault(r => r.Name == name);
+            return Registered.FirstOrDefault(r => r.Name == name);
         }
 
         /// <summary>
@@ -187,10 +197,21 @@ namespace Exiled.CustomRoles.API.Features
         /// </summary>
         /// <typeparam name="T">The specified <see cref="CustomRole"/> type.</typeparam>
         /// <returns>The role, or <see langword="null"/> if it doesn't exist.</returns>
-        public static CustomRole? Get<T>()
+        public static T? Get<T>()
             where T : CustomRole
         {
-            return Get(typeof(T));
+            return Registered.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/> by type.
+        /// </summary>
+        /// <typeparam name="T">The specified <see cref="CustomRole"/> type.</typeparam>
+        /// <returns>The <see cref="IEnumerable{T}"/> of <see cref="CustomRole"/>.</returns>
+        public static IEnumerable<T> GetMany<T>()
+            where T : CustomRole
+        {
+            return Registered.OfType<T>();
         }
 
         /// <summary>
@@ -251,7 +272,7 @@ namespace Exiled.CustomRoles.API.Features
                 throw new ArgumentNullException(nameof(player));
 
             List<CustomRole> tempList = ListPool<CustomRole>.Pool.Get();
-            tempList.AddRange(Registered?.Where(customRole => customRole.Check(player)) ?? Array.Empty<CustomRole>());
+            tempList.AddRange(Registered.Where(customRole => customRole.Check(player)) ?? Array.Empty<CustomRole>());
 
             customRoles = tempList.AsReadOnly();
             ListPool<CustomRole>.Pool.Return(tempList);
@@ -265,7 +286,7 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="customRole">The custom role.</param>
         /// <typeparam name="T">The specified <see cref="CustomRole"/> type.</typeparam>
         /// <returns>True if the role exists.</returns>
-        public static bool TryGet<T>(out CustomRole? customRole)
+        public static bool TryGet<T>(out T? customRole)
             where T : CustomRole
         {
             customRole = Get<T>();
@@ -959,7 +980,7 @@ namespace Exiled.CustomRoles.API.Features
                 {
                     try
                     {
-                        if (!ev.Player.IsConnected || ev.Player.GetCustomRoles().Any() || ev.Player.Role != Role || ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
+                        if (!ev.Player.IsConnected || ev.Player.HasCustomRole() || ev.Player.Role != Role || ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
                             return;
                         AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.All);
                     }

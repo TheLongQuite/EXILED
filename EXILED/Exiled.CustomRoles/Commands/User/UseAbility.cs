@@ -35,8 +35,7 @@ namespace Exiled.CustomRoles.Commands.User
         {
             Player player = Player.Get((CommandSender)sender);
 
-            CustomRole? role = player.GetCustomRoles().FirstOrDefault();
-            if (role == null)
+            if (!player.TryGetCustomRole(out CustomRole role))
             {
                 response = "У вас нет спецролей со спецспособностями";
                 return false;

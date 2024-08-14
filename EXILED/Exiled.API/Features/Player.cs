@@ -52,11 +52,14 @@ namespace Exiled.API.Features
     using NorthwoodLib;
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
+    using PlayerRoles.PlayableScps.Scp079;
     using PlayerRoles.RoleAssign;
     using PlayerRoles.Spectating;
     using PlayerRoles.Voice;
     using PlayerStatsSystem;
     using PluginAPI.Core;
+    using PluginAPI.Events;
+
     using RelativePositioning;
     using RemoteAdmin;
     using Respawning.NamingRules;
@@ -2274,7 +2277,7 @@ namespace Exiled.API.Features
         /// <returns><see langword="true"/> if message was send; otherwise, <see langword="false"/>.</returns>
         public bool SendStaffMessage(string message, EncryptedChannelManager.EncryptedChannel channel = EncryptedChannelManager.EncryptedChannel.AdminChat)
         {
-            return ReferenceHub.encryptedChannelManager.TrySendMessageToClient("!" + NetId + message, channel);
+            return ReferenceHub.encryptedChannelManager.TrySendMessageToClient(NetId + "!" + message, channel);
         }
 
         /// <summary>
@@ -2285,7 +2288,7 @@ namespace Exiled.API.Features
         /// <returns><see langword="true"/> if message was send; otherwise, <see langword="false"/>.</returns>
         public bool SendStaffPing(string message, EncryptedChannelManager.EncryptedChannel channel = EncryptedChannelManager.EncryptedChannel.AdminChat)
         {
-            return ReferenceHub.encryptedChannelManager.TrySendMessageToClient("!0" + message, channel);
+            return ReferenceHub.encryptedChannelManager.TrySendMessageToClient("0!" + message, channel);
         }
 
         /// <summary>

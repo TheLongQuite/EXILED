@@ -1261,13 +1261,8 @@ namespace Exiled.API.Features
             if (Dictionary.TryGetValue(gameObject, out Player player))
                 return player;
 
-            if (UnverifiedPlayers.TryGetValue(gameObject, out player))
-                return player;
-
-            if (ReferenceHub.TryGetHub(gameObject, out ReferenceHub hub))
-                return new(hub);
-
-            return null;
+            UnverifiedPlayers.TryGetValue(gameObject, out player);
+            return player;
         }
 
         /// <summary>

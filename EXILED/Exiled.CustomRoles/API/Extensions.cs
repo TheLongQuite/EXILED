@@ -44,7 +44,7 @@ namespace Exiled.CustomRoles.API
         /// </summary>
         /// <param name="player">The <see cref="Player"/> to check for role.</param>
         /// <returns>A target <see cref="CustomRole"/> (can be null).</returns>
-        public static CustomRole GetCustomRole(this Player player)
+        public static CustomRole? GetCustomRole(this Player player)
         {
             foreach (CustomRole customRole in CustomRole.Registered)
             {
@@ -54,7 +54,7 @@ namespace Exiled.CustomRoles.API
                 }
             }
 
-            return null!;
+            return null;
         }
 
         /// <summary>
@@ -65,7 +65,7 @@ namespace Exiled.CustomRoles.API
         /// <returns>A boolean indicating whether or not a custom role was found.</returns>
         public static bool TryGetCustomRole(this Player player, out CustomRole customRole)
         {
-            return (customRole = GetCustomRole(player)) is not null;
+            return (customRole = GetCustomRole(player) !) is not null;
         }
 
         /// <summary>
@@ -84,7 +84,7 @@ namespace Exiled.CustomRoles.API
         /// <param name="player">The <see cref="Player"/> to check for role.</param>
         /// <typeparam name="T">The specified <see cref="CustomRole"/> type.</typeparam>
         /// <returns>A target <see cref="CustomRole"/> (can be null).</returns>
-        public static T GetCustomRole<T>(this Player player)
+        public static T? GetCustomRole<T>(this Player player)
             where T : CustomRole
         {
             foreach (T customRole in CustomRole.GetMany<T>())
@@ -95,7 +95,7 @@ namespace Exiled.CustomRoles.API
                 }
             }
 
-            return null!;
+            return null;
         }
 
         /// <summary>
@@ -108,7 +108,7 @@ namespace Exiled.CustomRoles.API
         public static bool TryGetCustomRole<T>(this Player player, out T customRole)
             where T : CustomRole
         {
-            return (customRole = GetCustomRole<T>(player)) is not null;
+            return (customRole = GetCustomRole<T>(player) !) is not null;
         }
 
         /// <summary>

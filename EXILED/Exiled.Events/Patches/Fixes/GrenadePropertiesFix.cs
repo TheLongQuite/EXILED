@@ -69,7 +69,7 @@ namespace Exiled.Events.Patches.Fixes
                 // GrenadePropertiesFix.NotifyWrongType(Item.Get(this));
                 // return;
                 new(OpCodes.Ldarg_0),
-                new(OpCodes.Call, Method(typeof(Item), nameof(Item.Get), new[] { typeof(ItemBase) })),
+                new(OpCodes.Call, GetDeclaredMethods(typeof(Item)).First(x => !x.IsGenericMethod && x.Name is nameof(Item.Get) && x.GetParameters().Length is 1 && x.GetParameters()[0].ParameterType == typeof(ItemBase))),
                 new(OpCodes.Call, Method(typeof(GrenadePropertiesFix), nameof(NotifyWrongType))),
                 new(OpCodes.Ret),
 

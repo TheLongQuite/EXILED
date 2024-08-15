@@ -52,14 +52,11 @@ namespace Exiled.API.Features
     using NorthwoodLib;
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
-    using PlayerRoles.PlayableScps.Scp079;
     using PlayerRoles.RoleAssign;
     using PlayerRoles.Spectating;
     using PlayerRoles.Voice;
     using PlayerStatsSystem;
     using PluginAPI.Core;
-    using PluginAPI.Events;
-
     using RelativePositioning;
     using RemoteAdmin;
     using Respawning.NamingRules;

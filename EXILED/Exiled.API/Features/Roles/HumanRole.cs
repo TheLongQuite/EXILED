@@ -65,6 +65,12 @@ namespace Exiled.API.Features.Roles
         /// </summary>
         public new HumanGameRole Base { get; }
 
+        /// <inheritdoc/>
+        public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        {
+            return roleBase is HumanGameRole;
+        }
+
         /// <summary>
         /// Gets the <see cref="HumanRole"/> armor efficacy based on a specific <see cref="HitboxType"/> and the armor the <see cref="Role.Owner"/> is wearing.
         /// </summary>

@@ -8,6 +8,10 @@
 namespace Exiled.API.Features.Roles
 {
     using System;
+    using System.Collections.Generic;
+
+    using Exiled.API.Extensions;
+    using Exiled.API.Features.Pools;
 
     using PlayerRoles;
 
@@ -18,8 +22,11 @@ namespace Exiled.API.Features.Roles
     /// <summary>
     /// Defines a role that represents a spectator.
     /// </summary>
-    public class SpectatorRole : Role
+    public class SpectatorRole : Role, IAppearancedRole
     {
+        private RoleTypeId fakeAppearance;
+        private Dictionary<Player, RoleTypeId> individualAppearances = DictionaryPool<Player, RoleTypeId>.Pool.Get();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SpectatorRole"/> class.
         /// </summary>
@@ -27,7 +34,16 @@ namespace Exiled.API.Features.Roles
         internal SpectatorRole(SpectatorGameRole baseRole)
             : base(baseRole)
         {
+            fakeAppearance = baseRole.RoleTypeId;
             Base = baseRole;
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="SpectatorRole"/> class.
+        /// </summary>
+        ~SpectatorRole()
+        {
+            DictionaryPool<Player, RoleTypeId>.Pool.Return(individualAppearances);
         }
 
         /// <inheritdoc/>
@@ -70,5 +86,90 @@ namespace Exiled.API.Features.Roles
         /// Gets the game <see cref="SpectatorGameRole"/>.
         /// </summary>
         public new SpectatorGameRole Base { get; }
+
+        /// <inheritdoc/>
+        public RoleTypeId GlobalAppearance => fakeAppearance;
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<Player, RoleTypeId> IndividualAppearances => individualAppearances;
+
+        /// <inheritdoc/>
+        public bool TrySetGlobalAppearance(RoleTypeId fakeRole, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                return false;
+            }
+
+            fakeAppearance = fakeRole;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetIndividualAppearance(Player player, RoleTypeId fakeRole, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                return false;
+            }
+
+            individualAppearances[player] = fakeRole;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public void ClearIndividualAppearances(bool update = true)
+        {
+            individualAppearances.Clear();
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        {
+            return roleBase is SpectatorGameRole;
+        }
+
+        /// <inheritdoc/>
+        public void ResetAppearance(bool update = true)
+        {
+            ClearIndividualAppearances(false);
+            fakeAppearance = Type;
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UpdateAppearance()
+        {
+            if (Owner != null)
+                Owner.RoleManager._sendNextFrame = true;
+        }
     }
 }

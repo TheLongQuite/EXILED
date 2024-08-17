@@ -112,6 +112,12 @@ namespace Exiled.API.Features.Roles
         /// </summary>
         public float AttackCooldown => AttackAbility.BaseCooldown;
 
+        /// <inheritdoc/>
+        public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        {
+            return roleBase is ZombieRole;
+        }
+
         /// <summary>
         /// Returns a <see langword="bool"/> indicating whether or not SCP-049-2 is close enough to a ragdoll to consume it.
         /// </summary>

@@ -10,6 +10,7 @@ namespace Exiled.API.Features.Roles
     using System.Collections.Generic;
     using System.Reflection;
 
+    using Exiled.API.Extensions;
     using Exiled.API.Features.Pools;
 
     using HarmonyLib;
@@ -24,9 +25,11 @@ namespace Exiled.API.Features.Roles
     /// <summary>
     /// Defines a role that represents an fpc class.
     /// </summary>
-    public abstract class FpcRole : Role
+    public abstract class FpcRole : Role, IAppearancedRole
     {
         private static FieldInfo enableFallDamageField;
+        private RoleTypeId fakeAppearance;
+        private Dictionary<Player, RoleTypeId> individualAppearances = DictionaryPool<Player, RoleTypeId>.Pool.Get();
         private bool isUsingStamina = true;
 
         /// <summary>
@@ -37,12 +40,18 @@ namespace Exiled.API.Features.Roles
             : base(baseRole)
         {
             FirstPersonController = baseRole;
+            fakeAppearance = baseRole.RoleTypeId;
+            individualAppearances = new();
         }
 
         /// <summary>
         /// Finalizes an instance of the <see cref="FpcRole"/> class.
         /// </summary>
-        ~FpcRole() => HashSetPool<Player>.Pool.Return(IsInvisibleFor);
+        ~FpcRole()
+        {
+            HashSetPool<Player>.Pool.Return(IsInvisibleFor);
+            DictionaryPool<Player, RoleTypeId>.Pool.Return(individualAppearances);
+        }
 
         /// <summary>
         /// Gets the <see cref="FirstPersonController"/>.
@@ -243,6 +252,12 @@ namespace Exiled.API.Features.Roles
             set => Owner.ReferenceHub.playerStats.GetModule<AdminFlagsStat>().SetFlag(AdminFlags.Noclip, value);
         }
 
+        /// <inheritdoc/>
+        public RoleTypeId GlobalAppearance => fakeAppearance;
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<Player, RoleTypeId> IndividualAppearances => individualAppearances;
+
         /// <summary>
         /// Resets the <see cref="Player"/>'s stamina.
         /// </summary>
@@ -256,6 +271,85 @@ namespace Exiled.API.Features.Roles
 
             StaminaUsageMultiplier = 1f;
             StaminaRegenMultiplier = 1f;
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetGlobalAppearance(RoleTypeId fakeRole, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                return false;
+            }
+
+            fakeAppearance = fakeRole;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetIndividualAppearance(Player player, RoleTypeId fakeRole, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                return false;
+            }
+
+            individualAppearances[player] = fakeRole;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public void ClearIndividualAppearances(bool update = true)
+        {
+            individualAppearances.Clear();
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        {
+            return roleBase is FpcStandardRoleBase;
+        }
+
+        /// <inheritdoc/>
+        public void ResetAppearance(bool update = true)
+        {
+            ClearIndividualAppearances(false);
+            fakeAppearance = Type;
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UpdateAppearance()
+        {
+            if (Owner != null)
+                Owner.RoleManager._sendNextFrame = true;
         }
     }
 }

@@ -12,6 +12,9 @@ namespace Exiled.API.Extensions
     using System.Linq;
 
     using Enums;
+
+    using Exiled.API.Features;
+    using Exiled.API.Features.Roles;
     using Exiled.API.Features.Spawn;
     using InventorySystem;
     using InventorySystem.Configs;
@@ -167,6 +170,19 @@ namespace Exiled.API.Extensions
             InventoryRoleInfo info = roleType.GetInventory();
 
             return info.Ammo.ToDictionary(kvp => kvp.Key.GetAmmoType(), kvp => kvp.Value);
+        }
+
+        /// <summary>
+        /// Gets a custom <see cref="IAppearancedRole"/> appearance for target <see cref="Player"/>, using <see cref="IAppearancedRole.GlobalAppearance"/> and <see cref="IAppearancedRole.IndividualAppearances"/>.
+        /// </summary>
+        /// <param name="appearancedRole"><see cref="IAppearancedRole"/>, the player role, whose appearance we want to get.</param>
+        /// <param name="player">Target <see cref="Player"/>.</param>
+        /// <returns>A valid <see cref="RoleTypeId"/>, what target <see cref="Player"/> will see.</returns>
+        public static RoleTypeId GetAppearanceForPlayer(this IAppearancedRole appearancedRole, Player player)
+        {
+            if (player == null || !appearancedRole.IndividualAppearances.TryGetValue(player, out RoleTypeId roleType))
+                return appearancedRole.GlobalAppearance;
+            return roleType;
         }
     }
 }

@@ -115,12 +115,6 @@ namespace Exiled.API.Features.Roles
         public float AttackCooldown => AttackAbility.BaseCooldown;
 
         /// <inheritdoc/>
-        public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
-        {
-            return roleBase is ZombieRole;
-        }
-
-        /// <inheritdoc/>
         public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
         {
             if (basicRole is ZombieRole basicZombieRole)

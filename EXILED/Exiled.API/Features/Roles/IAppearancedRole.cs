@@ -10,6 +10,8 @@ namespace Exiled.API.Features.Roles
     using System;
     using System.Collections.Generic;
 
+    using Mirror;
+
     using PlayerRoles;
 
     /// <summary>
@@ -57,6 +59,14 @@ namespace Exiled.API.Features.Roles
         /// <param name="roleBase">Target <see cref="PlayerRoleBase"/>, main class for target <see cref="RoleTypeId"/>.</param>
         /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> can be used as new appearance.</returns>
         public bool CheckAppearanceCompatibility(RoleTypeId fakeAppearance, PlayerRoleBase roleBase);
+
+        /// <summary>
+        /// Overrides change role sever message, to implement <see cref="IAppearancedRole"/>, using basic <see cref="PlayerRoleBase"/>.
+        /// </summary>
+        /// <param name="writer"><see cref="NetworkWriter"/> to write message.</param>
+        /// <param name="basicRole">Target <see cref="PlayerRoleBase"/>.</param>
+        /// <remarks>Not for public usage. Called on fake <see cref="IAppearancedRole"/> class, not on real <see cref="Role"/> class.</remarks>
+        void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole);
 
         /// <summary>
         /// Resets current appearance to a real player <see cref="RoleTypeId"/>.

@@ -7,6 +7,8 @@
 
 namespace Exiled.API.Features.Roles
 {
+    using Mirror;
+
     using PlayerRoles;
     using PlayerRoles.PlayableScps.HumeShield;
     using PlayerRoles.PlayableScps.Scp049;
@@ -116,6 +118,24 @@ namespace Exiled.API.Features.Roles
         public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
         {
             return roleBase is ZombieRole;
+        }
+
+        /// <inheritdoc/>
+        public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
+            if (basicRole is ZombieRole basicZombieRole)
+            {
+                writer.WriteUShort(basicZombieRole._syncMaxHealth);
+                writer.WriteBool(basicZombieRole._showConfirmationBox);
+            }
+            else
+            {
+                // Doesn't really affect anything
+                writer.WriteUShort(400);
+                writer.WriteBool(false);
+            }
+
+            base.SendAppearanceSpawnMessage(writer, basicRole);
         }
 
         /// <summary>

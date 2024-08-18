@@ -14,6 +14,9 @@ namespace Exiled.API.Features.Roles
     using Exiled.API.Features.Pools;
 
     using HarmonyLib;
+
+    using Mirror;
+
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
 
@@ -331,7 +334,16 @@ namespace Exiled.API.Features.Roles
         /// <inheritdoc/>
         public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
         {
-            return roleBase is FpcStandardRoleBase && roleBase is not PlayerRoles.HumanRole && roleBase is not PlayerRoles.PlayableScps.Scp049.Zombies.ZombieRole;
+            return roleBase is FpcStandardRoleBase;
+        }
+
+        /// <inheritdoc/>
+        public virtual void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
+            FpcStandardRoleBase fpcRole = (FpcStandardRoleBase)basicRole;
+            fpcRole.FpcModule.MouseLook.GetSyncValues(0, out ushort syncH, out ushort _);
+            writer.WriteRelativePosition(new RelativePosition(fpcRole._hubTransform.position));
+            writer.WriteUShort(syncH);
         }
 
         /// <inheritdoc/>

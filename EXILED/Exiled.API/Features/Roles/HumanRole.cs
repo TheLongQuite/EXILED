@@ -7,6 +7,8 @@
 
 namespace Exiled.API.Features.Roles
 {
+    using Mirror;
+
     using PlayerRoles;
 
     using Respawning;
@@ -66,9 +68,17 @@ namespace Exiled.API.Features.Roles
         public new HumanGameRole Base { get; }
 
         /// <inheritdoc/>
-        public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
         {
-            return roleBase is HumanGameRole;
+            if (basicRole is not HumanGameRole humanRole)
+            {
+                humanRole = Base;
+            }
+
+            if (humanRole.UsesUnitNames)
+                writer.WriteByte(humanRole.UnitNameId);
+
+            base.SendAppearanceSpawnMessage(writer, basicRole);
         }
 
         /// <summary>

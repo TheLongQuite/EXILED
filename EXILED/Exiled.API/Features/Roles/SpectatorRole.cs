@@ -12,6 +12,7 @@ namespace Exiled.API.Features.Roles
 
     using Exiled.API.Extensions;
     using Exiled.API.Features.Pools;
+    using Mirror;
 
     using PlayerRoles;
 
@@ -152,6 +153,11 @@ namespace Exiled.API.Features.Roles
         public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
         {
             return roleBase is SpectatorGameRole;
+        }
+
+        /// <inheritdoc/>
+        public virtual void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
         }
 
         /// <inheritdoc/>

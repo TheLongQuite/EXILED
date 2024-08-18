@@ -70,13 +70,8 @@ namespace Exiled.API.Features.Roles
         /// <inheritdoc/>
         public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
         {
-            if (basicRole is not HumanGameRole humanRole)
-            {
-                humanRole = Base;
-            }
-
-            if (humanRole.UsesUnitNames)
-                writer.WriteByte(humanRole.UnitNameId);
+            if (Base.UsesUnitNames)
+                writer.WriteByte(basicRole is HumanGameRole humanRole && humanRole.UsesUnitNames ? humanRole.UnitNameId : (byte)0);
 
             base.SendAppearanceSpawnMessage(writer, basicRole);
         }

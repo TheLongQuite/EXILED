@@ -71,7 +71,7 @@ namespace Exiled.Events.Patches.Generic
                     //     skip;
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.Role))),
-                    new(OpCodes.Isinst, role.LocalType),
+                    new(OpCodes.Isinst, typeof(IAppearancedRole)),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, role.LocalIndex),
                     new(OpCodes.Brfalse_S, skip),
@@ -123,7 +123,7 @@ namespace Exiled.Events.Patches.Generic
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
 
-        private void SendMessage(Role role, NetworkWriter writer, RoleTypeId appearance)
+        private static void SendMessage(Role role, NetworkWriter writer, RoleTypeId appearance)
         {
             IAppearancedRole appearancedRole = (IAppearancedRole)Role.Create(appearance.GetRoleBase());
             appearancedRole.SendAppearanceSpawnMessage(writer, role.Base);

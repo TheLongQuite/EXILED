@@ -331,7 +331,7 @@ namespace Exiled.API.Features.Roles
         /// <inheritdoc/>
         public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
         {
-            return roleBase is FpcStandardRoleBase;
+            return roleBase is FpcStandardRoleBase && roleBase is not PlayerRoles.HumanRole && roleBase is not PlayerRoles.PlayableScps.Scp049.Zombies.ZombieRole;
         }
 
         /// <inheritdoc/>

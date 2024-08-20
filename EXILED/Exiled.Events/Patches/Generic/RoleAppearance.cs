@@ -15,6 +15,7 @@ namespace Exiled.Events.Patches.Generic
     using Exiled.API.Extensions;
     using Exiled.API.Features.Pools;
     using Exiled.API.Features.Roles;
+    using Exiled.Events.EventArgs.Player;
 
     using HarmonyLib;
 
@@ -39,6 +40,7 @@ namespace Exiled.Events.Patches.Generic
             LocalBuilder role = generator.DeclareLocal(typeof(IAppearancedRole));
             LocalBuilder roleType = generator.DeclareLocal(typeof(RoleTypeId));
 
+            Label skipPlayer = generator.DefineLabel();
             Label skip = generator.DefineLabel();
             Label skip2 = generator.DefineLabel();
 
@@ -49,23 +51,23 @@ namespace Exiled.Events.Patches.Generic
                 index,
                 new[]
                 {
-                    // if (_targetNetId == _receiverNetId)
-                    //     skip;
-                    new CodeInstruction(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetNetId))),
-                    new CodeInstruction(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
-                    new(OpCodes.Beq_S, skip),
-
                     // Player player = Player.Get(_targetNetId);
                     // if (player == null)
                     //     skip;
-                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetNetId))),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(uint) })),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, player.LocalIndex),
-                    new(OpCodes.Brfalse_S, skip),
+                    new(OpCodes.Brfalse_S, skipPlayer),
+
+                    // if (_targetNetId == _receiverNetId)
+                    //     skip;
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetNetId))),
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
+                    new(OpCodes.Beq_S, skip),
 
                     // if (player.Role is not IAppearancedRole appearancedRole)
                     //     skip;
@@ -77,9 +79,9 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Brfalse_S, skip),
 
                     // roleType = appearance = appearancedRole.GetAppearanceForPlayer(Player.Get(this._receiverHub));
-                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldloc_S, role.LocalIndex),
-                    new CodeInstruction(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(uint) })),
                     new(OpCodes.Call, Method(typeof(RoleExtensions), nameof(RoleExtensions.GetAppearanceForPlayer))),
@@ -88,6 +90,19 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Stfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
 
                     new CodeInstruction(OpCodes.Nop).WithLabels(skip),
+
+                    // SendingRoleEventArgs ev = new(player, _receiverNetId, _targetRole);
+                    // Player.OnSendingRole(ev);
+                    new(OpCodes.Ldloc_S, player.LocalIndex),
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
+
+                    new(OpCodes.Newobj, GetDeclaredConstructors(typeof(SendingRoleEventArgs))[0]),
+                    new(OpCodes.Call, Method(typeof(Handlers.Player), nameof(Handlers.Player.OnSendingRole))),
+
+                    new CodeInstruction(OpCodes.Nop).WithLabels(skipPlayer),
                 });
 
             offset = -2;

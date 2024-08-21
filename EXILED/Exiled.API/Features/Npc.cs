@@ -145,7 +145,7 @@ namespace Exiled.API.Features
         /// <param name="position">The position to spawn the NPC.</param>
         /// <returns>The <see cref="Npc"/> spawned.</returns>
         public static Npc Spawn(string name, RoleTypeId role, Vector3? position = null) =>
-            Spawn(name, role, 0, "", position);
+            Spawn(name, role, 0, string.Empty, position);
 
         /// <summary>
         /// Spawns an NPC based on the given parameters.

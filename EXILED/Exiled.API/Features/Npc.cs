@@ -142,11 +142,10 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="name">The name of the NPC.</param>
         /// <param name="role">The RoleTypeId of the NPC.</param>
-        /// <param name="userId">The userID of the NPC.</param>
         /// <param name="position">The position to spawn the NPC.</param>
         /// <returns>The <see cref="Npc"/> spawned.</returns>
-        public static Npc Spawn(string name, RoleTypeId role, string userId = "", Vector3? position = null) =>
-            Spawn(name, role, 0, userId, position);
+        public static Npc Spawn(string name, RoleTypeId role, Vector3? position = null) =>
+            Spawn(name, role, 0, "", position);
 
         /// <summary>
         /// Spawns an NPC based on the given parameters.
@@ -177,6 +176,9 @@ namespace Exiled.API.Features
 
             npc.Id = id;
 
+            npc.ReferenceHub.nicknameSync.SetNick(name);
+            Dictionary.Add(newObject, npc);
+
             try
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
@@ -185,18 +187,6 @@ namespace Exiled.API.Features
             {
                 Log.Error(e);
             }
-
-            try
-            {
-                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
-            }
-            catch (Exception e)
-            {
-                Log.Error(e);
-            }
-
-            npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-            Dictionary.Add(newObject, npc);
 
             Timing.CallDelayed(
                 0.3f,

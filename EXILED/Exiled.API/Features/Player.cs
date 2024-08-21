@@ -1261,7 +1261,7 @@ namespace Exiled.API.Features
             if (UnverifiedPlayers.TryGetValue(gameObject, out player))
                 return player;
 
-            if (!Npc.Dictionary.ContainsKey(gameObject) && ReferenceHub.TryGetHub(gameObject, out ReferenceHub hub) && ReferenceHub.LocalHub != hub)
+            if (ReferenceHub.TryGetHub(gameObject, out ReferenceHub hub) && ReferenceHub.LocalHub != hub)
                 return new(hub);
 
             return null;

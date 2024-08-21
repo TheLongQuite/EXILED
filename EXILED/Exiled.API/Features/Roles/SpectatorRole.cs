@@ -177,5 +177,18 @@ namespace Exiled.API.Features.Roles
             if (Owner != null)
                 Owner.RoleManager._sendNextFrame = true;
         }
+
+        /// <inheritdoc/>
+        public void UpdateAppearanceFor(Player player)
+        {
+            RoleTypeId roleTypeId = Type;
+            if (Base is IObfuscatedRole obfuscatedRole)
+            {
+                roleTypeId = obfuscatedRole.GetRoleForUser(player.ReferenceHub);
+            }
+
+            player.Connection.Send(new RoleSyncInfo(Owner.ReferenceHub, roleTypeId, player.ReferenceHub));
+            Owner.RoleManager.PreviouslySentRole[player.NetId] = roleTypeId;
+        }
     }
 }

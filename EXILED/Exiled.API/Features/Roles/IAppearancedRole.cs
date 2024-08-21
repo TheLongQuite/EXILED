@@ -79,5 +79,11 @@ namespace Exiled.API.Features.Roles
         /// Updates current player visibility.
         /// </summary>
         public void UpdateAppearance();
+
+        /// <summary>
+        /// Updates current player visibility, for target <see cref="Player"/>.
+        /// </summary>
+        /// <param name="player">Target <see cref="Player"/>.</param>
+        public void UpdateAppearanceFor(Player player);
     }
 }

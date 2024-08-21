@@ -50,7 +50,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a list of all <see cref="Npc"/>'s on the server.
         /// </summary>
-        public static new IReadOnlyCollection<Player> List => Dictionary.Values;
+        public static new IReadOnlyCollection<Npc> List => Dictionary.Values;
 
         /// <summary>
         /// Gets or sets the player's position.

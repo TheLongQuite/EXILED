@@ -80,11 +80,13 @@ namespace Exiled.Events.Patches.Generic
 
                     // roleType = appearance = appearancedRole.GetAppearanceForPlayer(Player.Get(this._receiverHub));
                     new(OpCodes.Ldarg_0),
+
                     new(OpCodes.Ldloc_S, role.LocalIndex),
                     new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(uint) })),
                     new(OpCodes.Call, Method(typeof(RoleExtensions), nameof(RoleExtensions.GetAppearanceForPlayer))),
+
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, roleType.LocalIndex),
                     new(OpCodes.Stfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
@@ -93,6 +95,9 @@ namespace Exiled.Events.Patches.Generic
 
                     // SendingRoleEventArgs ev = new(player, _receiverNetId, _targetRole);
                     // Player.OnSendingRole(ev);
+                    // roleType = ev.RoleType;
+                    new(OpCodes.Ldarg_0),
+
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
@@ -100,7 +105,11 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
 
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(SendingRoleEventArgs))[0]),
+                    new(OpCodes.Dup),
                     new(OpCodes.Call, Method(typeof(Handlers.Player), nameof(Handlers.Player.OnSendingRole))),
+
+                    new(OpCodes.Callvirt, PropertyGetter(typeof(SendingRoleEventArgs), nameof(SendingRoleEventArgs.RoleType))),
+                    new(OpCodes.Stfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
 
                     new CodeInstruction(OpCodes.Nop).WithLabels(skipPlayer),
                 });

@@ -7,7 +7,9 @@
 
 namespace Exiled.Events.EventArgs.Player
 {
+    using Exiled.API.Extensions;
     using Exiled.API.Features;
+    using Exiled.API.Features.Roles;
     using Exiled.Events.EventArgs.Interfaces;
 
     using PlayerRoles;
@@ -17,6 +19,8 @@ namespace Exiled.Events.EventArgs.Player
     /// </summary>
     public class SendingRoleEventArgs : IPlayerEvent
     {
+        private RoleTypeId roleTypeId;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="SendingRoleEventArgs" /> class.
         /// </summary>
@@ -32,8 +36,9 @@ namespace Exiled.Events.EventArgs.Player
         public SendingRoleEventArgs(Player player, uint target, RoleTypeId roleType)
         {
             Player = player;
-            Target = Player.Get(target);
-            RoleType = roleType;
+            ReferenceHub.TryGetHubNetID(target, out ReferenceHub targetHub);
+            Target = targetHub;
+            roleTypeId = roleType;
         }
 
         /// <summary>
@@ -42,13 +47,27 @@ namespace Exiled.Events.EventArgs.Player
         public Player Player { get; }
 
         /// <summary>
-        /// gets the <see cref="API.Features.Player"/> to whom the request is sent.
+        /// gets the <see cref="ReferenceHub"/> to whom the request is sent.
         /// </summary>
-        public Player Target { get; }
+        public ReferenceHub Target { get; }
 
         /// <summary>
-        /// Gets the <see cref="RoleTypeId"/> that is sent to the <see cref="Target"/>.
+        /// Gets or sets the <see cref="RoleTypeId"/> that is sent to the <see cref="Target"/>.
         /// </summary>
-        public RoleTypeId RoleType { get; }
+        public RoleTypeId RoleType
+        {
+            get
+            {
+                return roleTypeId;
+            }
+
+            set
+            {
+                if (Player.Role is IAppearancedRole appearancedRole && RoleExtensions.TryGetRoleBase(value, out PlayerRoleBase roleBase) && appearancedRole.CheckAppearanceCompatibility(value, roleBase))
+                {
+                    roleTypeId = value;
+                }
+            }
+        }
     }
 }

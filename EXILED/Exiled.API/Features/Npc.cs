@@ -159,7 +159,7 @@ namespace Exiled.API.Features
             }
             catch (Exception e)
             {
-                Log.Debug($"Ignore: {e}");
+                Log.Error(e);
             }
 
             if (RecyclablePlayerId.FreeIds.Contains(id))

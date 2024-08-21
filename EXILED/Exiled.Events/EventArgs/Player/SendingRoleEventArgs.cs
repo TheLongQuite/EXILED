@@ -36,8 +36,7 @@ namespace Exiled.Events.EventArgs.Player
         public SendingRoleEventArgs(Player player, uint target, RoleTypeId roleType)
         {
             Player = player;
-            ReferenceHub.TryGetHubNetID(target, out ReferenceHub targetHub);
-            Target = targetHub;
+            Target = Player.Get(target);
             roleTypeId = roleType;
         }
 
@@ -47,9 +46,9 @@ namespace Exiled.Events.EventArgs.Player
         public Player Player { get; }
 
         /// <summary>
-        /// gets the <see cref="ReferenceHub"/> to whom the request is sent.
+        /// gets the <see cref="API.Features.Player"/> to whom the request is sent.
         /// </summary>
-        public ReferenceHub Target { get; }
+        public Player Target { get; }
 
         /// <summary>
         /// Gets or sets the <see cref="RoleTypeId"/> that is sent to the <see cref="Target"/>.

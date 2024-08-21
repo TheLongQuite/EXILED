@@ -13,7 +13,7 @@ namespace Exiled.Events.EventArgs.Player
     using PlayerRoles;
 
     /// <summary>
-    /// Contains all information before a player sends a message in AdminChat.
+    /// Contains all information before a <see cref="API.Features.Player"/>'s role is sent to a client.
     /// </summary>
     public class SendingRoleEventArgs : IPlayerEvent
     {

@@ -176,7 +176,6 @@ namespace Exiled.API.Features
 
             npc.Id = id;
 
-            npc.ReferenceHub.nicknameSync.SetNick(name);
             Dictionary.Add(newObject, npc);
 
             try
@@ -186,6 +185,14 @@ namespace Exiled.API.Features
             catch (Exception e)
             {
                 Log.Error(e);
+            }
+
+            try
+            {
+                npc.ReferenceHub.nicknameSync.SetNick(name);
+            }
+            catch
+            {
             }
 
             Timing.CallDelayed(

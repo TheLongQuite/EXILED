@@ -43,9 +43,14 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Gets a list of Npcs.
+        /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing all <see cref="Npc"/>'s on the server.
         /// </summary>
-        public static new List<Npc> List => Player.List.OfType<Npc>().ToList();
+        public static new Dictionary<GameObject, Npc> Dictionary { get; } = new(Server.MaxPlayerCount, new ReferenceHub.GameObjectComparer());
+
+        /// <summary>
+        /// Gets a list of all <see cref="Npc"/>'s on the server.
+        /// </summary>
+        public static new IReadOnlyCollection<Player> List => Dictionary.Values;
 
         /// <summary>
         /// Gets or sets the player's position.
@@ -198,8 +203,6 @@ namespace Exiled.API.Features
         public void Destroy()
         {
             NetworkConnectionToClient conn = ReferenceHub.connectionToClient;
-            if (ReferenceHub._playerId.Value <= RecyclablePlayerId._autoIncrement)
-                ReferenceHub._playerId.Destroy();
             ReferenceHub.OnDestroy();
             CustomNetworkManager.TypedSingleton.OnServerDisconnect(conn);
             Dictionary.Remove(GameObject);

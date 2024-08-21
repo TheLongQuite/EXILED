@@ -141,6 +141,17 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="name">The name of the NPC.</param>
         /// <param name="role">The RoleTypeId of the NPC.</param>
+        /// <param name="userId">The userID of the NPC.</param>
+        /// <param name="position">The position to spawn the NPC.</param>
+        /// <returns>The <see cref="Npc"/> spawned.</returns>
+        public static Npc Spawn(string name, RoleTypeId role, string userId = "", Vector3? position = null) =>
+            Spawn(name, role, 0, userId, position);
+
+        /// <summary>
+        /// Spawns an NPC based on the given parameters.
+        /// </summary>
+        /// <param name="name">The name of the NPC.</param>
+        /// <param name="role">The RoleTypeId of the NPC.</param>
         /// <param name="id">The player ID of the NPC.</param>
         /// <param name="userId">The userID of the NPC.</param>
         /// <param name="position">The position to spawn the NPC.</param>
@@ -153,6 +164,10 @@ namespace Exiled.API.Features
                 IsVerified = true,
                 IsNPC = true,
             };
+
+            FakeConnection fakeConnection = new(new RecyclablePlayerId(false).Value);
+            NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
+
             try
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
@@ -162,24 +177,13 @@ namespace Exiled.API.Features
                 Log.Error(e);
             }
 
-            if (RecyclablePlayerId.FreeIds.Contains(id))
-            {
-                RecyclablePlayerId.FreeIds.RemoveFromQueue(id);
-            }
-            else if (RecyclablePlayerId._autoIncrement >= id)
-            {
-                RecyclablePlayerId._autoIncrement = id = RecyclablePlayerId._autoIncrement + 1;
-            }
-
-            FakeConnection fakeConnection = new(id);
-            NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
             try
             {
                 npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
             }
             catch (Exception e)
             {
-                Log.Debug($"Ignore: {e}");
+                Log.Error($"Ignore: {e}");
             }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;

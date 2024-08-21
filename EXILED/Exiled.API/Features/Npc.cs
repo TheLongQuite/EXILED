@@ -11,6 +11,7 @@ namespace Exiled.API.Features
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     using CommandSystem;
     using Exiled.API.Enums;
@@ -165,8 +166,16 @@ namespace Exiled.API.Features
                 IsNPC = true,
             };
 
-            FakeConnection fakeConnection = new(new RecyclablePlayerId(false).Value);
+            if (!RecyclablePlayerId.FreeIds.Contains(id) && RecyclablePlayerId._autoIncrement >= id)
+            {
+                Log.Warn($"{Assembly.GetCallingAssembly().GetName().Name} tried to spawn an NPC with a duplicate PlayerID. Using auto-incremented ID instead to avoid issues..");
+                id = new RecyclablePlayerId(false).Value;
+            }
+
+            FakeConnection fakeConnection = new(id);
             NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
+
+            npc.Id = id;
 
             try
             {
@@ -183,7 +192,7 @@ namespace Exiled.API.Features
             }
             catch (Exception e)
             {
-                Log.Error($"Ignore: {e}");
+                Log.Error(e);
             }
 
             npc.ReferenceHub.nicknameSync.Network_myNickSync = name;

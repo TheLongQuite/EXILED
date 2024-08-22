@@ -165,7 +165,11 @@ namespace Exiled.API.Features
                 IsNPC = true,
             };
 
-            if (!RecyclablePlayerId.FreeIds.Contains(id) && RecyclablePlayerId._autoIncrement >= id)
+            if (id == 0)
+            {
+                id = new RecyclablePlayerId(false).Value;
+            }
+            else if (!RecyclablePlayerId.FreeIds.Contains(id) && RecyclablePlayerId._autoIncrement >= id)
             {
                 Log.Error($"{Assembly.GetCallingAssembly().GetName().Name} tried to spawn an NPC with a duplicate PlayerID. Using auto-incremented ID instead to avoid issues..");
                 id = new RecyclablePlayerId(false).Value;
@@ -181,7 +185,7 @@ namespace Exiled.API.Features
             try
             {
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
-                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
+                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy{id}@localhost" : userId;
             }
             catch (Exception e)
             {

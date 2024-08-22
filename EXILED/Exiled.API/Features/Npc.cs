@@ -186,15 +186,6 @@ namespace Exiled.API.Features
 
             try
             {
-                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy{id}@localhost" : userId;
-            }
-            catch (Exception e)
-            {
-                Log.Error(e);
-            }
-
-            try
-            {
                 npc.ReferenceHub.nicknameSync.SetNick(name);
             }
             catch (Exception e)

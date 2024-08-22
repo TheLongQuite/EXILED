@@ -1258,6 +1258,9 @@ namespace Exiled.API.Features
             if (Dictionary.TryGetValue(gameObject, out Player player))
                 return player;
 
+            if (Npc.Dictionary.TryGetValue(gameObject, out Npc npc))
+                return npc;
+
             if (UnverifiedPlayers.TryGetValue(gameObject, out player))
                 return player;
 

@@ -182,9 +182,10 @@ namespace Exiled.API.Features
 
             Dictionary.Add(newObject, npc);
 
+            npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
+
             try
             {
-                npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
                 npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy{id}@localhost" : userId;
             }
             catch (Exception e)
@@ -196,8 +197,9 @@ namespace Exiled.API.Features
             {
                 npc.ReferenceHub.nicknameSync.SetNick(name);
             }
-            catch
+            catch (Exception e)
             {
+                Log.Error(e);
             }
 
             Timing.CallDelayed(

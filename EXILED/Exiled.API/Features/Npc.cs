@@ -161,46 +161,29 @@ namespace Exiled.API.Features
             GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
             Npc npc = new(newObject)
             {
-                IsVerified = true,
                 IsNPC = true,
             };
 
-            if (id == 0)
-            {
-                id = new RecyclablePlayerId(false).Value;
-            }
-            else if (!RecyclablePlayerId.FreeIds.Contains(id) && RecyclablePlayerId._autoIncrement >= id)
-            {
-                Log.Error($"{Assembly.GetCallingAssembly().GetName().Name} tried to spawn an NPC with a duplicate PlayerID. Using auto-incremented ID instead to avoid issues..");
-                id = new RecyclablePlayerId(false).Value;
-            }
+            id = npc.Id;
 
             FakeConnection fakeConnection = new(id);
             NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
 
-            npc.Id = id;
-
-            Dictionary.Add(newObject, npc);
-
             npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
+            Dictionary.Add(newObject, npc);
 
             try
             {
+                npc.ReferenceHub.authManager._hub = npc.ReferenceHub;
                 npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy{id}@localhost" : userId;
             }
             catch (Exception e)
             {
-                Log.Error(e);
+                Log.Warn(e);
             }
 
-            try
-            {
-                npc.ReferenceHub.nicknameSync.SetNick(name);
-            }
-            catch (Exception e)
-            {
-                Log.Error(e);
-            }
+            npc.ReferenceHub.nicknameSync._hub = npc.ReferenceHub;
+            npc.ReferenceHub.nicknameSync.SetNick(name);
 
             Timing.CallDelayed(
                 0.3f,

@@ -180,8 +180,8 @@ namespace Exiled.API.Features
 
             try
             {
-                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
                 npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
+                npc.ReferenceHub.authManager.UserId = string.IsNullOrEmpty(userId) ? $"Dummy@localhost" : userId;
             }
             catch (Exception e)
             {

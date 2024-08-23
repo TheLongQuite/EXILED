@@ -1985,7 +1985,6 @@ namespace Exiled.API.Features
                     Inventory.NetworkCurItem = ItemIdentifier.None;
 
                 Inventory.UserInventory.Items.Remove(item.Serial);
-                typeof(InventoryExtensions).InvokeStaticEvent(nameof(InventoryExtensions.OnItemRemoved), new object[] { ReferenceHub, item.Base, null });
 
                 Inventory.SendItemsNextFrame = true;
             }

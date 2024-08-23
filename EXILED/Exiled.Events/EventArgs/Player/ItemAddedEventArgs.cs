@@ -7,6 +7,8 @@
 
 namespace Exiled.Events.EventArgs.Player
 {
+    using System.Diagnostics;
+
     using API.Features;
     using Exiled.API.Features.Items;
     using Exiled.API.Features.Pickups;
@@ -32,7 +34,7 @@ namespace Exiled.Events.EventArgs.Player
             Item = Item.Get(itemBase);
             Pickup = Pickup.Get(pickupBase);
             Log.Assert(Item != null, $"ItemAddedEventArgs ctor: Item is null! Base: '{itemBase}'");
-            Log.Assert(Player != null, $"ItemAddedEventArgs ctor: Player is null! Base: '{referenceHub}'");
+            Log.Assert(Player != null, $"ItemAddedEventArgs ctor: Player is null! Base: '{referenceHub} {new StackTrace()}'");
         }
 
         /// <summary>

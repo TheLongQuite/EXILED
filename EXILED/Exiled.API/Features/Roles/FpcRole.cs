@@ -28,11 +28,9 @@ namespace Exiled.API.Features.Roles
     /// <summary>
     /// Defines a role that represents an fpc class.
     /// </summary>
-    public abstract class FpcRole : Role, IAppearancedRole
+    public abstract class FpcRole : Role
     {
         private static FieldInfo enableFallDamageField;
-        private RoleTypeId fakeAppearance;
-        private Dictionary<Player, RoleTypeId> individualAppearances = DictionaryPool<Player, RoleTypeId>.Pool.Get();
         private bool isUsingStamina = true;
 
         /// <summary>
@@ -43,8 +41,6 @@ namespace Exiled.API.Features.Roles
             : base(baseRole)
         {
             FirstPersonController = baseRole;
-            fakeAppearance = baseRole.RoleTypeId;
-            individualAppearances = new();
         }
 
         /// <summary>
@@ -53,7 +49,6 @@ namespace Exiled.API.Features.Roles
         ~FpcRole()
         {
             HashSetPool<Player>.Pool.Return(IsInvisibleFor);
-            DictionaryPool<Player, RoleTypeId>.Pool.Return(individualAppearances);
         }
 
         /// <summary>
@@ -255,12 +250,6 @@ namespace Exiled.API.Features.Roles
             set => Owner.ReferenceHub.playerStats.GetModule<AdminFlagsStat>().SetFlag(AdminFlags.Noclip, value);
         }
 
-        /// <inheritdoc/>
-        public RoleTypeId GlobalAppearance => fakeAppearance;
-
-        /// <inheritdoc/>
-        public IReadOnlyDictionary<Player, RoleTypeId> IndividualAppearances => individualAppearances;
-
         /// <summary>
         /// Resets the <see cref="Player"/>'s stamina.
         /// </summary>
@@ -277,104 +266,18 @@ namespace Exiled.API.Features.Roles
         }
 
         /// <inheritdoc/>
-        public bool TrySetGlobalAppearance(RoleTypeId fakeRole, bool update = true)
-        {
-            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
-                return false;
-
-            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
-            {
-                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
-                return false;
-            }
-
-            fakeAppearance = fakeRole;
-
-            if (update)
-            {
-                UpdateAppearance();
-            }
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public bool TrySetIndividualAppearance(Player player, RoleTypeId fakeRole, bool update = true)
-        {
-            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
-                return false;
-
-            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
-            {
-                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
-                return false;
-            }
-
-            individualAppearances[player] = fakeRole;
-
-            if (update)
-            {
-                UpdateAppearance();
-            }
-
-            return true;
-        }
-
-        /// <inheritdoc/>
-        public void ClearIndividualAppearances(bool update = true)
-        {
-            individualAppearances.Clear();
-
-            if (update)
-            {
-                UpdateAppearance();
-            }
-        }
-
-        /// <inheritdoc/>
-        public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
         {
             return roleBase is FpcStandardRoleBase;
         }
 
         /// <inheritdoc/>
-        public virtual void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
         {
             FpcStandardRoleBase fpcRole = (FpcStandardRoleBase)basicRole;
             fpcRole.FpcModule.MouseLook.GetSyncValues(0, out ushort syncH, out ushort _);
             writer.WriteRelativePosition(new RelativePosition(fpcRole._hubTransform.position));
             writer.WriteUShort(syncH);
-        }
-
-        /// <inheritdoc/>
-        public void ResetAppearance(bool update = true)
-        {
-            ClearIndividualAppearances(false);
-            fakeAppearance = Type;
-            if (update)
-            {
-                UpdateAppearance();
-            }
-        }
-
-        /// <inheritdoc/>
-        public void UpdateAppearance()
-        {
-            if (Owner != null)
-                Owner.RoleManager._sendNextFrame = true;
-        }
-
-        /// <inheritdoc/>
-        public void UpdateAppearanceFor(Player player)
-        {
-            RoleTypeId roleTypeId = Type;
-            if (Base is IObfuscatedRole obfuscatedRole)
-            {
-                roleTypeId = obfuscatedRole.GetRoleForUser(player.ReferenceHub);
-            }
-
-            player.Connection.Send(new RoleSyncInfo(Owner.ReferenceHub, roleTypeId, player.ReferenceHub));
-            Owner.RoleManager.PreviouslySentRole[player.NetId] = roleTypeId;
         }
     }
 }

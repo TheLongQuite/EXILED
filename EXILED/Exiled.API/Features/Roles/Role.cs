@@ -8,14 +8,20 @@
 namespace Exiled.API.Features.Roles
 {
     using System;
+    using System.Collections.Generic;
 
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features.Core;
+    using Exiled.API.Features.Pools;
     using Exiled.API.Features.Spawn;
     using Exiled.API.Interfaces;
+    using Mirror;
+
     using PlayerRoles;
+    using PlayerRoles.FirstPersonControl;
     using PlayerRoles.PlayableScps.Scp049.Zombies;
+
     using UnityEngine;
 
     using FilmmakerGameRole = PlayerRoles.Filmmaker.FilmmakerRole;
@@ -34,8 +40,12 @@ namespace Exiled.API.Features.Roles
     /// <summary>
     /// Defines the class for role-related classes.
     /// </summary>
-    public abstract class Role : TypeCastObject<Role>, IWrapper<PlayerRoleBase>
+    public abstract class Role : TypeCastObject<Role>, IWrapper<PlayerRoleBase>, IAppearancedRole
     {
+        private RoleTypeId fakeAppearance;
+        private Dictionary<Player, RoleTypeId> individualAppearances = DictionaryPool<Player, RoleTypeId>.Pool.Get();
+        private Dictionary<Team, RoleTypeId> teamAppearances = DictionaryPool<Team, RoleTypeId>.Pool.Get();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Role"/> class.
         /// </summary>
@@ -46,6 +56,16 @@ namespace Exiled.API.Features.Roles
                 Owner = Player.Get(hub);
 
             Base = baseRole;
+            fakeAppearance = baseRole.RoleTypeId;
+        }
+
+        /// <summary>
+        /// Finalizes an instance of the <see cref="Role"/> class.
+        /// </summary>
+        ~Role()
+        {
+            DictionaryPool<Player, RoleTypeId>.Pool.Return(individualAppearances);
+            DictionaryPool<Team, RoleTypeId>.Pool.Return(teamAppearances);
         }
 
         /// <summary>
@@ -112,6 +132,15 @@ namespace Exiled.API.Features.Roles
         /// Gets a value indicating whether or not this role is still valid. This will only ever be <see langword="false"/> if the Role is stored and accessed at a later date.
         /// </summary>
         public bool IsValid => Owner != null && Owner.IsConnected && Base == Owner.RoleManager.CurrentRole;
+
+        /// <inheritdoc/>
+        public RoleTypeId GlobalAppearance => fakeAppearance;
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<Team, RoleTypeId> TeamAppearances => teamAppearances;
+
+        /// <inheritdoc/>
+        public IReadOnlyDictionary<Player, RoleTypeId> IndividualAppearances => individualAppearances;
 
         /// <summary>
         /// Gets a random spawn position of this role.
@@ -207,6 +236,149 @@ namespace Exiled.API.Features.Roles
         /// <param name="spawnFlags">The <see cref="RoleSpawnFlags"/> defining player spawn logic.</param>
         public virtual void Set(RoleTypeId newRole, SpawnReason reason, RoleSpawnFlags spawnFlags) =>
             Owner.RoleManager.ServerSetRole(newRole, (RoleChangeReason)reason, spawnFlags);
+
+        /// <inheritdoc/>
+        public bool TrySetGlobalAppearance(RoleTypeId fakeRole, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                return false;
+            }
+
+            fakeAppearance = fakeRole;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetTeamAppearance(Team team, RoleTypeId fakeAppearance, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeAppearance, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeAppearance, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeAppearance}");
+                return false;
+            }
+
+            teamAppearances[team] = fakeAppearance;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public bool TrySetIndividualAppearance(Player player, RoleTypeId fakeRole, bool update = true)
+        {
+            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
+                return false;
+
+            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            {
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                return false;
+            }
+
+            individualAppearances[player] = fakeRole;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+
+            return true;
+        }
+
+        /// <inheritdoc/>
+        public void ClearGlobalAppearance(bool update = true)
+        {
+            fakeAppearance = Type;
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void ClearTeamAppearances(bool update = true)
+        {
+            teamAppearances.Clear();
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void ClearIndividualAppearances(bool update = true)
+        {
+            individualAppearances.Clear();
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        {
+            return roleBase is not(FpcStandardRoleBase or NoneGameRole);
+        }
+
+        /// <inheritdoc/>
+        public virtual void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
+        }
+
+        /// <inheritdoc/>
+        public void ResetAppearance(bool update = true)
+        {
+            ClearGlobalAppearance(false);
+            ClearTeamAppearances(false);
+            ClearIndividualAppearances(false);
+
+            if (update)
+            {
+                UpdateAppearance();
+            }
+        }
+
+        /// <inheritdoc/>
+        public void UpdateAppearance()
+        {
+            if (Owner != null)
+                Owner.RoleManager._sendNextFrame = true;
+        }
+
+        /// <inheritdoc/>
+        public void UpdateAppearanceFor(Player player)
+        {
+            RoleTypeId roleTypeId = Type;
+            if (Base is IObfuscatedRole obfuscatedRole)
+            {
+                roleTypeId = obfuscatedRole.GetRoleForUser(player.ReferenceHub);
+            }
+
+            player.Connection.Send(new RoleSyncInfo(Owner.ReferenceHub, roleTypeId, player.ReferenceHub));
+            Owner.RoleManager.PreviouslySentRole[player.NetId] = roleTypeId;
+        }
 
         /// <summary>
         /// Creates a role from <see cref="RoleTypeId"/> and <see cref="Player"/>.

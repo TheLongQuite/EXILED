@@ -27,7 +27,7 @@ namespace Exiled.Events.Patches.Generic
     using static HarmonyLib.AccessTools;
 
     /// <summary>
-    /// Patches <see cref="RoleSyncInfo.Write(Mirror.NetworkWriter)"/> to implement <see cref="IAppearancedRole.GlobalAppearance"/>.
+    /// Patches <see cref="RoleSyncInfo.Write(Mirror.NetworkWriter)"/> to implement <see cref="IAppearancedRole"/>.
     /// </summary>
     [HarmonyPatch(typeof(RoleSyncInfo), nameof(RoleSyncInfo.Write))]
     internal class RoleAppearance
@@ -149,7 +149,8 @@ namespace Exiled.Events.Patches.Generic
 
         private static void SendMessage(Role role, NetworkWriter writer, RoleTypeId appearance)
         {
-            IAppearancedRole appearancedRole = (IAppearancedRole)Role.Create(appearance.GetRoleBase());
+            IAppearancedRole appearancedRole = role.Type == appearance ? role : Role.Create(appearance.GetRoleBase());
+
             appearancedRole.SendAppearanceSpawnMessage(writer, role.Base);
         }
     }

@@ -25,6 +25,11 @@ namespace Exiled.API.Features.Roles
         public RoleTypeId GlobalAppearance { get; }
 
         /// <summary>
+        /// Gets an overriden <see cref="RoleTypeId"/> appearance for specific <see cref="Team"/>'s.
+        /// </summary>
+        public IReadOnlyDictionary<Team, RoleTypeId> TeamAppearances { get; }
+
+        /// <summary>
         /// Gets an overriden <see cref="RoleTypeId"/> appearance for specific <see cref="Player"/>'s.
         /// </summary>
         public IReadOnlyDictionary<Player, RoleTypeId> IndividualAppearances { get; }
@@ -38,13 +43,34 @@ namespace Exiled.API.Features.Roles
         public bool TrySetGlobalAppearance(RoleTypeId fakeAppearance, bool update = true);
 
         /// <summary>
-        /// Try-set a new global appearance for current <see cref="IAppearancedRole"/>.
+        /// Try-set a new team appearance for current <see cref="IAppearancedRole"/>.
+        /// </summary>
+        /// <param name="team">Target <see cref="Team"/>.</param>
+        /// <param name="fakeAppearance">New <see cref="RoleTypeId"/>.</param>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> can be used as new appearance.</returns>
+        public bool TrySetTeamAppearance(Team team, RoleTypeId fakeAppearance, bool update = true);
+
+        /// <summary>
+        /// Try-set a new individual appearance for current <see cref="IAppearancedRole"/>.
         /// </summary>
         /// <param name="player">Target <see cref="Player"/>.</param>
         /// <param name="fakeAppearance">New <see cref="RoleTypeId"/>.</param>
         /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
         /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> can be used as new appearance.</returns>
         public bool TrySetIndividualAppearance(Player player, RoleTypeId fakeAppearance, bool update = true);
+
+        /// <summary>
+        /// resets <see cref="GlobalAppearance"/> to current <see cref="Role.Type"/>.
+        /// </summary>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        public void ClearGlobalAppearance(bool update = true);
+
+        /// <summary>
+        /// Clears all custom <see cref="TeamAppearances"/>.
+        /// </summary>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        public void ClearTeamAppearances(bool update = true);
 
         /// <summary>
         /// Clears all custom <see cref="IndividualAppearances"/>.

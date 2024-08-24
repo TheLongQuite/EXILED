@@ -10,10 +10,13 @@ namespace Exiled.API.Extensions
     using System;
     using System.Collections.Generic;
     using System.Collections.ObjectModel;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
     using System.Reflection.Emit;
     using System.Text;
+
+    using Exiled.API.Features.Roles;
 
     using Features;
     using Features.Pools;
@@ -256,50 +259,18 @@ namespace Exiled.API.Extensions
             if (!player.IsConnected || !RoleExtensions.TryGetRoleBase(type, out PlayerRoleBase roleBase))
                 return;
 
-            bool isRisky = type.GetTeam() is Team.Dead || player.IsDead;
+            Log.Error($"{nameof(ChangeAppearance)} Вызывал {new StackTrace()} [IRacle] проверь можно ли переписать на свои штуки");
 
-            NetworkWriterPooled writer = NetworkWriterPool.Get();
-            writer.WriteUShort(38952);
-            writer.WriteUInt(player.NetId);
-            writer.WriteRoleType(type);
-
-            if (roleBase is HumanRole humanRole && humanRole.UsesUnitNames)
+            if (player.Role is not IAppearancedRole appearancedRole || !appearancedRole.CheckAppearanceCompatibility(type, roleBase))
             {
-                if (player.Role.Base is not HumanRole)
-                    isRisky = true;
-                writer.WriteByte(unitId);
-            }
-
-            if (roleBase is FpcStandardRoleBase fpc)
-            {
-                if (player.Role.Base is not FpcStandardRoleBase playerfpc)
-                    isRisky = true;
-                else
-                    fpc = playerfpc;
-
-                ushort value = 0;
-                fpc?.FpcModule.MouseLook.GetSyncValues(0, out value, out ushort _);
-                writer.WriteRelativePosition(player.RelativePosition);
-                writer.WriteUShort(value);
-            }
-
-            if (roleBase is ZombieRole)
-            {
-                if (player.Role.Base is not ZombieRole)
-                    isRisky = true;
-
-                writer.WriteUShort((ushort)Mathf.Clamp(Mathf.CeilToInt(player.MaxHealth), ushort.MinValue, ushort.MaxValue));
+                Log.Error($"[IRacle] Кринжанули братки {player.Role.Type} {type}");
+                return;
             }
 
             foreach (Player target in playersToAffect)
             {
-                if (target != player || !isRisky)
-                    target.Connection.Send(writer.ToArraySegment());
-                else
-                    Log.Error($"Prevent Seld-Desync of {player.Nickname} with {type}");
+                player.Role.TrySetIndividualAppearance(target, type, false);
             }
-
-            NetworkWriterPool.Return(writer);
 
             // To counter a bug that makes the player invisible until they move after changing their appearance, we will teleport them upwards slightly to force a new position update for all clients.
             if (!skipJump)

@@ -86,6 +86,8 @@ namespace Exiled.Events.Handlers.Internal
 
             foreach (Player player in Player.List)
             {
+                if (player == ev.Player)
+                    return;
                 if (player.Role.TeamAppearances.ContainsKey(ev.Player.Role.Team) || player.Role.TeamAppearances.ContainsKey(ev.OldRole.Team))
                 {
                     player.Role.UpdateAppearanceFor(ev.Player);

@@ -203,7 +203,6 @@ namespace Exiled.API.Features
         public void Destroy()
         {
             NetworkConnectionToClient conn = ReferenceHub.connectionToClient;
-            ReferenceHub.OnDestroy();
             CustomNetworkManager.TypedSingleton.OnServerDisconnect(conn);
             Dictionary.Remove(GameObject);
             Object.Destroy(GameObject);

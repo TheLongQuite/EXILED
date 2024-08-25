@@ -114,24 +114,6 @@ namespace Exiled.API.Features.Roles
         /// </summary>
         public float AttackCooldown => AttackAbility.BaseCooldown;
 
-        /// <inheritdoc/>
-        public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
-        {
-            if (basicRole is ZombieRole basicZombieRole)
-            {
-                writer.WriteUShort(basicZombieRole._syncMaxHealth);
-                writer.WriteBool(basicZombieRole._showConfirmationBox);
-            }
-            else
-            {
-                // Doesn't really affect anything
-                writer.WriteUShort(400);
-                writer.WriteBool(false);
-            }
-
-            base.SendAppearanceSpawnMessage(writer, basicRole);
-        }
-
         /// <summary>
         /// Returns a <see langword="bool"/> indicating whether or not SCP-049-2 is close enough to a ragdoll to consume it.
         /// </summary>
@@ -147,5 +129,23 @@ namespace Exiled.API.Features.Roles
         /// <param name="ragdoll">The ragdoll to check.</param>
         /// <returns><see langword="true"/> if close enough to consume the body; otherwise, <see langword="false"/>.</returns>
         public bool IsInConsumeRange(Ragdoll ragdoll) => ragdoll is not null && IsInConsumeRange(ragdoll.Base);
+
+        /// <inheritdoc/>
+        internal override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
+            if (basicRole is ZombieRole basicZombieRole)
+            {
+                writer.WriteUShort(basicZombieRole._syncMaxHealth);
+                writer.WriteBool(basicZombieRole._showConfirmationBox);
+            }
+            else
+            {
+                // Doesn't really affect anything
+                writer.WriteUShort(400);
+                writer.WriteBool(false);
+            }
+
+            base.SendAppearanceSpawnMessage(writer, basicRole);
+        }
     }
 }

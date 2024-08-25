@@ -27,7 +27,7 @@ namespace Exiled.Events.Patches.Generic
     using static HarmonyLib.AccessTools;
 
     /// <summary>
-    /// Patches <see cref="RoleSyncInfo.Write(Mirror.NetworkWriter)"/> to implement <see cref="IAppearancedRole"/>.
+    /// Patches <see cref="RoleSyncInfo.Write(Mirror.NetworkWriter)"/> to implement <see cref="Role.GlobalAppearance"/>, <see cref="Role.TeamAppearances"/> and <see cref="Role.IndividualAppearances"/>.
     /// </summary>
     [HarmonyPatch(typeof(RoleSyncInfo), nameof(RoleSyncInfo.Write))]
     internal class RoleAppearance
@@ -37,10 +37,9 @@ namespace Exiled.Events.Patches.Generic
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(codeInstructions);
 
             LocalBuilder player = generator.DeclareLocal(typeof(Player));
-            LocalBuilder role = generator.DeclareLocal(typeof(IAppearancedRole));
-            LocalBuilder roleType = generator.DeclareLocal(typeof(RoleTypeId));
+            LocalBuilder role = generator.DeclareLocal(typeof(Role));
 
-            Label skipPlayer = generator.DefineLabel();
+            Label skipEvent = generator.DefineLabel();
             Label skip = generator.DefineLabel();
             Label skip2 = generator.DefineLabel();
 
@@ -59,7 +58,7 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(uint) })),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, player.LocalIndex),
-                    new(OpCodes.Brfalse_S, skipPlayer),
+                    new(OpCodes.Brfalse_S, skipEvent),
 
                     // if (_targetNetId == _receiverNetId)
                     //     skip;
@@ -67,18 +66,18 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetNetId))),
                     new(OpCodes.Ldarg_0),
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
-                    new(OpCodes.Beq_S, skip),
+                    new(OpCodes.Beq_S, skipEvent),
 
-                    // if (player.Role is not IAppearancedRole appearancedRole)
+                    // role = player.Role;
+                    // if (role == null)
                     //     skip;
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.Role))),
-                    new(OpCodes.Isinst, typeof(IAppearancedRole)),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, role.LocalIndex),
                     new(OpCodes.Brfalse_S, skip),
 
-                    // roleType = appearance = appearancedRole.GetAppearanceForPlayer(Player.Get(this._receiverHub));
+                    // _targetRole = role.GetAppearanceForPlayer(Player.Get(this._receiverHub));
                     new(OpCodes.Ldarg_0),
 
                     new(OpCodes.Ldloc_S, role.LocalIndex),
@@ -86,9 +85,6 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._receiverNetId))),
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(uint) })),
                     new(OpCodes.Call, Method(typeof(RoleExtensions), nameof(RoleExtensions.GetAppearanceForPlayer))),
-
-                    new(OpCodes.Dup),
-                    new(OpCodes.Stloc_S, roleType.LocalIndex),
                     new(OpCodes.Stfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
 
                     new CodeInstruction(OpCodes.Nop).WithLabels(skip),
@@ -111,7 +107,7 @@ namespace Exiled.Events.Patches.Generic
                     new(OpCodes.Callvirt, PropertyGetter(typeof(SendingRoleEventArgs), nameof(SendingRoleEventArgs.RoleType))),
                     new(OpCodes.Stfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
 
-                    new CodeInstruction(OpCodes.Nop).WithLabels(skipPlayer),
+                    new CodeInstruction(OpCodes.Nop).WithLabels(skipEvent),
                 });
 
             offset = -2;
@@ -123,17 +119,18 @@ namespace Exiled.Events.Patches.Generic
                 index,
                 new[]
                 {
-                    // if (appearancedRole == null)
+                    // if (role == null)
                     //     skip;
                     new CodeInstruction(OpCodes.Ldloc_S, role.LocalIndex),
                     new(OpCodes.Brfalse_S, skip2),
 
-                    // SendMessage(player.Role, writer, appearance)
+                    // SendMessage(player.Role, writer, _targetRole)
                     // skip original nw code;
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.Role))),
                     new(OpCodes.Ldarg_1),
-                    new(OpCodes.Ldloc_S, roleType.LocalIndex),
+                    new(OpCodes.Ldarg_0),
+                    new(OpCodes.Ldfld, Field(typeof(RoleSyncInfo), nameof(RoleSyncInfo._targetRole))),
 
                     new(OpCodes.Call, Method(typeof(RoleAppearance), nameof(RoleAppearance.SendMessage))),
                     new(OpCodes.Br_S, cnt),
@@ -149,7 +146,7 @@ namespace Exiled.Events.Patches.Generic
 
         private static void SendMessage(Role role, NetworkWriter writer, RoleTypeId appearance)
         {
-            IAppearancedRole appearancedRole = role.Type == appearance ? role : Role.Create(appearance.GetRoleBase());
+            Role appearancedRole = role.Type == appearance ? role : Role.Create(appearance.GetRoleBase());
 
             appearancedRole.SendAppearanceSpawnMessage(writer, role.Base);
         }

@@ -53,6 +53,7 @@ namespace Exiled.Events.EventArgs.Player
         /// <summary>
         /// Gets or sets the <see cref="RoleTypeId"/> that is sent to the <see cref="Target"/>.
         /// </summary>
+        /// <remarks>Checks value by player <see cref="Role.CheckAppearanceCompatibility(RoleTypeId)"/>.</remarks>
         public RoleTypeId RoleType
         {
             get
@@ -62,7 +63,7 @@ namespace Exiled.Events.EventArgs.Player
 
             set
             {
-                if (Player.Role is IAppearancedRole appearancedRole && RoleExtensions.TryGetRoleBase(value, out PlayerRoleBase roleBase) && appearancedRole.CheckAppearanceCompatibility(value, roleBase))
+                if (Player.Role.CheckAppearanceCompatibility(value))
                 {
                     roleTypeId = value;
                 }

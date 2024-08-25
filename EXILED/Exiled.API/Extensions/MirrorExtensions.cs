@@ -256,12 +256,12 @@ namespace Exiled.API.Extensions
         /// <param name="unitId">The UnitNameId to use for the player's new role, if the player's new role uses unit names. (is NTF).</param>
         public static void ChangeAppearance(this Player player, RoleTypeId type, IEnumerable<Player> playersToAffect, bool skipJump = false, byte unitId = 0)
         {
-            if (!player.IsConnected || !RoleExtensions.TryGetRoleBase(type, out PlayerRoleBase roleBase))
+            if (!player.IsConnected)
                 return;
 
             Log.Error($"{nameof(ChangeAppearance)} Вызывал {new StackTrace()} [IRacle] проверь можно ли переписать на свои штуки");
 
-            if (player.Role is not IAppearancedRole appearancedRole || !appearancedRole.CheckAppearanceCompatibility(type, roleBase))
+            if (!player.Role.CheckAppearanceCompatibility(type))
             {
                 Log.Error($"[IRacle] Кринжанули братки {player.Role.Type} {type}");
                 return;

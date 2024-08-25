@@ -266,13 +266,16 @@ namespace Exiled.API.Features.Roles
         }
 
         /// <inheritdoc/>
-        public override bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
+        internal override bool CheckAppearanceCompatibility(RoleTypeId newAppearance)
         {
+            if (!RoleExtensions.TryGetRoleBase(newAppearance, out PlayerRoleBase roleBase))
+                return false;
+
             return roleBase is FpcStandardRoleBase;
         }
 
         /// <inheritdoc/>
-        public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        internal override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
         {
             FpcStandardRoleBase fpcRole = (FpcStandardRoleBase)basicRole;
             fpcRole.FpcModule.MouseLook.GetSyncValues(0, out ushort syncH, out ushort _);

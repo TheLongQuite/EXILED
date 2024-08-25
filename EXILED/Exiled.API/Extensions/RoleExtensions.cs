@@ -173,29 +173,29 @@ namespace Exiled.API.Extensions
         }
 
         /// <summary>
-        /// Gets a custom <see cref="IAppearancedRole"/> appearance for target <see cref="Player"/>, using <see cref="IAppearancedRole.GlobalAppearance"/>, <see cref="IAppearancedRole.TeamAppearances"/> and <see cref="IAppearancedRole.IndividualAppearances"/>.
+        /// Gets a custom appearance for target <see cref="Player"/>, using <see cref="Role.GlobalAppearance"/>, <see cref="Role.TeamAppearances"/> and <see cref="Role.IndividualAppearances"/>.
         /// </summary>
-        /// <param name="appearancedRole"><see cref="IAppearancedRole"/>, the player role, whose appearance we want to get.</param>
+        /// <param name="role">The player ><see cref="Role"/>, whose appearance we want to get.</param>
         /// <param name="player">Target <see cref="Player"/>.</param>
         /// <returns>A valid <see cref="RoleTypeId"/>, what target <see cref="Player"/> will see.</returns>
-        public static RoleTypeId GetAppearanceForPlayer(this IAppearancedRole appearancedRole, Player player)
+        public static RoleTypeId GetAppearanceForPlayer(this Role role, Player player)
         {
-            RoleTypeId appearance = appearancedRole.GlobalAppearance;
+            RoleTypeId appearance = role.GlobalAppearance;
 
             if (player == null)
                 return appearance;
 
-            if (appearancedRole.TeamAppearances.TryGetValue(player.Role.Team, out appearance))
+            if (role.IndividualAppearances.TryGetValue(player, out appearance))
             {
                 return appearance;
             }
 
-            if (appearancedRole.IndividualAppearances.TryGetValue(player, out appearance))
+            if (role.TeamAppearances.TryGetValue(player.Role.Team, out appearance))
             {
                 return appearance;
             }
 
-            return appearancedRole.GlobalAppearance;
+            return role.GlobalAppearance;
         }
     }
 }

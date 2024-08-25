@@ -23,6 +23,7 @@ namespace Exiled.API.Features.Roles
     using PlayerRoles.PlayableScps.Scp049.Zombies;
 
     using UnityEngine;
+    using YamlDotNet.Core.Tokens;
 
     using FilmmakerGameRole = PlayerRoles.Filmmaker.FilmmakerRole;
     using HumanGameRole = PlayerRoles.HumanRole;
@@ -40,7 +41,7 @@ namespace Exiled.API.Features.Roles
     /// <summary>
     /// Defines the class for role-related classes.
     /// </summary>
-    public abstract class Role : TypeCastObject<Role>, IWrapper<PlayerRoleBase>, IAppearancedRole
+    public abstract class Role : TypeCastObject<Role>, IWrapper<PlayerRoleBase>
     {
         private RoleTypeId fakeAppearance;
         private Dictionary<Player, RoleTypeId> individualAppearances = DictionaryPool<Player, RoleTypeId>.Pool.Get();
@@ -133,13 +134,19 @@ namespace Exiled.API.Features.Roles
         /// </summary>
         public bool IsValid => Owner != null && Owner.IsConnected && Base == Owner.RoleManager.CurrentRole;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets an overriden global <see cref="RoleTypeId"/> appearance.
+        /// </summary>
         public RoleTypeId GlobalAppearance => fakeAppearance;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets an overriden <see cref="RoleTypeId"/> appearance for specific <see cref="Team"/>'s.
+        /// </summary>
         public IReadOnlyDictionary<Team, RoleTypeId> TeamAppearances => teamAppearances;
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Gets an overriden <see cref="RoleTypeId"/> appearance for specific <see cref="Player"/>'s.
+        /// </summary>
         public IReadOnlyDictionary<Player, RoleTypeId> IndividualAppearances => individualAppearances;
 
         /// <summary>
@@ -237,19 +244,21 @@ namespace Exiled.API.Features.Roles
         public virtual void Set(RoleTypeId newRole, SpawnReason reason, RoleSpawnFlags spawnFlags) =>
             Owner.RoleManager.ServerSetRole(newRole, (RoleChangeReason)reason, spawnFlags);
 
-        /// <inheritdoc/>
-        public bool TrySetGlobalAppearance(RoleTypeId fakeRole, bool update = true)
+        /// <summary>
+        /// Try-set a new global appearance for current <see cref="Role"/>.
+        /// </summary>
+        /// <param name="newAppearance">New global <see cref="RoleTypeId"/> appearance.</param>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> will be used as new appearance.</returns>
+        public bool TrySetGlobalAppearance(RoleTypeId newAppearance, bool update = true)
         {
-            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
-                return false;
-
-            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            if (!CheckAppearanceCompatibility(newAppearance))
             {
-                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {newAppearance}");
                 return false;
             }
 
-            fakeAppearance = fakeRole;
+            fakeAppearance = newAppearance;
 
             if (update)
             {
@@ -259,19 +268,22 @@ namespace Exiled.API.Features.Roles
             return true;
         }
 
-        /// <inheritdoc/>
-        public bool TrySetTeamAppearance(Team team, RoleTypeId fakeAppearance, bool update = true)
+        /// <summary>
+        /// Try-set a new team appearance for current <see cref="Role"/>.
+        /// </summary>
+        /// <param name="team">Target <see cref="Team"/>.</param>
+        /// <param name="newAppearance">New team specific <see cref="RoleTypeId"/> appearance.</param>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> will be used as new appearance.</returns>
+        public bool TrySetTeamAppearance(Team team, RoleTypeId newAppearance, bool update = true)
         {
-            if (!RoleExtensions.TryGetRoleBase(fakeAppearance, out PlayerRoleBase roleBase))
-                return false;
-
-            if (!CheckAppearanceCompatibility(fakeAppearance, roleBase))
+            if (!CheckAppearanceCompatibility(newAppearance))
             {
-                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeAppearance}");
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {newAppearance}");
                 return false;
             }
 
-            teamAppearances[team] = fakeAppearance;
+            teamAppearances[team] = newAppearance;
 
             if (update)
             {
@@ -281,19 +293,22 @@ namespace Exiled.API.Features.Roles
             return true;
         }
 
-        /// <inheritdoc/>
-        public bool TrySetIndividualAppearance(Player player, RoleTypeId fakeRole, bool update = true)
+        /// <summary>
+        /// Try-set a new individual appearance for current <see cref="Role"/>.
+        /// </summary>
+        /// <param name="player">Target <see cref="Player"/>.</param>
+        /// <param name="newAppearance">New individual <see cref="RoleTypeId"/> appearance.</param>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> will be used as new appearance.</returns>
+        public bool TrySetIndividualAppearance(Player player, RoleTypeId newAppearance, bool update = true)
         {
-            if (!RoleExtensions.TryGetRoleBase(fakeRole, out PlayerRoleBase roleBase))
-                return false;
-
-            if (!CheckAppearanceCompatibility(fakeRole, roleBase))
+            if (!CheckAppearanceCompatibility(newAppearance))
             {
-                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {fakeRole}");
+                Log.Error($"Prevent Seld-Desync of {Owner.Nickname} ({Type}) with {newAppearance}");
                 return false;
             }
 
-            individualAppearances[player] = fakeRole;
+            individualAppearances[player] = newAppearance;
 
             if (update)
             {
@@ -303,7 +318,10 @@ namespace Exiled.API.Features.Roles
             return true;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// resets <see cref="GlobalAppearance"/> to current <see cref="Role.Type"/>.
+        /// </summary>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
         public void ClearGlobalAppearance(bool update = true)
         {
             fakeAppearance = Type;
@@ -314,7 +332,10 @@ namespace Exiled.API.Features.Roles
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Clears all custom <see cref="TeamAppearances"/>.
+        /// </summary>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
         public void ClearTeamAppearances(bool update = true)
         {
             teamAppearances.Clear();
@@ -325,7 +346,10 @@ namespace Exiled.API.Features.Roles
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Clears all custom <see cref="IndividualAppearances"/>.
+        /// </summary>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
         public void ClearIndividualAppearances(bool update = true)
         {
             individualAppearances.Clear();
@@ -336,18 +360,11 @@ namespace Exiled.API.Features.Roles
             }
         }
 
-        /// <inheritdoc/>
-        public virtual bool CheckAppearanceCompatibility(RoleTypeId fakeRole, PlayerRoleBase roleBase)
-        {
-            return roleBase is not(FpcStandardRoleBase or NoneGameRole);
-        }
-
-        /// <inheritdoc/>
-        public virtual void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
-        {
-        }
-
-        /// <inheritdoc/>
+        /// <summary>
+        /// Resets current appearance to a real player <see cref="RoleTypeId"/>.
+        /// </summary>
+        /// <param name="update">Whether or not the change-role requect should sent imidiately.</param>
+        /// <remarks>Clears <see cref="IndividualAppearances"/>, <see cref="TeamAppearances"/> and <see cref="GlobalAppearance"/>.</remarks>
         public void ResetAppearance(bool update = true)
         {
             ClearGlobalAppearance(false);
@@ -360,14 +377,19 @@ namespace Exiled.API.Features.Roles
             }
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Updates current player appearance.
+        /// </summary>
         public void UpdateAppearance()
         {
             if (Owner != null)
                 Owner.RoleManager._sendNextFrame = true;
         }
 
-        /// <inheritdoc/>
+        /// <summary>
+        /// Updates current player visibility, for target <see cref="Player"/>.
+        /// </summary>
+        /// <param name="player">Target <see cref="Player"/>.</param>
         public void UpdateAppearanceFor(Player player)
         {
             RoleTypeId roleTypeId = Type;
@@ -402,5 +424,28 @@ namespace Exiled.API.Features.Roles
             NoneGameRole => new NoneRole(role),
             _ => null,
         };
+
+        /// <summary>
+        /// Overrides change role sever message, to implement fake appearance, using basic <see cref="PlayerRoleBase"/>.
+        /// </summary>
+        /// <param name="writer"><see cref="NetworkWriter"/> to write message.</param>
+        /// <param name="basicRole">Original (not fake) <see cref="PlayerRoleBase"/>.</param>
+        /// <remarks>Not for public usage. Called on fake <see cref="Role"/> class, not on real <see cref="Role"/> class.</remarks>
+        internal virtual void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
+        }
+
+        /// <summary>
+        /// Checks compatibility for target <see cref="RoleTypeId"/> appearance using <see cref="PlayerRoleBase"/>.
+        /// </summary>
+        /// <param name="newAppearance">New <see cref="RoleTypeId"/>.</param>
+        /// <returns>A boolean indicating whether or not a target <see cref="RoleTypeId"/> can be used as new appearance.</returns>
+        internal virtual bool CheckAppearanceCompatibility(RoleTypeId newAppearance)
+        {
+            if (!RoleExtensions.TryGetRoleBase(newAppearance, out PlayerRoleBase roleBase))
+                return false;
+
+            return roleBase is not(FpcStandardRoleBase or NoneGameRole);
+        }
     }
 }

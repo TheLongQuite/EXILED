@@ -67,20 +67,20 @@ namespace Exiled.API.Features.Roles
         /// </summary>
         public new HumanGameRole Base { get; }
 
-        /// <inheritdoc/>
-        public override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
-        {
-            if (UsesUnitNames)
-                writer.WriteByte(basicRole is HumanGameRole humanRole && humanRole.UsesUnitNames ? humanRole.UnitNameId : (byte)0);
-
-            base.SendAppearanceSpawnMessage(writer, basicRole);
-        }
-
         /// <summary>
         /// Gets the <see cref="HumanRole"/> armor efficacy based on a specific <see cref="HitboxType"/> and the armor the <see cref="Role.Owner"/> is wearing.
         /// </summary>
         /// <param name="hitbox">The <see cref="HitboxType"/>.</param>
         /// <returns>The armor efficacy.</returns>
         public int GetArmorEfficacy(HitboxType hitbox) => Base.GetArmorEfficacy(hitbox);
+
+        /// <inheritdoc/>
+        internal override void SendAppearanceSpawnMessage(NetworkWriter writer, PlayerRoleBase basicRole)
+        {
+            if (UsesUnitNames)
+                writer.WriteByte(basicRole is HumanGameRole humanRole && humanRole.UsesUnitNames ? humanRole.UnitNameId : (byte)0);
+
+            base.SendAppearanceSpawnMessage(writer, basicRole);
+        }
     }
 }

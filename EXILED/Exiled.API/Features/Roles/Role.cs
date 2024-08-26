@@ -312,7 +312,7 @@ namespace Exiled.API.Features.Roles
 
             if (update)
             {
-                UpdateAppearance();
+                UpdateAppearanceFor(player);
             }
 
             return true;

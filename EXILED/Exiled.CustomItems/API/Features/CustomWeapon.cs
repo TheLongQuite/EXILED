@@ -150,43 +150,10 @@ namespace Exiled.CustomItems.API.Features
         public bool AllowDoubleShot { get; set; } = false;
 
         /// <inheritdoc />
-        public override Pickup? Spawn(Vector3 position, Player? previousOwner = null)
+        public override Item CreateItem()
         {
-            if (Item.Create(Type) is not Firearm firearm)
-            {
-                Log.Debug($"{nameof(Spawn)}: Item is not Firearm.");
-                return null;
-            }
+            Item item = base.CreateItem();
 
-            if (!Attachments.IsEmpty())
-                firearm.AddAttachment(Attachments);
-
-            if (firearm.Type != ItemType.GunShotgun)
-            {
-                firearm.Ammo = ClipSize;
-                firearm.MaxAmmo = ClipSize;
-            }
-
-            Pickup? pickup = firearm.CreatePickup(position);
-
-            if (pickup is null)
-            {
-                Log.Debug($"{nameof(Spawn)}: Pickup is null.");
-                return null;
-            }
-
-            pickup.Weight = Weight < 0 ? pickup.Weight : Weight;
-            pickup.Scale = Scale;
-            if (previousOwner is not null)
-                pickup.PreviousOwner = previousOwner;
-
-            TrackedSerials.Add(pickup.Serial);
-            return pickup;
-        }
-
-        /// <inheritdoc />
-        public override Pickup? Spawn(Vector3 position, Item item, Player? previousOwner = null)
-        {
             if (item is Firearm firearm)
             {
                 if (!Attachments.IsEmpty())
@@ -197,44 +164,9 @@ namespace Exiled.CustomItems.API.Features
                     firearm.Ammo = ClipSize;
                     firearm.MaxAmmo = ClipSize;
                 }
-
-                Log.Debug($"{nameof(Name)}.{nameof(Spawn)}: Spawning weapon with {firearm.Ammo} ammo.");
-
-                Pickup pickup = firearm.CreatePickup(position);
-                pickup.Scale = Scale;
-
-                if (previousOwner is not null)
-                    pickup.PreviousOwner = previousOwner;
-
-                TrackedSerials.Add(pickup.Serial);
-                return pickup;
             }
 
-            return base.Spawn(position, item, previousOwner);
-        }
-
-        /// <inheritdoc />
-        public override void Give(Player player, Item item, bool displayMessage = true)
-        {
-            item.Scale = Scale;
-
-            if (item is Firearm firearm)
-            {
-                if (!Attachments.IsEmpty())
-                    firearm.AddAttachment(Attachments);
-                if (firearm.Type != ItemType.GunShotgun)
-                {
-                    firearm.Ammo = ClipSize;
-                    firearm.MaxAmmo = ClipSize;
-                }
-            }
-
-            player.AddItem(item);
-
-            Log.Debug($"{nameof(Give)}: Adding {item.Serial} to tracker.");
-            TrackedSerials.Add(item.Serial);
-
-            OnAcquired(player, item, displayMessage);
+            return item;
         }
 
         /// <inheritdoc />

@@ -10,6 +10,7 @@ namespace Exiled.CustomItems.API.Features
     using System;
     using System.Collections;
     using System.Collections.Generic;
+    using System.Diagnostics;
     using System.Linq;
     using System.Reflection;
 
@@ -543,6 +544,18 @@ namespace Exiled.CustomItems.API.Features
         public static IEnumerable<CustomItem> UnregisterItems(IEnumerable<CustomItem> targetItems, bool isIgnored = false) => UnregisterItems(targetItems.Select(x => x.GetType()), isIgnored);
 
         /// <summary>
+        /// Creates a new current <see cref="CustomItem"/> <see cref="Item"/> instance.
+        /// </summary>
+        /// <returns>A created <see cref="Item"/>.</returns>
+        public virtual Item CreateItem()
+        {
+            Item item = Item.Create(Type);
+            item.Scale = Scale;
+            TrackedSerials.Add(item.Serial);
+            return item;
+        }
+
+        /// <summary>
         /// Spawns the <see cref="CustomItem"/> in a specific location.
         /// </summary>
         /// <param name="x">The x coordinate.</param>
@@ -550,16 +563,6 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="z">The z coordinate.</param>
         /// <returns>The <see cref="Pickup"/> wrapper of the spawned <see cref="CustomItem"/>.</returns>
         public virtual Pickup? Spawn(float x, float y, float z) => Spawn(new Vector3(x, y, z));
-
-        /// <summary>
-        /// Spawns a <see cref="Item"/> as a <see cref="CustomItem"/> in a specific location.
-        /// </summary>
-        /// <param name="x">The x coordinate.</param>
-        /// <param name="y">The y coordinate.</param>
-        /// <param name="z">The z coordinate.</param>
-        /// <param name="item">The <see cref="Item"/> to be spawned as a <see cref="CustomItem"/>.</param>
-        /// <returns>The <see cref="Pickup"/> wrapper of the spawned <see cref="CustomItem"/>.</returns>
-        public virtual Pickup? Spawn(float x, float y, float z, Item item) => Spawn(new Vector3(x, y, z), item);
 
         /// <summary>
         /// Spawns the <see cref="CustomItem"/> where a specific <see cref="Player"/> is, and optionally sets the previous owner.
@@ -570,39 +573,18 @@ namespace Exiled.CustomItems.API.Features
         public virtual Pickup? Spawn(Player player, Player? previousOwner = null) => Spawn(player.Position, previousOwner);
 
         /// <summary>
-        /// Spawns a <see cref="Item"/> as a <see cref="CustomItem"/> where a specific <see cref="Player"/> is, and optionally sets the previous owner.
-        /// </summary>
-        /// <param name="player">The <see cref="Player"/> position where the <see cref="CustomItem"/> will be spawned.</param>
-        /// <param name="item">The <see cref="Item"/> to be spawned as a <see cref="CustomItem"/>.</param>
-        /// <param name="previousOwner">The previous owner of the pickup, can be null.</param>
-        /// <returns>The <see cref="Pickup"/> of the spawned <see cref="CustomItem"/>.</returns>
-        public virtual Pickup? Spawn(Player player, Item item, Player? previousOwner = null) => Spawn(player.Position, item, previousOwner);
-
-        /// <summary>
         /// Spawns the <see cref="CustomItem"/> in a specific position.
         /// </summary>
         /// <param name="position">The <see cref="Vector3"/> where the <see cref="CustomItem"/> will be spawned.</param>
         /// <param name="previousOwner">The <see cref="Pickup.PreviousOwner"/> of the item. Can be null.</param>
         /// <returns>The <see cref="Pickup"/> of the spawned <see cref="CustomItem"/>.</returns>
-        public virtual Pickup? Spawn(Vector3 position, Player? previousOwner = null) => Spawn(position, Item.Create(Type), previousOwner);
-
-        /// <summary>
-        /// Spawns the <see cref="CustomItem"/> in a specific position.
-        /// </summary>
-        /// <param name="position">The <see cref="Vector3"/> where the <see cref="CustomItem"/> will be spawned.</param>
-        /// <param name="item">The <see cref="Item"/> to be spawned as a <see cref="CustomItem"/>.</param>
-        /// <param name="previousOwner">The <see cref="Pickup.PreviousOwner"/> of the item. Can be null.</param>
-        /// <returns>The <see cref="Pickup"/> of the spawned <see cref="CustomItem"/>.</returns>
-        public virtual Pickup? Spawn(Vector3 position, Item item, Player? previousOwner = null)
+        public virtual Pickup? Spawn(Vector3 position, Player? previousOwner = null)
         {
+            Item item = CreateItem();
             Pickup? pickup = item.CreatePickup(position);
-            pickup.Scale = Scale;
-            pickup.Weight = Weight < 0 ? pickup.Weight : Weight;
 
             if (previousOwner is not null)
                 pickup.PreviousOwner = previousOwner;
-
-            TrackedSerials.Add(pickup.Serial);
 
             return pickup;
         }
@@ -728,12 +710,6 @@ namespace Exiled.CustomItems.API.Features
 
                 player.AddItem(item);
 
-                item.Scale = Scale;
-
-                Log.Debug($"{nameof(Give)}: Adding {item.Serial} to tracker.");
-                if (!TrackedSerials.Contains(item.Serial))
-                    TrackedSerials.Add(item.Serial);
-
                 Timing.CallDelayed(0.05f, () => OnAcquired(player, item, displayMessage));
             }
             catch (Exception e)
@@ -743,19 +719,11 @@ namespace Exiled.CustomItems.API.Features
         }
 
         /// <summary>
-        /// Gives a <see cref="ItemPickupBase"/> as a <see cref="CustomItem"/> to a <see cref="Player"/>.
-        /// </summary>
-        /// <param name="player">The <see cref="Player"/> who will receive the item.</param>
-        /// <param name="pickup">The <see cref="ItemPickupBase"/> to be given.</param>
-        /// <param name="displayMessage">Indicates whether or not <see cref="ShowPickedUpMessage"/> will be called when the player receives the item.</param>
-        public virtual void Give(Player player, Pickup pickup, bool displayMessage = true) => Give(player, player.AddItem(pickup), displayMessage);
-
-        /// <summary>
         /// Gives the <see cref="CustomItem"/> to a player.
         /// </summary>
         /// <param name="player">The <see cref="Player"/> who will receive the item.</param>
         /// <param name="displayMessage">Indicates whether or not <see cref="ShowPickedUpMessage"/> will be called when the player receives the item.</param>
-        public virtual void Give(Player player, bool displayMessage = true) => Give(player, Item.Create(Type), displayMessage);
+        public virtual void Give(Player player, bool displayMessage = true) => Give(player, CreateItem(), displayMessage);
 
         /// <summary>
         /// Called when the item is registered.

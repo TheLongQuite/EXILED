@@ -63,17 +63,21 @@ namespace Exiled.CustomItems.API.Features
         public abstract float FuseTime { get; set; }
 
         /// <summary>
-        ///     Throw the CustomGrenade object.
+        /// Spawns activated <see cref="CustomGrenade"/> object.
         /// </summary>
-        /// <param name="position">The <see cref="Vector3" />position to throw at.</param>
-        /// <param name="force">The amount of force to throw with.</param>
-        /// <param name="weight">The <see cref="float" />Weight of the Grenade.</param>
-        /// <param name="fuseTime">The <see cref="float" />FuseTime of the grenade.</param>
-        /// <param name="grenadeType">The <see cref="ItemType" />of the grenade to spawn.</param>
+        /// <param name="position">The <see cref="Vector3"/> position to spawn at.</param>
         /// <param name="player">The <see cref="Player" /> to count as the thrower of the grenade.</param>
-        /// <returns>The <see cref="Pickup" /> spawned.</returns>
-        public virtual Pickup Throw(Vector3 position, float force, float weight, float fuseTime = 3f, ItemType grenadeType = ItemType.GrenadeHE, Player? player = null)
+        /// <returns>The <see cref="Pickup"/> spawned.</returns>
+        public virtual Projectile Throw(Vector3 position, Player? player = null)
         {
+
+            Projectile projectile = ((Throwable)CreateItem()).CreateProjectile(position);
+
+            if (player != null && player != Server.Host)
+            {
+
+            }
+            projectile.PreviousOwner = pla;
             if (player is null)
                 player = Server.Host;
 

@@ -115,28 +115,14 @@ namespace Exiled.API.Features.Items
 #if DEBUG
             Log.Debug($"Spawning active grenade: {FuseTime}");
 #endif
-            ItemPickupBase ipb = Object.Instantiate(Projectile.Base, position, Quaternion.identity);
 
-            ipb.Info = new PickupSyncInfo(Type, Weight, ItemSerialGenerator.GenerateNext());
+            Projectile projectile = CreateProjectile(position, Quaternion.identity);
 
-            ExplosionGrenadeProjectile grenade = Pickup.Get<ExplosionGrenadeProjectile>(ipb);
+            projectile.PreviousOwner = owner ?? Server.Host;
 
-            grenade.Base.gameObject.SetActive(true);
+            projectile.Activate();
 
-            grenade.MaxRadius = MaxRadius;
-            grenade.ScpDamageMultiplier = ScpDamageMultiplier;
-            grenade.BurnDuration = BurnDuration;
-            grenade.DeafenDuration = DeafenDuration;
-            grenade.ConcussDuration = ConcussDuration;
-            grenade.FuseTime = FuseTime;
-
-            grenade.PreviousOwner = owner ?? Server.Host;
-
-            grenade.Spawn();
-
-            grenade.Base.ServerActivate();
-
-            return grenade;
+            return (ExplosionGrenadeProjectile)projectile;
         }
 
         /// <summary>

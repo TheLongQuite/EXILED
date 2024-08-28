@@ -11,13 +11,9 @@ namespace Exiled.API.Features.Items
     using Exiled.API.Features.Pickups;
     using Exiled.API.Features.Pickups.Projectiles;
 
-    using InventorySystem.Items;
-    using InventorySystem.Items.Pickups;
     using InventorySystem.Items.ThrowableProjectiles;
 
     using UnityEngine;
-
-    using Object = UnityEngine.Object;
 
     /// <summary>
     /// A wrapper class for <see cref="FlashbangGrenade"/>.
@@ -96,26 +92,14 @@ namespace Exiled.API.Features.Items
 #if DEBUG
             Log.Debug($"Spawning active grenade: {FuseTime}");
 #endif
-            ItemPickupBase ipb = Object.Instantiate(Projectile.Base, position, Quaternion.identity);
 
-            ipb.Info = new PickupSyncInfo(Type, Weight, ItemSerialGenerator.GenerateNext());
+            Projectile projectile = CreateProjectile(position, Quaternion.identity);
 
-            FlashbangProjectile grenade = Pickup.Get<FlashbangProjectile>(ipb);
+            projectile.PreviousOwner = owner ?? Server.Host;
 
-            grenade.Base.gameObject.SetActive(true);
+            projectile.Activate();
 
-            grenade.MinimalDurationEffect = MinimalDurationEffect;
-            grenade.AdditionalBlindedEffect = AdditionalBlindedEffect;
-            grenade.SurfaceDistanceIntensifier = SurfaceDistanceIntensifier;
-            grenade.FuseTime = FuseTime;
-
-            grenade.PreviousOwner = owner ?? Server.Host;
-
-            grenade.Spawn();
-
-            grenade.Base.ServerActivate();
-
-            return grenade;
+            return (FlashbangProjectile)projectile;
         }
 
         /// <summary>

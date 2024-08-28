@@ -7,10 +7,8 @@
 
 namespace Exiled.API.Features.Items
 {
-    using Exiled.API.Features.Pickups;
+    using Exiled.API.Features.Pickups.Projectiles;
 
-    using InventorySystem.Items;
-    using InventorySystem.Items.Pickups;
     using InventorySystem.Items.ThrowableProjectiles;
 
     using UnityEngine;
@@ -67,23 +65,14 @@ namespace Exiled.API.Features.Items
 #if DEBUG
             Log.Debug($"Spawning active grenade: {FuseTime}");
 #endif
-            ItemPickupBase ipb = Object.Instantiate(Projectile.Base, position, Quaternion.identity);
 
-            ipb.Info = new PickupSyncInfo(Type, Weight, ItemSerialGenerator.GenerateNext());
+            Projectile projectile = CreateProjectile(position, Quaternion.identity);
 
-            Scp2176Projectile grenade = Pickup.Get<Scp2176Projectile>(ipb);
+            projectile.PreviousOwner = owner ?? Server.Host;
 
-            grenade.Base.gameObject.SetActive(true);
+            projectile.Activate();
 
-            grenade.FuseTime = FuseTime;
-
-            grenade.PreviousOwner = owner ?? Server.Host;
-
-            grenade.Spawn();
-
-            grenade.Base.ServerActivate();
-
-            return grenade;
+            return (Scp2176Projectile)projectile;
         }
 
         /// <summary>

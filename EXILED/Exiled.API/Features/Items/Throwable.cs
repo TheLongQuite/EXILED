@@ -11,6 +11,7 @@ namespace Exiled.API.Features.Items
     using Exiled.API.Features.Pickups.Projectiles;
     using Exiled.API.Interfaces;
 
+    using InventorySystem.Items.Pickups;
     using InventorySystem.Items.ThrowableProjectiles;
 
     using UnityEngine;
@@ -90,6 +91,30 @@ namespace Exiled.API.Features.Items
             ThrowableItem.ProjectileSettings settings = fullForce ? Base.FullThrowSettings : Base.WeakThrowSettings;
 
             Base.ServerThrow(settings.StartVelocity, settings.UpwardsFactor, settings.StartTorque, ThrowableNetworkHandler.GetLimitedVelocity(Owner?.Velocity ?? Vector3.one));
+        }
+
+        /// <summary>
+        /// Creates the <see cref="Pickups.Projectiles.Projectile"/> that based on this <see cref="Item"/>.
+        /// </summary>
+        /// <param name="position">The location to spawn the item.</param>
+        /// <param name="rotation">The rotation of the item.</param>
+        /// <param name="spawn">Whether the <see cref="Pickups.Projectiles.Projectile"/> should be initially spawned.</param>
+        /// <returns>The created <see cref="Pickups.Projectiles.Projectile"/>.</returns>
+        /// <remarks><see cref="Pickups.Projectiles.Projectile"/> wont be activated, use <see cref="Projectile.Activate"/> to activate spawned <see cref="Pickups.Projectiles.Projectile"/>.</remarks>
+        public virtual Projectile CreateProjectile(Vector3 position, Quaternion rotation = default, bool spawn = true)
+        {
+            ThrownProjectile ipb = Object.Instantiate(Projectile.Base, position, rotation);
+
+            ipb.Info = new PickupSyncInfo(Type, Weight, Serial);
+
+            Projectile projectile = Pickup.Get<Projectile>(ipb);
+
+            projectile.PreviousOwner = Owner;
+
+            if (spawn)
+                projectile.Spawn();
+
+            return projectile;
         }
 
         /// <summary>

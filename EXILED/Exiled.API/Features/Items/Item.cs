@@ -348,9 +348,6 @@ namespace Exiled.API.Features.Items
 
             Pickup pickup = Pickup.Get(ipb);
 
-            if (Owner != Server.Host)
-                pickup.PreviousOwner = Owner;
-
             if (spawn)
                 pickup.Spawn();
 

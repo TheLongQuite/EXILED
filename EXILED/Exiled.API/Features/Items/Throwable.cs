@@ -109,8 +109,6 @@ namespace Exiled.API.Features.Items
 
             Projectile projectile = Pickup.Get<Projectile>(ipb);
 
-            projectile.PreviousOwner = Owner;
-
             if (spawn)
                 projectile.Spawn();
 

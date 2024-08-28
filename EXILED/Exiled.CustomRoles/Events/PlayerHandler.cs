@@ -20,6 +20,8 @@ namespace Exiled.CustomRoles.Events
 
     using MEC;
 
+    using PlayerRoles;
+
     /// <summary>
     ///     Event Handlers for the CustomRole API.
     /// </summary>
@@ -33,39 +35,32 @@ namespace Exiled.CustomRoles.Events
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole" />
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {
+            if (ev.Reason is SpawnReason.Destroyed or SpawnReason.None)
+                return;
+
             if (ev.Player.TryGetCustomRole(out CustomRole customRole))
                 ev.Player.SessionVariables[LastCustomRoleKey] = customRole;
             else
                 ev.Player.SessionVariables.Remove(LastCustomRoleKey);
+        }
 
-            if (ev.Reason == SpawnReason.Destroyed)
-                return;
-
-            Timing.CallDelayed(CustomRoles.Instance!.Config.CustomRolesSpectatorDisplayDelay, () =>
+        /// <inheritdoc cref="Exiled.Events.Handlers.Player.SendingRole" />
+        public void OnSendingRole(SendingRoleEventArgs ev)
+        {
+            if (ev.RoleType is RoleTypeId.Spectator or RoleTypeId.Overwatch)
             {
-                if (ev.Player.IsDead)
-                {
-                    Log.Debug("Player is now a spectrator. Sending data of CustomRoles...");
-                    foreach (Player? player in Player.List)
-                    {
-                        if (!player.TryGetCustomRole(out CustomRole role))
-                            continue;
-                        ev.Player.SetDispayNicknameForTargetOnly(player, role.GetSpectatorText(player));
-                        Log.Debug($"[Name sync] Sent name of {player.Nickname} to {ev.Player.Nickname}");
-                    }
-                }
-                else
-                {
-                    Log.Debug("Player is a regular player. Sending real data of names");
-                    foreach (Player? player in Player.List)
-                    {
-                        if (player.TryGetCustomRole(out _))
-                            continue;
-                        Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {player.Nickname}.");
-                        ev.Player.SetDispayNicknameForTargetOnly(player, player.CustomName);
-                    }
-                }
-            });
+                if (!ev.Player.TryGetCustomRole(out CustomRole role))
+                    return;
+                ev.Target.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
+                Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {ev.Target.Nickname}");
+            }
+            else if (ev.RoleType is not RoleTypeId.None)
+            {
+                if (ev.Player.TryGetCustomRole(out CustomRole role))
+                    return;
+                Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
+                ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
+            }
         }
     }
 }

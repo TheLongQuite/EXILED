@@ -38,6 +38,7 @@ namespace Exiled.CustomRoles
             playerHandler = new PlayerHandler();
 
             Player.ChangingRole += playerHandler.OnChangingRole;
+            Player.SendingRole += playerHandler.OnSendingRole;
 
             base.OnEnabled();
         }
@@ -46,6 +47,7 @@ namespace Exiled.CustomRoles
         public override void OnDisabled()
         {
             Player.ChangingRole -= playerHandler.OnChangingRole;
+            Player.SendingRole -= playerHandler.OnSendingRole;
 
             Instance = null;
             base.OnDisabled();

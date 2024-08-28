@@ -62,6 +62,19 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         public abstract float FuseTime { get; set; }
 
+        /// <inheritdoc/>
+        public override Item CreateItem()
+        {
+            Item item = base.CreateItem();
+
+            if (item is Throwable throwable && throwable.Projectile is TimeGrenadeProjectile timeProjectile)
+            {
+                timeProjectile.FuseTime = FuseTime;
+            }
+
+            return item;
+        }
+
         /// <summary>
         /// Spawns activated <see cref="CustomGrenade"/> object.
         /// </summary>
@@ -70,42 +83,10 @@ namespace Exiled.CustomItems.API.Features
         /// <returns>The <see cref="Pickup"/> spawned.</returns>
         public virtual Projectile Throw(Vector3 position, Player? player = null)
         {
-
             Projectile projectile = ((Throwable)CreateItem()).CreateProjectile(position);
-
-            if (player != null && player != Server.Host)
-            {
-
-            }
-            projectile.PreviousOwner = pla;
-            if (player is null)
-                player = Server.Host;
-
-            player.Role.Is(out FpcRole fpcRole);
-            Vector3 velocity = fpcRole.FirstPersonController.FpcModule.Motor.Velocity;
-
-            Throwable throwable = (Throwable)Item.Create(grenadeType, player);
-
-            ThrownProjectile thrownProjectile = Object.Instantiate(throwable.Base.Projectile, position, throwable.Owner.CameraTransform.rotation);
-
-            PickupSyncInfo newInfo = new()
-            {
-                ItemId = throwable.Type,
-                Locked = !throwable.Base._repickupable,
-                Serial = ItemSerialGenerator.GenerateNext(),
-                WeightKg = weight,
-            };
-            if (thrownProjectile is TimeGrenade time)
-                time._fuseTime = fuseTime;
-            thrownProjectile.NetworkInfo = newInfo;
-            thrownProjectile.PreviousOwner = new Footprint(throwable.Owner.ReferenceHub);
-            NetworkServer.Spawn(thrownProjectile.gameObject);
-            thrownProjectile.InfoReceivedHook(default, newInfo);
-            if (thrownProjectile.TryGetComponent(out Rigidbody component))
-                throwable.Base.PropelBody(component, throwable.Base.FullThrowSettings.StartTorque, ThrowableNetworkHandler.GetLimitedVelocity(velocity), force, throwable.Base.FullThrowSettings.UpwardsFactor);
-            thrownProjectile.ServerActivate();
-
-            return Pickup.Get(thrownProjectile);
+            projectile.PreviousOwner = player;
+            projectile.Activate();
+            return projectile;
         }
 
         /// <summary>
@@ -187,20 +168,17 @@ namespace Exiled.CustomItems.API.Features
             OnThrownProjectile(ev);
             Log.Debug($"{ev.Player.Nickname} has thrown a {Name} ({FuseTime}) {ev.Player.Items.ToString(true)}!");
 
-            if (ev.Projectile is TimeGrenadeProjectile timeGrenade)
-                timeGrenade.FuseTime = FuseTime;
-
             if (ExplodeOnCollision)
             {
                 ev.Projectile.GameObject.AttachActionOnCollision(
                     () =>
-                {
-                    if (ev.Projectile is TimeGrenadeProjectile grenadeProjectile)
                     {
-                        grenadeProjectile.FuseTime = 0.1f;
-                        ev.Projectile.PreviousOwner?.RemoveItem(ev.Projectile.Serial); // фикс наличия предмета в инвентаре на момент смерти от него же
-                    }
-                }, Server.Host,
+                        if (ev.Projectile is TimeGrenadeProjectile grenadeProjectile)
+                        {
+                            grenadeProjectile.FuseTime = 0.1f;
+                        }
+                    },
+                    ev.Projectile.PreviousOwner ?? Server.Host,
                     ExplodeOnCollisionFuseTime);
             }
         }
@@ -219,14 +197,22 @@ namespace Exiled.CustomItems.API.Features
             if (!Check(ev.Pickup))
                 return;
 
-            if (ev.Projectile is TimeGrenadeProjectile timedGrenade)
-                timedGrenade.FuseTime = FuseTime;
-
             OnChangedIntoGrenade(ev);
             Log.Debug($"A {Name} ChangedIntoGrenade");
 
             if (ExplodeOnCollision)
-                ev.Projectile.GameObject.AttachActionOnCollision(() => ((EffectGrenade)ev.Projectile.Base).TargetTime = 0.1f, ev.Pickup.PreviousOwner ?? Server.Host, ExplodeOnCollisionFuseTime);
+            {
+                ev.Projectile.GameObject.AttachActionOnCollision(
+                    () =>
+                    {
+                        if (ev.Projectile is TimeGrenadeProjectile grenadeProjectile)
+                        {
+                            grenadeProjectile.FuseTime = 0.1f;
+                        }
+                    },
+                    ev.Projectile.PreviousOwner ?? Server.Host,
+                    ExplodeOnCollisionFuseTime);
+            }
         }
     }
 }

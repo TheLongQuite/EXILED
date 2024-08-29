@@ -58,7 +58,7 @@ namespace Exiled.CustomItems.API.Features
         /// <inheritdoc/>
         public override Item CreateItem()
         {
-            Armor armor = (Armor)Item.Create(Type);
+            Armor armor = (Armor)base.CreateItem();
 
             armor.Weight = Weight < 0 ? armor.Weight : Weight;
             armor.StaminaUseMultiplier = StaminaUseMultiplier;

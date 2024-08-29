@@ -50,7 +50,7 @@ namespace Exiled.CustomRoles.Events
             if (ev.Target == null)
                 return;
 
-            if (!ev.Player.TryGetCustomRole(out CustomRole role))
+            if (ev.Player.TryGetCustomRole(out CustomRole role))
             {
                 ev.Target.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
                 Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {ev.Target.Nickname}");

@@ -47,7 +47,7 @@ namespace Exiled.CustomRoles.Events
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.SendingRole" />
         public void OnSendingRole(SendingRoleEventArgs ev)
         {
-            if (ev.Target != null)
+            if (ev.Target == null)
                 return;
 
             if (ev.RoleType is RoleTypeId.Spectator or RoleTypeId.Overwatch)

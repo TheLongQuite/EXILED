@@ -50,20 +50,15 @@ namespace Exiled.CustomRoles.Events
             if (ev.Target == null)
                 return;
 
-            if (ev.Target.IsDead && ev.Player.IsAlive)
+            if (!ev.Player.TryGetCustomRole(out CustomRole role))
             {
-                if (!ev.Player.TryGetCustomRole(out CustomRole role))
-                    return;
                 ev.Target.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
                 Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {ev.Target.Nickname}");
+                return;
             }
-            else if (ev.Target.Role.Type is not RoleTypeId.None)
-            {
-                if (ev.Player.TryGetCustomRole(out CustomRole role))
-                    return;
-                Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
-                ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
-            }
+
+            Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
+            ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
         }
     }
 }

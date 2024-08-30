@@ -33,6 +33,12 @@ namespace Exiled.CustomRoles.Events
         /// </summary>
         public const string LastCustomRoleKey = "LastCustomRole";
 
+        /// <inheritdoc cref="Exiled.Events.Handlers.Server.WaitingForPlayers" />
+        public void OnWaitingForPlayers()
+        {
+            Extensions.InternalPlayerToCustomRoles.Clear();
+        }
+
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangingRole" />
         public void OnChangingRole(ChangingRoleEventArgs ev)
         {

@@ -11,6 +11,7 @@ namespace Exiled.CustomRoles
     using Exiled.API.Features;
 
     using Player = Exiled.Events.Handlers.Player;
+    using Server = Exiled.Events.Handlers.Server;
 
     /// <summary>
     ///     Handles all custom role API functions.
@@ -37,6 +38,8 @@ namespace Exiled.CustomRoles
             Instance = this;
             playerHandler = new PlayerHandler();
 
+            Server.WaitingForPlayers += playerHandler.OnWaitingForPlayers;
+
             Player.ChangingRole += playerHandler.OnChangingRole;
             Player.SendingRole += playerHandler.OnSendingRole;
             Player.ChangedNickname += playerHandler.OnChangedNickname;
@@ -47,6 +50,8 @@ namespace Exiled.CustomRoles
         /// <inheritdoc />
         public override void OnDisabled()
         {
+            Server.WaitingForPlayers -= playerHandler.OnWaitingForPlayers;
+
             Player.ChangingRole -= playerHandler.OnChangingRole;
             Player.SendingRole -= playerHandler.OnSendingRole;
             Player.ChangedNickname -= playerHandler.OnChangedNickname;

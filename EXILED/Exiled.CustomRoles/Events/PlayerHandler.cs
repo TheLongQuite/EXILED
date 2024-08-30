@@ -14,6 +14,7 @@ namespace Exiled.CustomRoles.Events
 
     using Exiled.API.Enums;
     using Exiled.API.Features;
+    using Exiled.API.Features.Roles;
     using Exiled.Events.EventArgs.Player;
 
     using FLXLib.Extensions;
@@ -50,30 +51,40 @@ namespace Exiled.CustomRoles.Events
             if (ev.Target == null)
                 return;
 
-            if (ev.Target.IsDead && ev.Player.TryGetCustomRole(out CustomRole role))
+            if (ev.Player.IsDead && ev.Target.TryGetCustomRole(out CustomRole role))
+            {
+                ev.Player.SetDispayNicknameForTargetOnly(ev.Target, role.GetSpectatorText(ev.Target));
+                Log.Debug($"[Name sync] Sent name of {ev.Target.Nickname} to {ev.Player.Nickname}");
+            }
+            else if (ev.Target.IsDead && ev.Player.TryGetCustomRole(out role))
             {
                 ev.Target.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
                 Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {ev.Target.Nickname}");
-                return;
             }
-
-            Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
-            ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
+            else
+            {
+                Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
+                ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
+            }
         }
 
         /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangedNickname" />
         public void OnChangedNickname(ChangedNicknameEventArgs ev)
         {
-            if (ev.Player.TryGetCustomRole(out CustomRole role))
+            Timing.CallDelayed(0.1f, () =>
             {
-                foreach (Player player in Player.List)
+                if (ev.Player is { IsConnected: true } && ev.Player.TryGetCustomRole(out CustomRole role))
                 {
-                    if (!player.IsDead)
-                        continue;
-                    player.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
-                    Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {player.Nickname}");
+                    foreach (Player player in Player.List)
+                    {
+                        if (!player.IsDead)
+                            continue;
+
+                        player.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
+                        Log.Debug($"[Name sync] [{nameof(OnChangedNickname)}] Sent name of {ev.Player.Nickname} to {player.Nickname}");
+                    }
                 }
-            }
+            });
         }
     }
 }

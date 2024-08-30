@@ -21,6 +21,16 @@ namespace Exiled.CustomRoles.API
     public static class Extensions
     {
         /// <summary>
+        /// Gets a <see cref="IReadOnlyDictionary{TKey, TValue}"/> of all players that have custom role.
+        /// </summary>
+        public static IReadOnlyDictionary<Player, CustomRole> PlayerToCustomRoles => InternalPlayerToCustomRoles;
+
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey, TValue}"/> of all players that have custom role.
+        /// </summary>
+        internal static Dictionary<Player, CustomRole> InternalPlayerToCustomRoles { get; } = new();
+
+        /// <summary>
         ///     Gets a <see cref="ReadOnlyCollection{T}" /> of the player's current custom roles.
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to check for roles.</param>
@@ -30,10 +40,9 @@ namespace Exiled.CustomRoles.API
         {
             List<CustomRole> roles = new();
 
-            foreach (CustomRole customRole in CustomRole.Registered)
+            if (TryGetCustomRole(player, out CustomRole role))
             {
-                if (customRole.Check(player))
-                    roles.Add(customRole);
+                roles.Add(role);
             }
 
             return roles.AsReadOnly();
@@ -46,14 +55,8 @@ namespace Exiled.CustomRoles.API
         /// <returns>A target <see cref="CustomRole"/> (can be null).</returns>
         public static CustomRole? GetCustomRole(this Player player)
         {
-            foreach (CustomRole customRole in CustomRole.Registered)
-            {
-                if (customRole.Check(player))
-                {
-                    return customRole;
-                }
-            }
-
+            if (player != null && PlayerToCustomRoles.TryGetValue(player, out CustomRole? role))
+                return role;
             return null;
         }
 
@@ -87,13 +90,8 @@ namespace Exiled.CustomRoles.API
         public static T? GetCustomRole<T>(this Player player)
             where T : CustomRole
         {
-            foreach (T customRole in CustomRole.GetMany<T>())
-            {
-                if (customRole.Check(player))
-                {
-                    return customRole;
-                }
-            }
+            if (player != null && PlayerToCustomRoles.TryGetValue(player, out CustomRole? role) && role is T typedRole)
+                return typedRole;
 
             return null;
         }

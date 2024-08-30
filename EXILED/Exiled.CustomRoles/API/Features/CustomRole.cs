@@ -653,6 +653,7 @@ namespace Exiled.CustomRoles.API.Features
             }
 
             TrackedPlayers.Add(player);
+            Extensions.InternalPlayerToCustomRoles.Add(player, this);
             ShowMessage(player);
             RoleAdded(player);
             player.UniqueRole = Name;
@@ -678,6 +679,7 @@ namespace Exiled.CustomRoles.API.Features
             if (!TrackedPlayers.Contains(player))
                 return;
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
+            Extensions.InternalPlayerToCustomRoles.Remove(player);
             TrackedPlayers.Remove(player);
             player.CustomInfo = string.Empty;
             player.InfoArea |= PlayerInfoArea.Role;
@@ -705,6 +707,7 @@ namespace Exiled.CustomRoles.API.Features
             if (!TrackedPlayers.Contains(player))
                 return;
             Log.Debug($"{Name}: Removing role from {player.Nickname}");
+            Extensions.InternalPlayerToCustomRoles.Remove(player);
             TrackedPlayers.Remove(player);
             if (CustomAbilities is not null)
             {

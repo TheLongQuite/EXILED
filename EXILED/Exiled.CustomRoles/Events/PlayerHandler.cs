@@ -50,7 +50,7 @@ namespace Exiled.CustomRoles.Events
             if (ev.Target == null)
                 return;
 
-            if (ev.Player.TryGetCustomRole(out CustomRole role))
+            if (ev.Target.IsDead && ev.Player.TryGetCustomRole(out CustomRole role))
             {
                 ev.Target.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
                 Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {ev.Target.Nickname}");
@@ -59,6 +59,21 @@ namespace Exiled.CustomRoles.Events
 
             Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
             ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
+        }
+
+        /// <inheritdoc cref="Exiled.Events.Handlers.Player.ChangedNickname" />
+        public void OnChangedNickname(ChangedNicknameEventArgs ev)
+        {
+            if (ev.Player.TryGetCustomRole(out CustomRole role))
+            {
+                foreach (Player player in Player.List)
+                {
+                    if (!player.IsDead)
+                        continue;
+                    player.SetDispayNicknameForTargetOnly(ev.Player, role.GetSpectatorText(ev.Player));
+                    Log.Debug($"[Name sync] Sent name of {ev.Player.Nickname} to {player.Nickname}");
+                }
+            }
         }
     }
 }

@@ -39,6 +39,7 @@ namespace Exiled.CustomRoles
 
             Player.ChangingRole += playerHandler.OnChangingRole;
             Player.SendingRole += playerHandler.OnSendingRole;
+            Player.ChangedNickname += playerHandler.OnChangedNickname;
 
             base.OnEnabled();
         }
@@ -48,6 +49,7 @@ namespace Exiled.CustomRoles
         {
             Player.ChangingRole -= playerHandler.OnChangingRole;
             Player.SendingRole -= playerHandler.OnSendingRole;
+            Player.ChangedNickname -= playerHandler.OnChangedNickname;
 
             Instance = null;
             base.OnDisabled();

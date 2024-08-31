@@ -42,8 +42,8 @@ namespace Exiled.Events.Patches.Fixes
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            const int offset = -2;
-            int index = newInstructions.FindLastIndex(i => i.Calls(Method(typeof(NetworkServer), nameof(NetworkServer.Spawn), new[] { typeof(GameObject), typeof(NetworkConnection) }))) + offset;
+            const int offset = -1;
+            int index = newInstructions.FindLastIndex(i => i.Calls(PropertyGetter(typeof(ItemBase), nameof(ItemBase.Owner)))) + offset;
 
             // if (Item.Get(this) is not Throwable throwable)
             // {
@@ -60,7 +60,7 @@ namespace Exiled.Events.Patches.Fixes
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Call, GetDeclaredMethods(typeof(Item)).First(x => !x.IsGenericMethod && x.Name is nameof(Item.Get) && x.GetParameters().Length is 1 && x.GetParameters()[0].ParameterType == typeof(ItemBase))),
                 new(OpCodes.Castclass, typeof(Throwable)),
-                new(OpCodes.Callvirt, PropertyGetter(typeof(Projectile), nameof(Projectile.ReadThrowableItemInfo))),
+                new(OpCodes.Callvirt, Method(typeof(Projectile), nameof(Projectile.ReadThrowableItemInfo))),
             });
 
             for (int z = 0; z < newInstructions.Count; z++)

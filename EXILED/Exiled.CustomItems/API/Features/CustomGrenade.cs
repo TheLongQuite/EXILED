@@ -67,9 +67,9 @@ namespace Exiled.CustomItems.API.Features
         {
             Item item = base.CreateItem();
 
-            if (item is Throwable throwable && throwable.Projectile is TimeGrenadeProjectile timeProjectile)
+            if (item is TimedThrowable throwable)
             {
-                timeProjectile.FuseTime = FuseTime;
+                throwable.FuseTime = FuseTime;
             }
 
             return item;

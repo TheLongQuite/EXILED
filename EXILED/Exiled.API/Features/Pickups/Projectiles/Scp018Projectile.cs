@@ -10,6 +10,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
     using System;
     using System.Reflection;
 
+    using Exiled.API.Features.Items;
     using Exiled.API.Interfaces;
     using HarmonyLib;
 
@@ -113,5 +114,15 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// </summary>
         /// <returns>A string containing Scp018Pickup-related data.</returns>
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* |{Position}| -{Damage}- ={IgnoreFriendlyFire}=";
+
+        /// <inheritdoc/>
+        internal override void ReadThrowableItemInfo(Throwable throwable)
+        {
+            base.ReadThrowableItemInfo(throwable);
+            if (throwable is Scp018 scp018)
+            {
+                FriendlyFireTime = scp018.FriendlyFireTime;
+            }
+        }
     }
 }

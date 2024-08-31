@@ -20,7 +20,7 @@ namespace Exiled.API.Features.Items
     /// <summary>
     /// A wrapper class for <see cref="BaseScp018Projectile"/> item.
     /// </summary>
-    public class Scp018 : Throwable
+    public class Scp018 : TimedThrowable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Scp018"/> class.
@@ -29,7 +29,6 @@ namespace Exiled.API.Features.Items
         public Scp018(ThrowableItem itemBase)
             : base(itemBase)
         {
-            Projectile = (Scp018Projectile)((Throwable)this).Projectile;
         }
 
         /// <summary>
@@ -44,27 +43,9 @@ namespace Exiled.API.Features.Items
         }
 
         /// <summary>
-        /// Gets a <see cref="ExplosionGrenadeProjectile"/> to change grenade properties.
-        /// </summary>
-        public new Scp018Projectile Projectile { get; }
-
-        /// <summary>
         /// Gets or sets the time for SCP-018 not to ignore the friendly fire.
         /// </summary>
-        public float FriendlyFireTime
-        {
-            get => Projectile.FriendlyFireTime;
-            set => Projectile.FriendlyFireTime = value;
-        }
-
-        /// <summary>
-        /// Gets or sets how long the fuse will last.
-        /// </summary>
-        public float FuseTime
-        {
-            get => Projectile.FuseTime;
-            set => Projectile.FuseTime = value;
-        }
+        public float FriendlyFireTime { get; set; }
 
         /// <summary>
         /// Spawns an active grenade on the map at the specified location.
@@ -104,5 +85,15 @@ namespace Exiled.API.Features.Items
             PinPullTime = PinPullTime,
             Repickable = Repickable,
         };
+
+        /// <inheritdoc/>
+        protected override void InitializeProperties(ThrowableItem throwable)
+        {
+            base.InitializeProperties(throwable);
+            if (throwable.Projectile is BaseScp018Projectile grenade)
+            {
+                FriendlyFireTime = grenade._friendlyFireTime;
+            }
+        }
     }
 }

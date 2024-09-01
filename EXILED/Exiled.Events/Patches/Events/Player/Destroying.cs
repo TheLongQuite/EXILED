@@ -50,9 +50,7 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
                     new(OpCodes.Dup),
                     new(OpCodes.Stloc_S, player.LocalIndex),
-                    new(OpCodes.Ldnull),
-                    new(OpCodes.Ceq),
-                    new(OpCodes.Brtrue_S, continueLabel),
+                    new(OpCodes.Brfalse_S, continueLabel),
 
                     // if (!player.IsVerified)
                     //  goto continueLabel

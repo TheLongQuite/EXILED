@@ -33,7 +33,6 @@ namespace Exiled.Events.Patches.Events.Player
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
             Label continueLabel = generator.DefineLabel();
-            Label jmp = generator.DefineLabel();
 
             LocalBuilder player = generator.DeclareLocal(typeof(Player));
 
@@ -55,21 +54,15 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Ceq),
                     new(OpCodes.Brtrue_S, continueLabel),
 
-                    // if (player.IsVerified)
-                    //  goto jmp
+                    // if (!player.IsVerified)
+                    //  goto continueLabel
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.IsVerified))),
-                    new(OpCodes.Brtrue_S, jmp),
-
-                    // if (!player.IsNpc)
-                    //  goto continueLabel;
-                    new(OpCodes.Ldloc_S, player.LocalIndex),
-                    new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.IsNPC))),
                     new(OpCodes.Brfalse_S, continueLabel),
 
                     // jmp:
                     // DestroyingEventArgs ev = new(Player)
-                    new CodeInstruction(OpCodes.Ldloc_S, player.LocalIndex).WithLabels(jmp),
+                    new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(DestroyingEventArgs))[0]),
 
                     // Handlers.Player.OnDestroying(ev)

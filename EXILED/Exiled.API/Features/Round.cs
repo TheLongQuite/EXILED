@@ -59,7 +59,7 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets a value indicating whether the round is lobby or not.
         /// </summary>
-        public static bool IsLobby => !(IsEnded || IsStarted);
+        public static bool IsLobby => ReferenceHub.LocalHub != null && !(IsEnded || IsStarted);
 
         /// <summary>
         /// Gets or sets a value indicating the amount of Chaos Targets remaining.

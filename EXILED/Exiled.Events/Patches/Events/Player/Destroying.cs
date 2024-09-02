@@ -33,6 +33,7 @@ namespace Exiled.Events.Patches.Events.Player
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
             Label continueLabel = generator.DefineLabel();
+            Label skipEvent = generator.DefineLabel();
 
             LocalBuilder player = generator.DeclareLocal(typeof(Player));
 
@@ -56,7 +57,7 @@ namespace Exiled.Events.Patches.Events.Player
                     //  goto continueLabel
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.IsVerified))),
-                    new(OpCodes.Brfalse_S, continueLabel),
+                    new(OpCodes.Brfalse_S, skipEvent),
 
                     // jmp:
                     // DestroyingEventArgs ev = new(Player)
@@ -67,7 +68,7 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Call, Method(typeof(Handlers.Player), nameof(Handlers.Player.OnDestroying))),
 
                     // Player.Dictionary.Remove(player.GameObject)
-                    new(OpCodes.Call, PropertyGetter(typeof(Player), nameof(Player.Dictionary))),
+                    new CodeInstruction(OpCodes.Call, PropertyGetter(typeof(Player), nameof(Player.Dictionary))).WithLabels(skipEvent),
                     new(OpCodes.Ldloc_S, player.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Player), nameof(Player.GameObject))),
                     new(OpCodes.Callvirt, Method(typeof(Dictionary<GameObject, Player>), nameof(Dictionary<GameObject, Player>.Remove), new[] { typeof(GameObject) })),

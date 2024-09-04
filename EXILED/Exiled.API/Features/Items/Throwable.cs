@@ -49,6 +49,11 @@ namespace Exiled.API.Features.Items
         public new ThrowableItem Base { get; }
 
         /// <summary>
+        /// Gets or sets how long the fuse will last.
+        /// </summary>
+        public float FuseTime { get; set; }
+
+        /// <summary>
         /// Gets or sets the amount of time it takes to pull the pin.
         /// </summary>
         public float PinPullTime
@@ -124,6 +129,10 @@ namespace Exiled.API.Features.Items
         /// <param name="throwable">target throwable.</param>
         protected virtual void InitializeProperties(ThrowableItem throwable)
         {
+            if (throwable.Projectile is TimeGrenade timeGrenade)
+            {
+                FuseTime = timeGrenade._fuseTime;
+            }
         }
     }
 }

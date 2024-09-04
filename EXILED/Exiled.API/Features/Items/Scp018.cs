@@ -20,7 +20,7 @@ namespace Exiled.API.Features.Items
     /// <summary>
     /// A wrapper class for <see cref="BaseScp018Projectile"/> item.
     /// </summary>
-    public class Scp018 : TimedThrowable
+    public class Scp018 : Throwable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="Scp018"/> class.

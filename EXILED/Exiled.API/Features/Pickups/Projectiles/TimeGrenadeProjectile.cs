@@ -107,8 +107,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         internal override void ReadThrowableItemInfo(Throwable throwable)
         {
             base.ReadThrowableItemInfo(throwable);
-            if (throwable is TimedThrowable timedThrowable)
-                FuseTime = timedThrowable.FuseTime;
+            FuseTime = throwable.FuseTime;
         }
     }
 }

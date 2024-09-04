@@ -18,7 +18,7 @@ namespace Exiled.API.Features.Items
     /// <summary>
     /// A wrapper class for <see cref="FlashbangGrenade"/>.
     /// </summary>
-    public class FlashGrenade : TimedThrowable
+    public class FlashGrenade : Throwable
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="FlashGrenade"/> class.

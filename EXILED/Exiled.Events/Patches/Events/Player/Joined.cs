@@ -26,6 +26,10 @@ namespace Exiled.Events.Patches.Events.Player
             {
                 Server.Host = new Player(__instance);
             }
+            else
+            {
+                Player.UnverifiedPlayers.Add(__instance.gameObject, new Player(__instance));
+            }
         }
     }
 }

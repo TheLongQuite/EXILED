@@ -114,7 +114,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <param name="projectiletype">The <see cref="Enums.ProjectileType"/> of the projectile.</param>
         /// <typeparam name="T">The specified <see cref="Projectile"/> type.</typeparam>
         /// <returns>The created <see cref="Projectile"/>.</returns>
-        public static Projectile Create<T>(ProjectileType projectiletype)
+        public static T Create<T>(ProjectileType projectiletype)
             where T : Projectile => Create(projectiletype) as T;
 
         /// <summary>

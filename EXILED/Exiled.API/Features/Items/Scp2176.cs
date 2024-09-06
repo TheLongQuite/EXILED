@@ -58,7 +58,7 @@ namespace Exiled.API.Features.Items
 
             Projectile projectile = CreateProjectile(position, Quaternion.identity);
 
-            projectile.PreviousOwner = owner ?? Server.Host;
+            projectile.PreviousOwner = owner;
 
             projectile.Activate();
 

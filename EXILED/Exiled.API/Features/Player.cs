@@ -1984,6 +1984,7 @@ namespace Exiled.API.Features
                 if (item.Serial == Inventory.CurItem.SerialNumber)
                     Inventory.NetworkCurItem = ItemIdentifier.None;
 
+                ItemsValue.Remove(item);
                 Inventory.UserInventory.Items.Remove(item.Serial);
 
                 Inventory.SendItemsNextFrame = true;

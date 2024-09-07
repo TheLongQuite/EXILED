@@ -189,7 +189,13 @@ namespace Exiled.API.Features
                 0.3f,
                 () =>
                 {
-                    npc.Role.Set(role, SpawnReason.RoundStart, position is null ? RoleSpawnFlags.All : RoleSpawnFlags.AssignInventory);
+                    RoleSpawnFlags flags = RoleSpawnFlags.UseSpawnpoint;
+                    if (position is not null)
+                    {
+                        flags &= ~RoleSpawnFlags.UseSpawnpoint;
+                    }
+
+                    npc.Role.Set(role, SpawnReason.RoundStart, flags);
                 });
 
             if (position is not null)

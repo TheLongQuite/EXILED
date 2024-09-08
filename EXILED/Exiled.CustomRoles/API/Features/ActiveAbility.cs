@@ -126,6 +126,13 @@ namespace Exiled.CustomRoles.API.Features
             return false;
         }
 
+        /// <inheritdoc/>
+        protected override void AbilityRemoved(Player player)
+        {
+            LastUsed.Remove(player);
+            base.AbilityRemoved(player);
+        }
+
         /// <summary>
         ///     Called when the ability is used.
         /// </summary>

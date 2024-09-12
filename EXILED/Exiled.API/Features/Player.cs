@@ -2574,11 +2574,18 @@ namespace Exiled.API.Features
                 return AddItem(itemType.GetFirearmType(), null);
             }
 
-            Item item = Item.Create(itemType);
+            try
+            {
+                Item item = Item.Create(itemType);
+                AddItem(item);
+                return item;
+            }
+            catch (Exception ex)
+            {
+                Log.Error($"Error while creating ({itemType}): {ex}");
+            }
 
-            AddItem(item);
-
-            return item;
+            return null;
         }
 
         /// <summary>

@@ -652,6 +652,12 @@ namespace Exiled.CustomRoles.API.Features
                     ability.AddAbility(player);
             }
 
+            if (Extensions.InternalPlayerToCustomRoles.TryGetValue(player, out CustomRole cr))
+            {
+                Log.Error($"player: {player} already has custom role in AddRole: cr is {cr.Name} ({cr.Id})");
+                cr.RemoveRoleWhenDisconnect(player);
+            }
+
             TrackedPlayers.Add(player);
             Extensions.InternalPlayerToCustomRoles.Add(player, this);
             ShowMessage(player);

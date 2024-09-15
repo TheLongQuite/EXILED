@@ -608,65 +608,13 @@ namespace Exiled.CustomItems.API.Features
 
                 spawned++;
 
-                if (spawnPoint is DynamicSpawnPoint dynamicSpawnPoint && dynamicSpawnPoint.Location == SpawnLocationType.InsideLocker)
-                {
-                    for (int i = 0; i < 50; i++)
-                    {
-                        if (Map.Lockers is null)
-                        {
-                            Log.Debug($"{nameof(Spawn)}: Locker list is null.");
-                            continue;
-                        }
-
-                        Locker locker =
-                            Map.Lockers[
-                                Loader.Random.Next(Map.Lockers.Count)];
-
-                        if (locker is null)
-                        {
-                            Log.Debug($"{nameof(Spawn)}: Selected locker is null.");
-                            continue;
-                        }
-
-                        if (locker.Loot is null)
-                        {
-                            Log.Debug($"{nameof(Spawn)}: Invalid locker location. Attempting to find a new one..");
-                            continue;
-                        }
-
-                        if (locker.Chambers is null)
-                        {
-                            Log.Debug($"{nameof(Spawn)}: Locker chambers is null");
-                            continue;
-                        }
-
-                        LockerChamber chamber = locker.Chambers[Loader.Random.Next(Mathf.Max(0, locker.Chambers.Length - 1))];
-
-                        if (chamber is null)
-                        {
-                            Log.Debug($"{nameof(Spawn)}: chamber is null");
-                            continue;
-                        }
-
-                        Vector3 position = chamber._spawnpoint.transform.position;
-                        Spawn(position, null);
-                        Log.Debug($"Spawned {Name} at {position} ({spawnPoint.Name})");
-
-                        break;
-                    }
-                }
-                else if (spawnPoint is RoleSpawnPoint roleSpawnPoint)
+                if (spawnPoint is RoleSpawnPoint roleSpawnPoint)
                 {
                     Spawn(roleSpawnPoint.Role.GetRandomSpawnLocation().Position, null);
                 }
                 else
                 {
                     Pickup? pickup = Spawn(spawnPoint.Position, null);
-                    if (pickup?.Base is BaseFirearmPickup firearmPickup && this is CustomWeapon customWeapon)
-                    {
-                        firearmPickup.Status = new FirearmStatus(customWeapon.ClipSize, firearmPickup.Status.Flags, firearmPickup.Status.Attachments);
-                        firearmPickup.NetworkStatus = firearmPickup.Status;
-                    }
 
                     Log.Debug($"Spawned {Name} at {spawnPoint.Position} ({spawnPoint.Name})");
                 }

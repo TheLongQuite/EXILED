@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.Loader
+namespace Exiled.Starter
 {
     using System;
 

@@ -5,7 +5,7 @@
 // </copyright>
 // -----------------------------------------------------------------------
 <#@ assembly name="$(EXILED_REFERENCES)\Assembly-CSharp-Publicized.dll" #>
-namespace Exiled.Loader
+namespace Exiled.Starter
 {
     using System;
 

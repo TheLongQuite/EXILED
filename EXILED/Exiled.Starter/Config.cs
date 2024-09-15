@@ -5,28 +5,26 @@
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.Loader
+namespace Exiled.Starter
 {
-    using System;
     using System.ComponentModel;
     using System.IO;
-
-    using API.Enums;
-    using API.Interfaces;
-    using Exiled.API.Features;
-    using YamlDotNet.Core;
 
     /// <summary>
     /// The configs of the loader.
     /// </summary>
-    public sealed class Config : IConfig
+    public sealed class Config
     {
-        /// <inheritdoc />
-        [Description("Whether or not EXILED is enabled on this server.")]
+        /// <summary>
+        /// Gets or sets a value indicating whether the plugin is enabled or not.
+        /// </summary>
+        [Description("Whether or not this plugin is enabled.")]
         public bool IsEnabled { get; set; } = true;
 
-        /// <inheritdoc />
-        [Description("Whether or not debug messages should be shown.")]
+        /// <summary>
+        /// Gets or sets a value indicating whether debug messages should be displayed in the console or not.
+        /// </summary>
+        [Description("Whether or not debug messages should be shown in the console.")]
         public bool Debug { get; set; } = false;
 
         /// <summary>
@@ -45,13 +43,7 @@ namespace Exiled.Loader
         /// Gets or sets the Exiled directory path from which plugins will be loaded.
         /// </summary>
         [Description("The Exiled directory path from which plugins will be loaded.")]
-        public string ExiledDirectoryPath { get; set; } = Path.Combine(Paths.AppData, "EXILED");
-
-        /// <summary>
-        /// Gets or sets the config files distribution type.
-        /// </summary>
-        [Description("The config files distribution type (Default, Separated)")]
-        public ConfigType ConfigType { get; set; } = ConfigType.Default;
+        public string ExiledDirectoryPath { get; set; } = Path.Combine(LoaderPlugin.Paths.AppData, "EXILED");
 
         /// <summary>
         /// Gets or sets a value indicating whether the command translation config display type.

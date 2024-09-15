@@ -341,6 +341,8 @@ namespace Exiled.Loader
         /// <param name="dependencies">The dependencies that could have been loaded by Exiled.Bootstrap.</param>
         public void Run(Assembly[] dependencies)
         {
+            Paths.Reload(Starter.LoaderPlugin.Config.ExiledDirectoryPath);
+
             if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? CheckUAC() : geteuid() == 0)
             {
                 ServerConsole.AddLog("YOU ARE RUNNING THE SERVER AS ROOT / ADMINISTRATOR. THIS IS HIGHLY UNRECOMMENDED. PLEASE INSTALL YOUR SERVER AS A NON-ROOT/ADMIN USER.", ConsoleColor.DarkRed);
@@ -454,7 +456,7 @@ namespace Exiled.Loader
 
                     return true;
                 }
-                else if ((requiredVersion.Major < actualVersion.Major) && !LoaderPlugin.Config.ShouldLoadOutdatedPlugins)
+                else if ((requiredVersion.Major < actualVersion.Major) && !Starter.LoaderPlugin.Config.ShouldLoadOutdatedPlugins)
                 {
                     Log.Error(
                         $"You're running an older version of {plugin.Name} ({plugin.Version.ToString(3)})! " +

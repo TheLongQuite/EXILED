@@ -116,12 +116,11 @@ namespace Exiled.API.Features.Pickups.Projectiles
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* |{Position}| -{Damage}- ={IgnoreFriendlyFire}=";
 
         /// <inheritdoc/>
-        public override void Spawn()
+        public override void Activate()
         {
-            base.Spawn();
-
             if (Base.PhysicsModule is { } and not Scp018Physics)
                 Base.SetupModule();
+            base.Activate();
         }
 
         /// <inheritdoc/>

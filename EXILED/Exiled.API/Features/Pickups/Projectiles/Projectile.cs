@@ -157,7 +157,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <summary>
         /// Activates the current <see cref="Projectile"/>.
         /// </summary>
-        public void Activate() => Base.ServerActivate();
+        public virtual void Activate() => Base.ServerActivate();
 
         /// <summary>
         /// Spawns a <see cref="Projectile"/>.

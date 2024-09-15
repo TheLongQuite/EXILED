@@ -166,7 +166,14 @@ namespace Exiled.CustomItems.API.Features
                 return;
 
             OnThrownProjectile(ev);
-            Log.Debug($"{ev.Player.Nickname} has thrown a {Name} ({FuseTime}) {ev.Player.Items.ToString(true)}!");
+            if (ev.Player == null)
+            {
+                Log.Error($"CustomGrenade::OnInternalThrownProjectile player is null {ev.Projectile}");
+            }
+            else
+            {
+                Log.Debug($"{ev.Player.Nickname} has thrown a {Name} ({FuseTime}) {ev.Player.Items.ToString(true)}!");
+            }
 
             if (ExplodeOnCollision)
             {

@@ -41,7 +41,6 @@
 
     <PropertyGroup Condition=" '$(OS)' == 'Windows_NT' ">
         <PostBuildEvent>
-            if not "$(EXILED_DEV_PLUGINAPI_REFERENCE)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_DEV_PLUGINAPI_REFERENCE)\dependencies\"
             if not "$(EXILED_DEV_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_DEV_REFERENCES)\Plugins\dependencies\"
             if not "$(EXILED_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).dll" "$(EXILED_REFERENCES)\"
             if not "$(EXILED_REFERENCES)"=="" copy /y "$(OutputPath)$(AssemblyName).xml" "$(EXILED_REFERENCES)\"
@@ -49,7 +48,6 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(OS)' == 'Unix' ">
         <PostBuildEvent>if [[ ! -z "$EXILED_DEV_REFERENCES" ]]; then cp "$(OutputPath)$(AssemblyName).dll" "$EXILED_DEV_REFERENCES/Plugins/dependencies/"; fi</PostBuildEvent>
-        <PostBuildEvent>if [[ ! -z "$EXILED_DEV_PLUGINAPI_REFERENCE" ]]; then cp "$(OutputPath)$(AssemblyName).dll" "$EXILED_DEV_PLUGINAPI_REFERENCE/dependencies/"; fi</PostBuildEvent>
     </PropertyGroup>
 
 

@@ -111,7 +111,7 @@ namespace Exiled.Loader
                     {
                         if (configValue == DefaultValue)
                         {
-                            if (LoaderPlugin.Config.PrintFullCommandProps)
+                            if (Starter.LoaderPlugin.Config.PrintFullCommandProps)
                                 translationProperties[propertyInfo.Name] = propertyInfo.GetValue(command) as string;
                             continue;
                         }
@@ -120,7 +120,7 @@ namespace Exiled.Loader
                     }
                     else
                     {
-                        translationProperties[propertyInfo.Name] = LoaderPlugin.Config.PrintFullCommandProps ? propertyInfo.GetValue(command) as string : DefaultValue;
+                        translationProperties[propertyInfo.Name] = Starter.LoaderPlugin.Config.PrintFullCommandProps ? propertyInfo.GetValue(command) as string : DefaultValue;
                     }
                 }
 
@@ -187,9 +187,6 @@ namespace Exiled.Loader
         /// <returns>Returns the read translations.</returns>
         public static string Read()
         {
-            if (LoaderPlugin.Config.ConfigType != ConfigType.Default)
-                return string.Empty;
-
             try
             {
                 if (File.Exists(Paths.CommandTranslations))

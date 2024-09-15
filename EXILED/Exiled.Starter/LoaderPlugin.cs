@@ -89,7 +89,7 @@ namespace Exiled.Starter
             Assembly exiledApi = Assembly.Load(File.ReadAllBytes(exiledApiPath));
             Assembly exiledLoader = Assembly.Load(File.ReadAllBytes(exiledLoaderPath));
 
-            Type loaderType = exiledLoader.GetType("Loader");
+            Type loaderType = exiledLoader.GetType("Exiled.Loader.Loader");
             object loader = Activator.CreateInstance(loaderType);
             loader.GetType().GetMethod("Run").Invoke(loader, new[] { new Assembly[] { exiledApi } });
         }

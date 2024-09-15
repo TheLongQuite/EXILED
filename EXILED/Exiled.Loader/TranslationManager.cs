@@ -35,7 +35,7 @@ namespace Exiled.Loader
         {
             try
             {
-                Log.Info($"Loading plugin translations... ({LoaderPlugin.Config.ConfigType})");
+                Log.Info($"Loading plugin translations...");
 
                 Dictionary<string, object> rawDeserializedTranslations = Loader.Deserializer.Deserialize<Dictionary<string, object>>(rawTranslations) ?? DictionaryPool<string, object>.Pool.Get();
                 SortedDictionary<string, ITranslation> deserializedTranslations = new(StringComparer.Ordinal);
@@ -74,11 +74,8 @@ namespace Exiled.Loader
         /// <param name="plugin">The plugin which its translation has to be loaded.</param>
         /// <param name="rawTranslations">The raw translations to check whether or not the plugin already has a translation config.</param>
         /// <returns>The <see cref="ITranslation"/> of the desired plugin.</returns>
-        public static ITranslation LoadTranslation(this IPlugin<IConfig> plugin, Dictionary<string, object> rawTranslations = null) => LoaderPlugin.Config.ConfigType switch
-        {
-            ConfigType.Separated => plugin.LoadSeparatedTranslation(),
-            _ => plugin.LoadDefaultTranslation(rawTranslations),
-        };
+        public static ITranslation LoadTranslation(this IPlugin<IConfig> plugin, Dictionary<string, object> rawTranslations = null) =>
+            plugin.LoadDefaultTranslation(rawTranslations);
 
         /// <summary>
         /// Reads, loads, and saves plugin translations.
@@ -144,12 +141,7 @@ namespace Exiled.Loader
                 if (translations is null || translations.Count == 0)
                     return false;
 
-                if (LoaderPlugin.Config.ConfigType == ConfigType.Default)
-                {
-                    return SaveDefaultTranslation(Loader.Serializer.Serialize(translations));
-                }
-
-                return translations.All(plugin => SaveSeparatedTranslation(plugin.Key, Loader.Serializer.Serialize(plugin.Value)));
+                return SaveDefaultTranslation(Loader.Serializer.Serialize(translations));
             }
             catch (YamlException yamlException)
             {
@@ -165,9 +157,6 @@ namespace Exiled.Loader
         /// <returns>Returns the read translations.</returns>
         public static string Read()
         {
-            if (LoaderPlugin.Config.ConfigType != ConfigType.Default)
-                return string.Empty;
-
             try
             {
                 if (File.Exists(Paths.Translations))
@@ -189,13 +178,7 @@ namespace Exiled.Loader
         {
             try
             {
-                if (LoaderPlugin.Config.ConfigType == ConfigType.Default)
-                {
-                    SaveDefaultTranslation(string.Empty);
-                    return true;
-                }
-
-                return Loader.Plugins.All(plugin => SaveSeparatedTranslation(plugin.Prefix, string.Empty));
+                return SaveDefaultTranslation(string.Empty);
             }
             catch (Exception e)
             {

@@ -55,9 +55,6 @@ namespace Exiled.Loader
             }
 
             CustomNetworkManager.Modded = true;
-
-            if (LoaderPlugin.Config.ConfigType == ConfigType.Separated)
-                Directory.CreateDirectory(Paths.IndividualConfigs);
         }
 
         /// <summary>

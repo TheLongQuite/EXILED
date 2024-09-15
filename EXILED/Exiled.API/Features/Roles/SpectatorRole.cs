@@ -15,7 +15,7 @@ namespace Exiled.API.Features.Roles
     using Mirror;
 
     using PlayerRoles;
-
+    using PlayerRoles.Voice;
     using UnityEngine;
 
     using SpectatorGameRole = PlayerRoles.Spectating.SpectatorRole;
@@ -23,7 +23,7 @@ namespace Exiled.API.Features.Roles
     /// <summary>
     /// Defines a role that represents a spectator.
     /// </summary>
-    public class SpectatorRole : Role
+    public class SpectatorRole : Role, IVoiceRole
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="SpectatorRole"/> class.
@@ -75,5 +75,8 @@ namespace Exiled.API.Features.Roles
         /// Gets the game <see cref="SpectatorGameRole"/>.
         /// </summary>
         public new SpectatorGameRole Base { get; }
+
+        /// <inheritdoc/>
+        public VoiceModuleBase VoiceModule => Base.VoiceModule;
     }
 }

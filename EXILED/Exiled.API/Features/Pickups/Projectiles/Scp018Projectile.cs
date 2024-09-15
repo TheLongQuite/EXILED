@@ -65,6 +65,11 @@ namespace Exiled.API.Features.Pickups.Projectiles
         }
 
         /// <summary>
+        /// Gets a value indicating whether current Scp018 instance is projectile-typed, or normal pickup.
+        /// </summary>
+        public bool IsProjectile => Base.PhysicsModule is Scp018Physics;
+
+        /// <summary>
         /// Gets or sets the pickup's max velocity.
         /// </summary>
         public float MaxVelocity
@@ -118,7 +123,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <inheritdoc/>
         public override void Activate()
         {
-            if (Base.PhysicsModule is { } and not Scp018Physics)
+            if (!IsProjectile)
                 Base.SetupModule();
             base.Activate();
         }

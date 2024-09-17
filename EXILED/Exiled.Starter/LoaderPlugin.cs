@@ -59,7 +59,8 @@ namespace Exiled.Starter
                     GameCore.Version.BackwardRevision))
             {
                 ServerConsole.AddLog($"Exiled is outdated, please update to the latest version. Wait for release if still shows after update.\nSCP:SL: {GameCore.Version.VersionString} Exiled Supported Version: {AutoUpdateFiles.RequiredSCPSLVersion}", ConsoleColor.DarkRed);
-                return;
+
+                // return;
             }
 
             Paths.Reload(Config.ExiledDirectoryPath);

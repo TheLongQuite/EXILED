@@ -61,10 +61,10 @@ namespace Exiled.Events.Patches.Events.Server
 
                 new(OpCodes.Ret),
 
-                // id = ev.BanDetails.ToString();
+                // id = ev.TargetId;
                 new CodeInstruction(OpCodes.Ldloc_S, ev.LocalIndex).WithLabels(continueLabel),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(UnbanningEventArgs), nameof(UnbanningEventArgs.TargetId))),
-                new(OpCodes.Starg_S, 1),
+                new(OpCodes.Starg_S, 0),
             });
 
             newInstructions.InsertRange(newInstructions.Count - 1, new CodeInstruction[]

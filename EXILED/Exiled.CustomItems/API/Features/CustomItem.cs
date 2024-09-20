@@ -53,6 +53,7 @@ namespace Exiled.CustomItems.API.Features
     public abstract class CustomItem
     {
         private static Dictionary<uint, CustomItem?> idLookupTable = new();
+
         private ItemType type = ItemType.None;
 
         /// <summary>
@@ -131,9 +132,31 @@ namespace Exiled.CustomItems.API.Features
         /// <returns>The <see cref="CustomItem"/> matching the search, <see langword="null"/> if not registered.</returns>
         public static CustomItem? Get(uint id)
         {
-            if (!idLookupTable.ContainsKey(id))
-                idLookupTable.Add(id, Registered.FirstOrDefault(i => i.Id == id));
-            return idLookupTable[id];
+            if (!idLookupTable.TryGetValue(id, out CustomItem? ci))
+            {
+                ci = Registered.FirstOrDefault(i => i.Id == id);
+                idLookupTable.Add(id, ci);
+            }
+
+            return ci;
+        }
+
+        /// <summary>
+        /// Gets a <see cref="CustomItem"/> with a specific ID.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="id">The <see cref="CustomItem"/> ID.</param>
+        /// <returns>The <see cref="CustomItem"/> matching the search, <see langword="null"/> if not registered.</returns>
+        public static T? Get<T>(uint id)
+            where T : CustomItem
+        {
+            if (!idLookupTable.TryGetValue(id, out CustomItem? ci))
+            {
+                ci = GetMany<T>().FirstOrDefault(i => i.Id == id);
+                idLookupTable.Add(id, ci);
+            }
+
+            return ci as T;
         }
 
         /// <summary>
@@ -144,10 +167,36 @@ namespace Exiled.CustomItems.API.Features
         public static CustomItem? Get(string name) => Registered.FirstOrDefault(i => i.Name == name);
 
         /// <summary>
+        /// Gets a <see cref="CustomItem"/> with a specific name.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="name">The <see cref="CustomItem"/> name.</param>
+        /// <returns>The <see cref="CustomItem"/> matching the search, <see langword="null"/> if not registered.</returns>
+        public static T? Get<T>(string name)
+            where T : CustomItem => GetMany<T>().FirstOrDefault(i => i.Name == name);
+
+        /// <summary>
+        /// Gets a <see cref="CustomItem"/> for target <see cref="Item"/>.
+        /// </summary>
+        /// <param name="item">The <see cref="Item"/> to check.</param>
+        /// <returns>The <see cref="CustomItem"/> matching the search, <see langword="null"/> if not registered.</returns>
+        public static CustomItem? Get(Item item) => Registered.FirstOrDefault(i => i.Check(item));
+
+        /// <summary>
+        /// Gets a <see cref="CustomItem"/> for target <see cref="Item"/>.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="item">The <see cref="Item"/> to check.</param>
+        /// <returns>The <see cref="CustomItem"/> matching the search, <see langword="null"/> if not registered.</returns>
+        public static T? Get<T>(Item item)
+            where T : CustomItem => GetMany<T>().FirstOrDefault(i => i.Check(item));
+
+        /// <summary>
         /// Gets a <see cref="CustomItem"/> with a specific type.
         /// </summary>
         /// <param name="t">The <see cref="System.Type"/> type.</param>
         /// <returns>The <see cref="CustomItem"/> matching the search, <see langwod="null"/> if not registered.</returns>
+        [Obsolete("Для получения типов кастомИтема - используй GetMany<T>😡😡😡", true)]
         public static CustomItem? Get(Type t)
         {
             return Registered.FirstOrDefault(i => i.GetType() == t);
@@ -158,10 +207,22 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
         /// <returns>The <see cref="CustomItem"/> matching the search, <see langwod="null"/> if not registered.</returns>
+        [Obsolete("Для получения типов кастомИтема - используй GetMany<T>😡😡😡", true)]
         public static T? Get<T>()
             where T : CustomItem
         {
             return Registered.OfType<T>().FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Gets a <see cref="IEnumerable{T}"/> of <see cref="CustomItem"/>'s with a specific type.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <returns>The <see cref="IEnumerable{T}"/> of <see cref="CustomItem"/> matching the search.</returns>
+        public static IEnumerable<T> GetMany<T>()
+            where T : CustomItem
+        {
+            return Registered.OfType<T>();
         }
 
         /// <summary>
@@ -173,6 +234,21 @@ namespace Exiled.CustomItems.API.Features
         public static bool TryGet(uint id, out CustomItem? customItem)
         {
             customItem = Get(id);
+
+            return customItem is not null;
+        }
+
+        /// <summary>
+        /// Tries to get a <see cref="CustomItem"/> with a specific ID.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="id">The <see cref="CustomItem"/> ID to look for.</param>
+        /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
+        /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
+        public static bool TryGet<T>(uint id, out T? customItem)
+            where T : CustomItem
+        {
+            customItem = Get<T>(id);
 
             return customItem is not null;
         }
@@ -195,11 +271,31 @@ namespace Exiled.CustomItems.API.Features
         }
 
         /// <summary>
+        /// Tries to get a <see cref="CustomItem"/> with a specific name.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="name">The <see cref="CustomItem"/> name to look for.</param>
+        /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
+        /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
+        public static bool TryGet<T>(string name, out T? customItem)
+            where T : CustomItem
+        {
+            customItem = null;
+            if (string.IsNullOrEmpty(name))
+                return false;
+
+            customItem = uint.TryParse(name, out uint id) ? Get<T>(id) : Get<T>(name);
+
+            return customItem is not null;
+        }
+
+        /// <summary>
         /// Tries to get a <see cref="CustomItem"/> with a specific type.
         /// </summary>
         /// <param name="t">The <see cref="System.Type"/> of the item to look for.</param>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
+        [Obsolete("Для получения типов кастомИтема - используй TryGetMany<T>😡😡😡", true)]
         public static bool TryGet(Type t, out CustomItem? customItem)
         {
             customItem = Get(t);
@@ -213,6 +309,7 @@ namespace Exiled.CustomItems.API.Features
         /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
+        [Obsolete("Для получения типов кастомИтема - используй TryGetMany<T>😡😡😡", true)]
         public static bool TryGet<T>(out T? customItem)
             where T : CustomItem
         {
@@ -233,7 +330,26 @@ namespace Exiled.CustomItems.API.Features
             if (player is null)
                 return false;
 
-            customItem = Registered?.FirstOrDefault(tempCustomItem => tempCustomItem.Check(player.CurrentItem));
+            customItem = Registered.FirstOrDefault(tempCustomItem => tempCustomItem.Check(player.CurrentItem));
+
+            return customItem is not null;
+        }
+
+        /// <summary>
+        /// Tries to get the player's current <see cref="CustomItem"/> in their hand.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="player">The <see cref="Player"/> to check.</param>
+        /// <param name="customItem">The <see cref="CustomItem"/> in their hand.</param>
+        /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/> in their hand or not.</returns>
+        public static bool TryGet<T>(Player player, out T? customItem)
+            where T : CustomItem
+        {
+            customItem = null;
+            if (player is null)
+                return false;
+
+            customItem = GetMany<T>().FirstOrDefault(tempCustomItem => player.Items.Any(item => tempCustomItem.Check(item)));
 
             return customItem is not null;
         }
@@ -256,6 +372,25 @@ namespace Exiled.CustomItems.API.Features
         }
 
         /// <summary>
+        /// Tries to get the player's <see cref="IEnumerable{T}"/> of <see cref="CustomItem"/>.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="player">The <see cref="Player"/> to check.</param>
+        /// <param name="customItems">The player's <see cref="IEnumerable{T}"/> of <see cref="CustomItem"/>.</param>
+        /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/> in their hand or not.</returns>
+        public static bool TryGet<T>(Player player, out IEnumerable<CustomItem>? customItems)
+            where T : CustomItem
+        {
+            customItems = Enumerable.Empty<CustomItem>();
+            if (player is null)
+                return false;
+
+            customItems = GetMany<T>().Where(tempCustomItem => player.Items.Any(tempCustomItem.Check));
+
+            return customItems.Any();
+        }
+
+        /// <summary>
         /// Checks to see if this item is a custom item.
         /// </summary>
         /// <param name="item">The <see cref="Item"/> to check.</param>
@@ -263,7 +398,22 @@ namespace Exiled.CustomItems.API.Features
         /// <returns>True if the item is a custom item.</returns>
         public static bool TryGet(Item item, out CustomItem? customItem)
         {
-            customItem = item == null ? null : Registered?.FirstOrDefault(tempCustomItem => tempCustomItem.TrackedSerials.Contains(item.Serial));
+            customItem = item == null ? null : Get(item);
+
+            return customItem is not null;
+        }
+
+        /// <summary>
+        /// Checks to see if this item is a custom item.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="item">The <see cref="Item"/> to check.</param>
+        /// <param name="customItem">The <see cref="CustomItem"/> this item is.</param>
+        /// <returns>True if the item is a custom item.</returns>
+        public static bool TryGet<T>(Item item, out T? customItem)
+            where T : CustomItem
+        {
+            customItem = item == null ? null : Get<T>(item);
 
             return customItem is not null;
         }
@@ -276,7 +426,22 @@ namespace Exiled.CustomItems.API.Features
         /// <returns>True if the pickup is a custom item.</returns>
         public static bool TryGet(Pickup pickup, out CustomItem? customItem)
         {
-            customItem = Registered?.FirstOrDefault(tempCustomItem => tempCustomItem.TrackedSerials.Contains(pickup.Serial));
+            customItem = Registered.FirstOrDefault(tempCustomItem => tempCustomItem.Check(pickup));
+
+            return customItem is not null;
+        }
+
+        /// <summary>
+        /// Checks if this pickup is a custom item.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="pickup">The <see cref="ItemPickupBase"/> to check.</param>
+        /// <param name="customItem">The <see cref="CustomItem"/> this pickup is.</param>
+        /// <returns>True if the pickup is a custom item.</returns>
+        public static bool TryGet<T>(Pickup pickup, out T? customItem)
+            where T : CustomItem
+        {
+            customItem = GetMany<T>().FirstOrDefault(tempCustomItem => tempCustomItem.Check(pickup));
 
             return customItem is not null;
         }
@@ -346,23 +511,6 @@ namespace Exiled.CustomItems.API.Features
         public static bool TryGive(Player player, uint id, bool displayMessage = true)
         {
             if (!TryGet(id, out CustomItem? item))
-                return false;
-
-            item?.Give(player, displayMessage);
-
-            return true;
-        }
-
-        /// <summary>
-        /// Gives to a specific <see cref="Player"/> a specic <see cref="CustomItem"/>.
-        /// </summary>
-        /// <param name="player">The <see cref="Player"/> to give the item to.</param>
-        /// <param name="t">The <see cref="System.Type"/> of the item to give.</param>
-        /// <param name="displayMessage">Indicates a value whether <see cref="ShowPickedUpMessage"/> will be called when the player receives the <see cref="CustomItem"/> or not.</param>
-        /// <returns>Returns a value indicating if the player was given the <see cref="CustomItem"/> or not.</returns>
-        public static bool TryGive(Player player, Type t, bool displayMessage = true)
-        {
-            if (!TryGet(t, out CustomItem? item))
                 return false;
 
             item?.Give(player, displayMessage);

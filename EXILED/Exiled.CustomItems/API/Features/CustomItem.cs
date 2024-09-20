@@ -340,8 +340,8 @@ namespace Exiled.CustomItems.API.Features
         /// </summary>
         /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
         /// <param name="player">The <see cref="Player"/> to check.</param>
-        /// <param name="customItem">The <see cref="CustomItem"/> in their hand.</param>
-        /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/> in their hand or not.</returns>
+        /// <param name="customItem">The founded <see cref="CustomItem"/>.</param>
+        /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/>.</returns>
         public static bool TryGet<T>(Player player, out T? customItem)
             where T : CustomItem
         {
@@ -352,6 +352,38 @@ namespace Exiled.CustomItems.API.Features
             customItem = GetMany<T>().FirstOrDefault(tempCustomItem => player.Items.Any(item => tempCustomItem.Check(item)));
 
             return customItem is not null;
+        }
+
+        /// <summary>
+        /// Tries to get the player's current <see cref="CustomItem"/>, with a specific type.
+        /// </summary>
+        /// <typeparam name="T">The type <typeparamref name="T"/> to cast the customitem to.</typeparam>
+        /// <param name="player">The <see cref="Player"/> to check.</param>
+        /// <param name="item">The founded <see cref="Item"/>.</param>
+        /// <param name="customItem">The founded <see cref="CustomItem"/>.</param>
+        /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/>.</returns>
+        public static bool TryGet<T>(Player player, out Item? item, out T? customItem)
+            where T : CustomItem
+        {
+            item = null;
+            customItem = null;
+            if (player is null)
+                return false;
+
+            foreach (Item plyItems in player.Items)
+            {
+                foreach (T ci in GetMany<T>())
+                {
+                    if (ci.Check(plyItems))
+                    {
+                        item = plyItems;
+                        customItem = ci;
+                        return true;
+                    }
+                }
+            }
+
+            return false;
         }
 
         /// <summary>

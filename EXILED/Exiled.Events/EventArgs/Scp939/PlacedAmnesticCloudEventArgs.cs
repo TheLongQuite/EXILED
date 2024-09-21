@@ -26,7 +26,7 @@ namespace Exiled.Events.EventArgs.Scp939
         /// <inheritdoc cref="ReferenceHub" />
         /// </param>
         /// <param name="cloud">
-        /// <inheritdoc cref="PlayerRoles.PlayableScps.Scp939.Scp939AmnesticCloudInstance" />
+        /// <inheritdoc cref="Scp939AmnesticCloudInstance" />
         /// </param>
         public PlacedAmnesticCloudEventArgs(ReferenceHub hub, Scp939AmnesticCloudInstance cloud)
         {

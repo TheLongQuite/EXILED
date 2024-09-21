@@ -187,7 +187,7 @@ namespace Exiled.Events.Handlers
         /// <summary>
         /// Invoked before throwing an <see cref="API.Features.Items.Throwable"/>.
         /// </summary>
-        public static Event<ThrownProjectileEventArgs> ThrowingProjectile { get; set; } = new();
+        public static Event<ThrowingProjectileEventArgs> ThrowingProjectile { get; set; } = new();
 
         /// <summary>
         /// Invoked afer throwing an <see cref="API.Features.Items.Throwable"/>.

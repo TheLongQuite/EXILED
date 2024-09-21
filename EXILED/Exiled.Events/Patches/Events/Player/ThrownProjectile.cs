@@ -11,6 +11,9 @@ namespace Exiled.Events.Patches.Events.Player
     using System.Reflection.Emit;
 
     using API.Features.Pools;
+
+    using Exiled.API.Extensions;
+    using Exiled.API.Features;
     using Exiled.Events.Attributes;
     using Exiled.Events.EventArgs.Player;
 
@@ -65,10 +68,17 @@ namespace Exiled.Events.Patches.Events.Player
             offset = 0;
             index = newInstructions.FindLastIndex(i => i.Calls(Method(typeof(InventorySystem.Items.ThrowableProjectiles.ThrownProjectile), nameof(InventorySystem.Items.ThrowableProjectiles.ThrownProjectile.ServerActivate)))) + offset;
 
+            // remove original ServerActivate
+            List<Label> labels = newInstructions[index].ExtractLabels();
+            newInstructions.RemoveAt(index);
+
             newInstructions.InsertRange(index, new[]
             {
                 // thrownProjectile
-                new CodeInstruction(OpCodes.Dup).MoveLabelsFrom(newInstructions[index]),
+                new CodeInstruction(OpCodes.Dup).WithLabels(labels),
+
+                // ServerActivate
+                new(OpCodes.Callvirt, Method(typeof(InventorySystem.Items.ThrowableProjectiles.ThrownProjectile), nameof(InventorySystem.Items.ThrowableProjectiles.ThrownProjectile.ServerActivate))),
 
                 // API.Features.Player.Get(this.Owner)
                 new(OpCodes.Ldarg_0),

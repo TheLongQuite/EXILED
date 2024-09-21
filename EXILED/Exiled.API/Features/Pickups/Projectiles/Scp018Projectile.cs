@@ -26,6 +26,9 @@ namespace Exiled.API.Features.Pickups.Projectiles
         private static FieldInfo maxVelocityField;
         private static FieldInfo velocityPerBounceField;
 
+        private float? maxVelocity;
+        private float? velocityPerBounce;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Scp018Projectile"/> class.
         /// </summary>
@@ -74,11 +77,16 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// </summary>
         public float MaxVelocity
         {
-            get => PhysicsModule._maxVel;
+            get => IsProjectile ? PhysicsModule._maxVel : 0.0f;
             set
             {
-                maxVelocityField ??= AccessTools.Field(typeof(Scp018Physics), nameof(Scp018Physics._maxVel));
-                maxVelocityField.SetValue(PhysicsModule, value);
+                if (IsProjectile)
+                {
+                    maxVelocityField ??= AccessTools.Field(typeof(Scp018Physics), nameof(Scp018Physics._maxVel));
+                    maxVelocityField.SetValue(PhysicsModule, value);
+                }
+
+                maxVelocity = value;
             }
         }
 
@@ -87,11 +95,17 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// </summary>
         public float VelocityPerBounce
         {
-            get => PhysicsModule._maxVel;
+            get => IsProjectile ? PhysicsModule._velPerBounce : 0.0f;
             set
             {
-                velocityPerBounceField ??= AccessTools.Field(typeof(Scp018Physics), nameof(Scp018Physics._velPerBounce));
-                velocityPerBounceField.SetValue(PhysicsModule, value);
+                if (IsProjectile)
+                {
+                    velocityPerBounceField ??= AccessTools.Field(typeof(Scp018Physics), nameof(Scp018Physics._velPerBounce));
+                    velocityPerBounceField.SetValue(PhysicsModule, value);
+                    return;
+                }
+
+                velocityPerBounce = value;
             }
         }
 
@@ -136,6 +150,17 @@ namespace Exiled.API.Features.Pickups.Projectiles
             {
                 FriendlyFireTime = scp018.FriendlyFireTime;
             }
+        }
+
+        /// <summary>
+        /// Setups scp018 projectile.
+        /// </summary>
+        internal void SetupProjectile()
+        {
+            if (velocityPerBounce.HasValue)
+                VelocityPerBounce = velocityPerBounce.Value;
+            if (maxVelocity.HasValue)
+                MaxVelocity = maxVelocity.Value;
         }
     }
 }

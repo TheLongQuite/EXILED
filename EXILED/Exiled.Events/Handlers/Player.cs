@@ -185,6 +185,11 @@ namespace Exiled.Events.Handlers
         public static Event<ChangingRoleEventArgs> ChangingRole { get; set; } = new();
 
         /// <summary>
+        /// Invoked before throwing an <see cref="API.Features.Items.Throwable"/>.
+        /// </summary>
+        public static Event<ThrownProjectileEventArgs> ThrowingProjectile { get; set; } = new();
+
+        /// <summary>
         /// Invoked afer throwing an <see cref="API.Features.Items.Throwable"/>.
         /// </summary>
         public static Event<ThrownProjectileEventArgs> ThrownProjectile { get; set; } = new();
@@ -680,9 +685,14 @@ namespace Exiled.Events.Handlers
         /// <summary>
         /// Called before throwing a grenade.
         /// </summary>
+        /// <param name="ev">The <see cref="ThrowingProjectileEventArgs"/> instance.</param>
+        public static void OnThrowingProjectile(ThrowingProjectileEventArgs ev) => ThrowingProjectile.InvokeSafely(ev);
+
+        /// <summary>
+        /// Called after throwing a grenade.
+        /// </summary>
         /// <param name="ev">The <see cref="ThrownProjectileEventArgs"/> instance.</param>
-        // TODO: rename that to OnThrownProjectile
-        public static void OnThrowingProjectile(ThrownProjectileEventArgs ev) => ThrownProjectile.InvokeSafely(ev);
+        public static void OnThrownProjectile(ThrownProjectileEventArgs ev) => ThrownProjectile.InvokeSafely(ev);
 
         /// <summary>
         /// Called before receving a throwing request.

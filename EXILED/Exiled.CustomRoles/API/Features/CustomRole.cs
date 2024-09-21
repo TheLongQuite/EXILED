@@ -617,11 +617,11 @@ namespace Exiled.CustomRoles.API.Features
                                         else if (!uint.TryParse(item.Key, out _) && Enum.TryParse(item.Key, out ItemType itemType)) // Чтобы числа могли обозначать только кастомпредметы
                                             player.AddItem(itemType);
                                         else
-                                            Log.Error($"Error at adding items to custom role {Name}. Wrong item: {item.Key}");
+                                            Log.Error($"Error at adding items to custom role {Name} ({Id}). Wrong item: {item.Key}");
                                     }
                                     catch (Exception e)
                                     {
-                                        Log.Error($"Failed to give item {item.Key} to {player}!\n{e}");
+                                        Log.Error($"Failed to give item {item.Key} to {player}\nCustom role: {Name} ({Id})!\n{e}");
                                     }
 
                                     break;
@@ -633,12 +633,12 @@ namespace Exiled.CustomRoles.API.Features
                         }
                         catch (Exception e)
                         {
-                            Log.Error($"Exception in customrole {Name} inventory delayed process for player {player}:\n{e}");
+                            Log.Error($"Exception in customrole {Name} ({Id}) inventory delayed process for player {player}:\n{e}");
                         }
                     });
             }
 
-            Log.Debug($"{Name}: Setting health values.");
+            Log.Debug($"{Name} ({Id}): Setting health values.");
             player.Health = MaxHealth;
             player.MaxHealth = MaxHealth;
             player.Scale = Scale;

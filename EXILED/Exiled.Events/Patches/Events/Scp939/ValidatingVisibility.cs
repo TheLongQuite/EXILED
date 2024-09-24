@@ -81,8 +81,6 @@ namespace Exiled.Events.Patches.Events.Scp939
 
             newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.SeenByLastTime));
 
-            Log.Warn(newInstructions.ToString(true));
-
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];
 

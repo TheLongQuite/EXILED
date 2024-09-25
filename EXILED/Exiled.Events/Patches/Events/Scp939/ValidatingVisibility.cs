@@ -49,10 +49,10 @@ namespace Exiled.Events.Patches.Events.Scp939
 
             newInstructions[index].labels.Add(ret);
 
-            newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.None));
+            newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.None, false));
 
-            offset = 0;
-            index = newInstructions.FindIndex(i => i.LoadsConstant(1)) + offset;
+            offset = 2;
+            index = newInstructions.FindIndex(i => i.Calls(Method(typeof(HitboxIdentity), nameof(HitboxIdentity.IsEnemy), new[] { typeof(ReferenceHub), typeof(ReferenceHub) }))) + offset;
 
             newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.SeenAsScp));
 
@@ -79,7 +79,9 @@ namespace Exiled.Events.Patches.Events.Scp939
             offset = 0;
             index = newInstructions.FindLastIndex(i => i.LoadsField(Field(typeof(Scp939VisibilityController), nameof(Scp939VisibilityController.LastSeen)))) + offset;
 
-            newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.SeenByLastTime));
+            newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.SeenByRange));
+
+            Log.Warn(newInstructions.ToString(true));
 
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];
@@ -87,9 +89,16 @@ namespace Exiled.Events.Patches.Events.Scp939
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
         }
 
-        private static IEnumerable<CodeInstruction> StaticCallEvent(ILGenerator generator, LocalBuilder ev, Label ret, CodeInstruction insertInstuction, Scp939VisibilityState state)
+        private static IEnumerable<CodeInstruction> StaticCallEvent(ILGenerator generator, LocalBuilder ev, Label ret, CodeInstruction insertInstuction, Scp939VisibilityState state, bool setLabel = true)
         {
-            yield return new CodeInstruction(OpCodes.Ldc_I4, (int)state).MoveLabelsFrom(insertInstuction);
+            CodeInstruction first = new CodeInstruction(OpCodes.Ldc_I4, (int)state);
+
+            if (setLabel)
+            {
+                first.labels.AddRange(insertInstuction.ExtractLabels());
+            }
+
+            yield return first;
 
             foreach (CodeInstruction z in CallEvent(generator, ev, ret))
             {

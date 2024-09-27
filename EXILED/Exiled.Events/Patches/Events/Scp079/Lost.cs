@@ -60,7 +60,7 @@ namespace Exiled.Events.Patches.Events.Scp079
                 });
 
             newInstructions.InsertRange(
-                0,
+                newInstructions.Count - 1,
                 new[]
                 {
                     // Role._lastOwner

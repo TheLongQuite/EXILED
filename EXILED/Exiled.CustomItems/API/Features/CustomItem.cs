@@ -82,6 +82,16 @@ namespace Exiled.CustomItems.API.Features
         public abstract float Weight { get; set; }
 
         /// <summary>
+        /// Gets or sets the duration of Description hint when picked up. Default duration if smaller than zero.
+        /// </summary>
+        public virtual float PickedUpHintDuration { get; set; } = -1;
+
+        /// <summary>
+        /// Gets or sets the duration of Description hint when selected. Default duration if smaller than zero.
+        /// </summary>
+        public virtual float SelectedHintDuration { get; set; } = -1;
+
+        /// <summary>
         /// Gets or sets the list of spawn locations and chances for each one.
         /// </summary>
         public abstract SpawnProperties? SpawnProperties { get; set; }
@@ -1082,7 +1092,7 @@ namespace Exiled.CustomItems.API.Features
         protected virtual void ShowPickedUpMessage(Player player)
         {
             if (Instance!.Config.PickedUpHint.Show)
-                player.ShowHint(string.Format(Instance.Config.PickedUpHint.Content, Name, Description), Instance.Config.PickedUpHint.Duration);
+                player.ShowHint(string.Format(Instance.Config.PickedUpHint.Content, Name, Description), PickedUpHintDuration < 0 ? Instance.Config.PickedUpHint.Duration : PickedUpHintDuration);
         }
 
         /// <summary>
@@ -1092,7 +1102,7 @@ namespace Exiled.CustomItems.API.Features
         protected virtual void ShowSelectedMessage(Player player)
         {
             if (Instance!.Config.SelectedHint.Show)
-                player.ShowHint(string.Format(Instance.Config.SelectedHint.Content, Name, Description), Instance.Config.SelectedHint.Duration);
+                player.ShowHint(string.Format(Instance.Config.SelectedHint.Content, Name, Description), SelectedHintDuration < 0 ? Instance.Config.SelectedHint.Duration : SelectedHintDuration);
         }
 
         private void OnInternalOwnerChangingRole(ChangingRoleEventArgs ev)

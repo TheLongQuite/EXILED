@@ -71,12 +71,6 @@ namespace Exiled.Permissions.Extensions
         /// </summary>
         public static void Create()
         {
-            if (!Directory.Exists(Instance.Config.Folder))
-            {
-                Log.Warn($"Permissions directory at {Instance.Config.Folder} is missing, creating.");
-                Directory.CreateDirectory(Instance.Config.Folder);
-            }
-
             if (!File.Exists(Instance.Config.FullPath))
             {
                 Log.Warn($"Permissions file at {Instance.Config.FullPath} is missing, creating.");

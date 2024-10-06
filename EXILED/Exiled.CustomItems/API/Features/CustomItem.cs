@@ -241,9 +241,9 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="id">The <see cref="CustomItem"/> ID to look for.</param>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
-        public static bool TryGet(uint id, out CustomItem? customItem)
+        public static bool TryGet(uint id, out CustomItem customItem)
         {
-            customItem = Get(id);
+            customItem = Get(id) !;
 
             return customItem is not null;
         }
@@ -255,10 +255,10 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="id">The <see cref="CustomItem"/> ID to look for.</param>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
-        public static bool TryGet<T>(uint id, out T? customItem)
+        public static bool TryGet<T>(uint id, out T customItem)
             where T : CustomItem
         {
-            customItem = Get<T>(id);
+            customItem = Get<T>(id) !;
 
             return customItem is not null;
         }
@@ -269,13 +269,13 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="name">The <see cref="CustomItem"/> name to look for.</param>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
-        public static bool TryGet(string name, out CustomItem? customItem)
+        public static bool TryGet(string name, out CustomItem customItem)
         {
-            customItem = null;
+            customItem = null!;
             if (string.IsNullOrEmpty(name))
                 return false;
 
-            customItem = uint.TryParse(name, out uint id) ? Get(id) : Get(name);
+            customItem = (uint.TryParse(name, out uint id) ? Get(id) : Get(name)) !;
 
             return customItem is not null;
         }
@@ -287,14 +287,14 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="name">The <see cref="CustomItem"/> name to look for.</param>
         /// <param name="customItem">The found <see cref="CustomItem"/>, <see langword="null"/> if not registered.</param>
         /// <returns>Returns a value indicating whether the <see cref="CustomItem"/> was found or not.</returns>
-        public static bool TryGet<T>(string name, out T? customItem)
+        public static bool TryGet<T>(string name, out T customItem)
             where T : CustomItem
         {
-            customItem = null;
+            customItem = null!;
             if (string.IsNullOrEmpty(name))
                 return false;
 
-            customItem = uint.TryParse(name, out uint id) ? Get<T>(id) : Get<T>(name);
+            customItem = (uint.TryParse(name, out uint id) ? Get<T>(id) : Get<T>(name)) !;
 
             return customItem is not null;
         }
@@ -334,9 +334,9 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="player">The <see cref="Player"/> to check.</param>
         /// <param name="customItem">The <see cref="CustomItem"/> in their hand.</param>
         /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/> in their hand or not.</returns>
-        public static bool TryGet(Player player, out CustomItem? customItem)
+        public static bool TryGet(Player player, out CustomItem customItem)
         {
-            customItem = null;
+            customItem = null!;
             if (player is null)
                 return false;
 
@@ -352,10 +352,10 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="player">The <see cref="Player"/> to check.</param>
         /// <param name="customItem">The founded <see cref="CustomItem"/>.</param>
         /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/>.</returns>
-        public static bool TryGet<T>(Player player, out T? customItem)
+        public static bool TryGet<T>(Player player, out T customItem)
             where T : CustomItem
         {
-            customItem = null;
+            customItem = null!;
             if (player is null)
                 return false;
 
@@ -372,11 +372,11 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="item">The founded <see cref="Item"/>.</param>
         /// <param name="customItem">The founded <see cref="CustomItem"/>.</param>
         /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/>.</returns>
-        public static bool TryGet<T>(Player player, out Item? item, out T? customItem)
+        public static bool TryGet<T>(Player player, out Item item, out T customItem)
             where T : CustomItem
         {
-            item = null;
-            customItem = null;
+            item = null!;
+            customItem = null!;
             if (player is null)
                 return false;
 
@@ -402,7 +402,7 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="player">The <see cref="Player"/> to check.</param>
         /// <param name="customItems">The player's <see cref="IEnumerable{T}"/> of <see cref="CustomItem"/>.</param>
         /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/> in their hand or not.</returns>
-        public static bool TryGet(Player player, out IEnumerable<CustomItem>? customItems)
+        public static bool TryGet(Player player, out IEnumerable<CustomItem> customItems)
         {
             customItems = Enumerable.Empty<CustomItem>();
             if (player is null)
@@ -420,7 +420,7 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="player">The <see cref="Player"/> to check.</param>
         /// <param name="customItems">The player's <see cref="IEnumerable{T}"/> of <see cref="CustomItem"/>.</param>
         /// <returns>Returns a value indicating whether the <see cref="Player"/> has a <see cref="CustomItem"/> in their hand or not.</returns>
-        public static bool TryGet<T>(Player player, out IEnumerable<CustomItem>? customItems)
+        public static bool TryGet<T>(Player player, out IEnumerable<CustomItem> customItems)
             where T : CustomItem
         {
             customItems = Enumerable.Empty<CustomItem>();
@@ -438,9 +438,9 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="item">The <see cref="Item"/> to check.</param>
         /// <param name="customItem">The <see cref="CustomItem"/> this item is.</param>
         /// <returns>True if the item is a custom item.</returns>
-        public static bool TryGet(Item item, out CustomItem? customItem)
+        public static bool TryGet(Item item, out CustomItem customItem)
         {
-            customItem = item == null ? null : Get(item);
+            customItem = (item == null ? null : Get(item)) !;
 
             return customItem is not null;
         }
@@ -452,10 +452,10 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="item">The <see cref="Item"/> to check.</param>
         /// <param name="customItem">The <see cref="CustomItem"/> this item is.</param>
         /// <returns>True if the item is a custom item.</returns>
-        public static bool TryGet<T>(Item item, out T? customItem)
+        public static bool TryGet<T>(Item item, out T customItem)
             where T : CustomItem
         {
-            customItem = item == null ? null : Get<T>(item);
+            customItem = (item == null ? null : Get<T>(item)) !;
 
             return customItem is not null;
         }
@@ -466,7 +466,7 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="pickup">The <see cref="ItemPickupBase"/> to check.</param>
         /// <param name="customItem">The <see cref="CustomItem"/> this pickup is.</param>
         /// <returns>True if the pickup is a custom item.</returns>
-        public static bool TryGet(Pickup pickup, out CustomItem? customItem)
+        public static bool TryGet(Pickup pickup, out CustomItem customItem)
         {
             customItem = Registered.FirstOrDefault(tempCustomItem => tempCustomItem.Check(pickup));
 
@@ -480,7 +480,7 @@ namespace Exiled.CustomItems.API.Features
         /// <param name="pickup">The <see cref="ItemPickupBase"/> to check.</param>
         /// <param name="customItem">The <see cref="CustomItem"/> this pickup is.</param>
         /// <returns>True if the pickup is a custom item.</returns>
-        public static bool TryGet<T>(Pickup pickup, out T? customItem)
+        public static bool TryGet<T>(Pickup pickup, out T customItem)
             where T : CustomItem
         {
             customItem = GetMany<T>().FirstOrDefault(tempCustomItem => tempCustomItem.Check(pickup));

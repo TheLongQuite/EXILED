@@ -131,6 +131,7 @@ namespace Exiled.Events.Patches.Events.Player
                 // this.Owner
                 new CodeInstruction(OpCodes.Ldarg_0),
                 new CodeInstruction(OpCodes.Callvirt, PropertyGetter(typeof(Consumable), nameof(Consumable.Owner))),
+                new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
 
                 // this
                 new(OpCodes.Ldarg_0),

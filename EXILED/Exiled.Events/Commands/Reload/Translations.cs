@@ -18,7 +18,6 @@ namespace Exiled.Events.Commands.Reload
     /// <summary>
     /// The reload translations command.
     /// </summary>
-    [CommandHandler(typeof(Reload))]
     public class Translations : ICommand
     {
         /// <summary>

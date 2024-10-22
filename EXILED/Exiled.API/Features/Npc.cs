@@ -13,7 +13,6 @@ namespace Exiled.API.Features
     using System.Linq;
     using System.Reflection;
 
-    using CentralAuth;
     using CommandSystem;
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
@@ -172,8 +171,7 @@ namespace Exiled.API.Features
         /// <returns>The <see cref="Npc"/> spawned.</returns>
         public static Npc Spawn(string name, RoleTypeId role, SpawnReason reason = SpawnReason.RoundStart, RoleSpawnFlags roleFlags = RoleSpawnFlags.All, string userId = "", Vector3? position = null)
         {
-            GameObject newObject = UnityEngine.Object.Instantiate(Mirror.NetworkManager.singleton.playerPrefab);
-
+            GameObject newObject = Object.Instantiate(NetworkManager.singleton.playerPrefab);
             Npc npc = new(newObject)
             {
                 IsNPC = true,

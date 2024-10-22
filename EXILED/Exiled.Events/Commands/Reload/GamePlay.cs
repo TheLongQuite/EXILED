@@ -18,7 +18,6 @@ namespace Exiled.Events.Commands.Reload
     /// <summary>
     /// The reload gameplay command.
     /// </summary>
-    [CommandHandler(typeof(Reload))]
     public class GamePlay : ICommand
     {
         /// <summary>

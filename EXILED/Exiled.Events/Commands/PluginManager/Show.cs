@@ -24,7 +24,6 @@ namespace Exiled.Events.Commands.PluginManager
     /// <summary>
     /// The command to show all plugins.
     /// </summary>
-    [CommandHandler(typeof(PluginManager))]
     public sealed class Show : ICommand
     {
         /// <summary>

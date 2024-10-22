@@ -19,7 +19,6 @@ namespace Exiled.Events.Commands.Reload
     /// <summary>
     /// The reload plugins command.
     /// </summary>
-    [CommandHandler(typeof(Reload))]
     public class Plugins : ICommand
     {
         /// <summary>

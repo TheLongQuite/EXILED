@@ -21,7 +21,6 @@ namespace Exiled.API.Features.Roles
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
     using PlayerRoles.PlayableScps.Scp049.Zombies;
-
     using UnityEngine;
     using YamlDotNet.Core.Tokens;
 
@@ -421,7 +420,7 @@ namespace Exiled.API.Features.Roles
             SpectatorGameRole spectatorRole => new SpectatorRole(spectatorRole),
             HumanGameRole humanRole => new HumanRole(humanRole),
             FilmmakerGameRole filmmakerRole => new FilmMakerRole(filmmakerRole),
-            NoneGameRole => new NoneRole(role),
+            NoneGameRole noneRole => new NoneRole(noneRole),
             _ => null,
         };
 

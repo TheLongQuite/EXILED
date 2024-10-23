@@ -54,7 +54,7 @@ namespace Exiled.API.Features.Items
             Base.Owner = owner.ReferenceHub;
             Base.ActivateEffects();
 
-            typeof(UsableItemsController).InvokeStaticEvent(nameof(UsableItemsController.ServerOnUsingCompleted), new object[] { referenceHub, usableItem.Base });
+            typeof(UsableItemsController).InvokeStaticEvent(nameof(UsableItemsController.ServerOnUsingCompleted), new object[] { owner.ReferenceHub, Base });
 
             Base.Owner = oldOwner.ReferenceHub;
         }

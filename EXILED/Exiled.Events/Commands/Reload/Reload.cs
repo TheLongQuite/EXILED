@@ -9,6 +9,7 @@ namespace Exiled.Events.Commands.Reload
 {
     using System;
     using System.Collections.Generic;
+
     using API.Features;
     using CommandSystem;
 

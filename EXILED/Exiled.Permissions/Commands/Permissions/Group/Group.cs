@@ -10,6 +10,7 @@ namespace Exiled.Permissions.Commands.Permissions.Group
     using System;
     using System.Collections.Generic;
     using System.Text;
+
     using API.Features;
     using CommandSystem;
 

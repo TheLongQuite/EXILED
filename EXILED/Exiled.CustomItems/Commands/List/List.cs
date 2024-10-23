@@ -9,6 +9,7 @@ namespace Exiled.CustomItems.Commands.List
 {
     using System;
     using System.Collections.Generic;
+
     using Exiled.API.Features;
 
     /// <summary>

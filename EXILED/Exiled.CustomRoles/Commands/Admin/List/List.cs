@@ -9,6 +9,7 @@ namespace Exiled.CustomRoles.Commands.Admin.List
 {
     using System;
     using System.Collections.Generic;
+
     using Exiled.API.Features;
 
     /// <summary>

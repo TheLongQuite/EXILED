@@ -9,6 +9,7 @@ namespace Exiled.Events.Commands.PluginManager
 {
     using System;
     using System.Collections.Generic;
+
     using API.Features;
     using CommandSystem;
 

@@ -2157,10 +2157,16 @@ namespace Exiled.API.Features
 
             typeof(UsableItemsController).InvokeStaticEvent(nameof(UsableItemsController.ServerOnUsingCompleted), new object[] { referenceHub, usableItem.Base });
 
-            if (usableItem.Base is not null)
-                usableItem.Destroy();
-
             return true;
+        }
+
+        /// <summary>
+        /// Forces the player to use an item.
+        /// </summary>
+        /// <param name="item">The item to be used.</param>
+        public void UseItem(Usable item)
+        {
+            item.Use(this);
         }
 
         /// <summary>

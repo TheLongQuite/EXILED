@@ -124,11 +124,6 @@ namespace Exiled.CustomRoles.API.Features
         public virtual SpawnPositionSettings SpawnProperties { get; set; } = new();
 
         /// <summary>
-        ///     Gets or sets a value indicating whether players keep their current inventory when gaining this role.
-        /// </summary>
-        public virtual bool KeepInventoryOnSpawn { get; set; }
-
-        /// <summary>
         ///     Gets or sets a value indicating whether players keep this role when they die.
         /// </summary>
         public virtual bool KeepRoleOnDeath { get; set; }
@@ -538,19 +533,48 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
-        ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
+        /// Gives to a target <see cref="Player"/> items and ammos preset for current <see cref="CustomRole"/>.
         /// </summary>
-        /// <param name="player">The <see cref="Player" /> to add the role to.</param>
-        [Obsolete("Используй AddRole(player, SpawnReason, RoleSpawnFlags)", true)]
-        public virtual void AddRole(Player player) => AddRole(player, SpawnReason.ForceClass);
+        /// <param name="player">Target <see cref="Player"/>.</param>
+        public virtual void GivePreset(Player player)
+        {
+            try
+            {
+                player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out short itemsBuff);
+                foreach (Dictionary<string, short> slot in Inventory)
+                {
+                    foreach (KeyValuePair<string, short> item in slot)
+                    {
+                        byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
+                        if (!CommonExtensions.ChanceChecker(chance))
+                            continue;
 
-        /// <summary>
-        ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
-        /// </summary>
-        /// <param name="player">The <see cref="Player" /> to add the role to.</param>
-        /// <param name="spawnReason">The <see cref="SpawnReason" /> to spawn player.</param>
-        [Obsolete("Используй AddRole(player, SpawnReason, RoleSpawnFlags)", true)]
-        public virtual void AddRole(Player player, SpawnReason spawnReason) => AddRole(player, spawnReason, RoleSpawnFlags.All);
+                        try
+                        {
+                            if (CustomItem.TryGet(item.Key, out CustomItem? customItem))
+                                customItem?.Give(player, DisplayCustomItemMessages);
+                            else if (!uint.TryParse(item.Key, out _) && Enum.TryParse(item.Key, out ItemType itemType)) // Чтобы числа могли обозначать только кастомпредметы
+                                player.AddItem(itemType);
+                            else
+                                Log.Error($"Error at adding items to custom role {Name} ({Id}). Wrong item: {item.Key}");
+                        }
+                        catch (Exception e)
+                        {
+                            Log.Error($"Failed to give item {item.Key} to {player}\nCustom role: {Name} ({Id})!\n{e}");
+                        }
+
+                        break;
+                    }
+                }
+
+                foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
+                    player.SetAmmo(ammo.Key, ammo.Value);
+            }
+            catch (Exception e)
+            {
+                Log.Error($"Exception in customrole {Name} ({Id}) inventory delayed process for player {player}:\n{e}");
+            }
+        }
 
         /// <summary>
         ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
@@ -558,84 +582,49 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player" /> to add the role to.</param>
         /// <param name="spawnReason">The <see cref="SpawnReason" /> to spawn player.</param>
         /// <param name="spawnFlags">The <see cref="RoleSpawnFlags" /> to spawn player.</param>
-        public virtual void AddRole(Player player, SpawnReason spawnReason, RoleSpawnFlags spawnFlags)
+        public virtual void AddRole(Player player, SpawnReason spawnReason, RoleSpawnFlags spawnFlags) =>
+            AddRole(player, spawnReason, spawnFlags, true);
+
+        /// <summary>
+        ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
+        /// </summary>
+        /// <param name="player">The <see cref="Player" /> to add the role to.</param>
+        /// <param name="spawnReason">The <see cref="SpawnReason" /> to spawn player.</param>
+        /// <param name="spawnFlags">The <see cref="RoleSpawnFlags" /> to spawn player.</param>
+        /// <param name="forceRole">Whether or not <see cref="Player"/> will be forced.</param>
+        public virtual void AddRole(Player player, SpawnReason spawnReason, RoleSpawnFlags spawnFlags, bool forceRole)
         {
             Log.Debug($"{Name}: Adding role to {player.Nickname} with flags {spawnFlags}.");
 
             Vector3 position = Vector3.zero;
-            bool posAltered = false;
             bool useSpawnpoint = spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint);
-            if (SpawnProperties.IsAny)
-            {
-                position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
-                posAltered = true;
-            }
 
-            if (Role != RoleTypeId.None)
+            if (forceRole && Role != RoleTypeId.None)
             {
-                RoleSpawnFlags flags = !posAltered && useSpawnpoint ? RoleSpawnFlags.UseSpawnpoint : RoleSpawnFlags.None;
+                RoleSpawnFlags flags = RoleSpawnFlags.None;
+                if (!SpawnProperties.IsAny && useSpawnpoint)
+                    flags |= RoleSpawnFlags.UseSpawnpoint;
+                else if (SpawnProperties.IsAny && useSpawnpoint)
+                    Extensions.ToChangePositionPlayers.Add(player, this);
+
+                if (spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
+                    Extensions.ToChangeItemsPlayers.Add(player, this);
+
                 player.Role.Set(Role, spawnReason, flags);
                 Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
             }
-
-            if (posAltered && useSpawnpoint)
+            else
             {
-                player.Position = position;
-                Log.Debug($"{Name}: Setting position to {position}.");
-            }
+                if (SpawnProperties.IsAny && useSpawnpoint)
+                {
+                    player.Position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
+                }
 
-            if (player.IsHuman && spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
-            {
-                Timing.CallDelayed(
-                    0.25f,
-                    () =>
-                    {
-                        if (!player.IsConnected)
-                            return;
-
-                        try
-                        {
-                            if (!KeepInventoryOnSpawn)
-                            {
-                                Log.Debug($"{Name}: Clearing {player.Nickname}'s inventory.");
-                                player.ClearInventory();
-                            }
-
-                            player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out short itemsBuff);
-                            foreach (Dictionary<string, short> slot in Inventory)
-                            {
-                                foreach (KeyValuePair<string, short> item in slot)
-                                {
-                                    byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
-                                    if (!CommonExtensions.ChanceChecker(chance))
-                                        continue;
-
-                                    try
-                                    {
-                                        if (CustomItem.TryGet(item.Key, out CustomItem? customItem))
-                                            customItem?.Give(player, DisplayCustomItemMessages);
-                                        else if (!uint.TryParse(item.Key, out _) && Enum.TryParse(item.Key, out ItemType itemType)) // Чтобы числа могли обозначать только кастомпредметы
-                                            player.AddItem(itemType);
-                                        else
-                                            Log.Error($"Error at adding items to custom role {Name} ({Id}). Wrong item: {item.Key}");
-                                    }
-                                    catch (Exception e)
-                                    {
-                                        Log.Error($"Failed to give item {item.Key} to {player}\nCustom role: {Name} ({Id})!\n{e}");
-                                    }
-
-                                    break;
-                                }
-                            }
-
-                            foreach (KeyValuePair<AmmoType, ushort> ammo in Ammo)
-                                player.SetAmmo(ammo.Key, ammo.Value);
-                        }
-                        catch (Exception e)
-                        {
-                            Log.Error($"Exception in customrole {Name} ({Id}) inventory delayed process for player {player}:\n{e}");
-                        }
-                    });
+                if (spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
+                {
+                    player.ClearInventory();
+                    GivePreset(player);
+                }
             }
 
             Log.Debug($"{Name} ({Id}): Setting health values.");
@@ -656,7 +645,8 @@ namespace Exiled.CustomRoles.API.Features
             if (Extensions.InternalPlayerToCustomRoles.TryGetValue(player, out CustomRole cr))
             {
                 Log.Error($"player: {player} already has custom role in AddRole: cr is {cr.Name} ({cr.Id})");
-                cr.RemoveRoleWhenDisconnect(player);
+                cr.TrackedPlayers.Remove(player);
+                Extensions.InternalPlayerToCustomRoles.Remove(player);
             }
 
             TrackedPlayers.Add(player);
@@ -704,28 +694,6 @@ namespace Exiled.CustomRoles.API.Features
             RoleRemoved(player);
             player.UniqueRole = string.Empty;
             player.TryRemoveCustomeRoleFriendlyFire(Name);
-        }
-
-        /// <summary>
-        ///     Removes the role from a specific player.
-        /// </summary>
-        /// <param name="player">The <see cref="Player" /> to remove the role from.</param>
-        public virtual void RemoveRoleWhenDisconnect(Player player)
-        {
-            if (!TrackedPlayers.Contains(player))
-                return;
-            Log.Debug($"{Name}: Removing role from {player.Nickname}");
-            Extensions.InternalPlayerToCustomRoles.Remove(player);
-            TrackedPlayers.Remove(player);
-            if (CustomAbilities is not null)
-            {
-                foreach (CustomAbility ability in CustomAbilities)
-                {
-                    ability.RemoveAbility(player);
-                }
-            }
-
-            RoleRemoved(player);
         }
 
         /// <summary>
@@ -906,6 +874,8 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
+            if (ReplacesBaseRole)
+                Exiled.Events.Handlers.Player.ChangingRole += OnInternalSpawned;
         }
 
         /// <summary>
@@ -918,6 +888,8 @@ namespace Exiled.CustomRoles.API.Features
 
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
+            if (ReplacesBaseRole)
+                Exiled.Events.Handlers.Player.ChangingRole -= OnInternalSpawned;
         }
 
         /// <summary>
@@ -935,7 +907,7 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
-        ///     Called 1 frame before the role is removed from the player.
+        ///     Called after the role is removed from the player.
         /// </summary>
         /// <param name="player">The <see cref="Player" /> the role was removed from.</param>
         protected virtual void RoleRemoved(Player player)
@@ -947,33 +919,24 @@ namespace Exiled.CustomRoles.API.Features
             if (Check(ev.Player) &&
                 ((ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath) || ev.NewRole != RoleTypeId.Spectator))
             {
-                if (ev.Reason == SpawnReason.Destroyed)
-                {
-                    RemoveRoleWhenDisconnect(ev.Player);
-                }
-                else
-                {
-                    RemoveRole(ev.Player);
-                }
-
-                return;
+                RemoveRole(ev.Player);
             }
+        }
 
-            if (ReplacesBaseRole && Role != RoleTypeId.None && Role == ev.NewRole)
+        private void OnInternalSpawned(ChangingRoleEventArgs ev)
+        {
+            if (Role != RoleTypeId.None && Role == ev.NewRole)
             {
-                Timing.CallDelayed(1.1f, () =>
+                try
                 {
-                    try
-                    {
-                        if (!ev.Player.IsConnected || ev.Player.HasCustomRole() || ev.Player.Role != Role || ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
-                            return;
-                        AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.All);
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Error($"[{nameof(CustomRole)}.{nameof(OnInternalChangingRole)}] [{Name}] Failed to add customRole-replacer of basic {Role}:\n{e}");
-                    }
-                });
+                    if (!ev.Player.IsConnected || ev.Player.Role != Role || ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
+                        return;
+                    AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.AssignInventory, false);
+                }
+                catch (Exception e)
+                {
+                    Log.Error($"[{nameof(CustomRole)}.{nameof(OnInternalChangingRole)}] [{Name}] Failed to add customRole-replacer of basic {Role}:\n{e}");
+                }
             }
         }
     }

@@ -31,6 +31,16 @@ namespace Exiled.CustomRoles.API
         internal static Dictionary<Player, CustomRole> InternalPlayerToCustomRoles { get; } = new();
 
         /// <summary>
+        /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing all temp cache-roles for setting position.
+        /// </summary>
+        internal static Dictionary<Player, CustomRole> ToChangePositionPlayers { get; } = new();
+
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing all temp cache-roles for giving items and ammos.
+        /// </summary>
+        internal static Dictionary<Player, CustomRole> ToChangeItemsPlayers { get; } = new();
+
+        /// <summary>
         ///     Gets a <see cref="ReadOnlyCollection{T}" /> of the player's current custom roles.
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to check for roles.</param>

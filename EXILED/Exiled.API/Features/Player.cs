@@ -2154,10 +2154,7 @@ namespace Exiled.API.Features
             if (item is not Usable usableItem)
                 return false;
 
-            usableItem.Base.Owner = referenceHub;
-            usableItem.Base.ServerOnUsingCompleted();
-
-            typeof(UsableItemsController).InvokeStaticEvent(nameof(UsableItemsController.ServerOnUsingCompleted), new object[] { referenceHub, usableItem.Base });
+            UseItem(usableItem);
 
             return true;
         }

@@ -2140,6 +2140,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="usableItem">The ItemType to be used.</param>
         /// <returns><see langword="true"/> if item was used successfully. Otherwise, <see langword="false"/>.</returns>
+        [Obsolete("Use `void UseItem(Usable)`")]
         public bool UseItem(ItemType usableItem) => UseItem(Item.Create(usableItem));
 
         /// <summary>
@@ -2147,6 +2148,7 @@ namespace Exiled.API.Features
         /// </summary>
         /// <param name="item">The item to be used.</param>
         /// <returns><see langword="true"/> if item was used successfully. Otherwise, <see langword="false"/>.</returns>
+        [Obsolete("Use `void UseItem(Usable)`")]
         public bool UseItem(Item item)
         {
             if (item is not Usable usableItem)

@@ -26,16 +26,14 @@ namespace Exiled.API.Features
         {
             get
             {
-                if (Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
-                    return maxHealthStat.CurValue;
                 return customMaxValue;
             }
 
             set
             {
                 customMaxValue = value;
-                if (Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
-                    maxHealthStat.CurValue = value;
+                if (value > 100 && Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
+                    maxHealthStat.CurValue = value - 100;
             }
         }
     }

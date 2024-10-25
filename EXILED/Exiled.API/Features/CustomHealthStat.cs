@@ -42,8 +42,16 @@ namespace Exiled.API.Features
             {
                 if (Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
                 {
-                    customMaxValue = Math.Min(100, value - 100);
-                    maxHealthStat.CurValue = Math.Max(value - 100, 0);
+                    if (customMaxValue > 100)
+                    {
+                        customMaxValue = 100;
+                        maxHealthStat.CurValue = value - 100;
+                    }
+                    else
+                    {
+                        customMaxValue = value;
+                        maxHealthStat.CurValue = 0;
+                    }
                 }
                 else
                 {

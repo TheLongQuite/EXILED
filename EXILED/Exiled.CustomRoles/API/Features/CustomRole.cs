@@ -939,7 +939,7 @@ namespace Exiled.CustomRoles.API.Features
             {
                 try
                 {
-                    AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.AssignInventory, false);
+                    AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.All, false);
                 }
                 catch (Exception e)
                 {

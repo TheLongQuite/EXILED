@@ -7,6 +7,8 @@
 
 namespace Exiled.API.Features
 {
+    using System;
+
     using PlayerStatsSystem;
 
     /// <summary>
@@ -26,14 +28,27 @@ namespace Exiled.API.Features
         {
             get
             {
-                return customMaxValue;
+                float result = customMaxValue;
+
+                if (Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
+                {
+                    result += maxHealthStat.CurValue;
+                }
+
+                return result;
             }
 
             set
             {
-                customMaxValue = value;
-                if (value > 100 && Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
-                    maxHealthStat.CurValue = value - 100;
+                if (Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
+                {
+                    customMaxValue = Math.Min(100, value - 100);
+                    maxHealthStat.CurValue = Math.Max(value - 100, 0);
+                }
+                else
+                {
+                    customMaxValue = value;
+                }
             }
         }
     }

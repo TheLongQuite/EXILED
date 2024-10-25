@@ -42,7 +42,7 @@ namespace Exiled.API.Features
             {
                 if (Hub.playerStats.TryGetModule(out MaxHealthStat maxHealthStat))
                 {
-                    if (customMaxValue > 100)
+                    if (value > 100)
                     {
                         customMaxValue = 100;
                         maxHealthStat.CurValue = value - 100;

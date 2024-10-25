@@ -577,6 +577,51 @@ namespace Exiled.CustomRoles.API.Features
         }
 
         /// <summary>
+        /// Adds all <see cref="CustomRole"/> properties to a target <see cref="Player"/>.
+        /// </summary>
+        /// <param name="player">The <see cref="Player" /> to add the role to.</param>
+        /// <param name="spawnReason">The <see cref="SpawnReason" /> to spawn player.</param>
+        /// <param name="assignInventory">Should <see cref="Player"/> receive <see cref="CustomRole"/> inventory.</param>
+        public virtual void AddProperties(Player player, SpawnReason spawnReason, bool assignInventory)
+        {
+            if (assignInventory)
+            {
+                player.ClearInventory();
+                GivePreset(player);
+            }
+
+            Log.Debug($"{Name} ({Id}): Setting health values.");
+            player.Health = MaxHealth;
+            player.MaxHealth = MaxHealth;
+            player.Scale = Scale;
+
+            Log.Debug($"{Name}: Setting player info");
+            player.InfoArea &= ~PlayerInfoArea.Role;
+            if (CustomInfo.ToLowerInvariant() != "none")
+                player.CustomInfo = CustomInfo;
+
+            if (CustomAbilities is not null)
+            {
+                foreach (CustomAbility ability in CustomAbilities)
+                    ability.AddAbility(player);
+            }
+
+            if (Extensions.InternalPlayerToCustomRoles.TryGetValue(player, out CustomRole cr))
+            {
+                Log.Error($"player: {player} already has custom role in AddRole: cr is {cr.Name} ({cr.Id})");
+                cr.TrackedPlayers.Remove(player);
+                Extensions.InternalPlayerToCustomRoles.Remove(player);
+            }
+
+            TrackedPlayers.Add(player);
+            Extensions.InternalPlayerToCustomRoles.Add(player, this);
+            ShowMessage(player);
+            RoleAdded(player);
+            player.UniqueRole = Name;
+            player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
+        }
+
+        /// <summary>
         ///     Handles setup of the role, including spawn location, inventory and registering event handlers and add FF rules.
         /// </summary>
         /// <param name="player">The <see cref="Player" /> to add the role to.</param>
@@ -598,17 +643,18 @@ namespace Exiled.CustomRoles.API.Features
 
             Vector3 position = Vector3.zero;
             bool useSpawnpoint = spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint);
+            bool assignInventory = spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory);
 
             if (forceRole && Role != RoleTypeId.None)
             {
                 RoleSpawnFlags flags = RoleSpawnFlags.None;
                 if (!SpawnProperties.IsAny && useSpawnpoint)
                     flags |= RoleSpawnFlags.UseSpawnpoint;
-                else if (SpawnProperties.IsAny && useSpawnpoint)
-                    Extensions.ToChangePositionPlayers.Add(player, this);
 
-                if (spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
-                    Extensions.ToChangeItemsPlayers.Add(player, this);
+                if (assignInventory)
+                    Extensions.AssignInventoryPlayers.Add(player);
+
+                Extensions.ToChangeRolePlayers[player] = this;
 
                 player.Role.Set(Role, spawnReason, flags);
                 Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
@@ -616,45 +662,9 @@ namespace Exiled.CustomRoles.API.Features
             else
             {
                 if (SpawnProperties.IsAny && useSpawnpoint)
-                {
                     player.Position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
-                }
-
-                if (spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
-                {
-                    player.ClearInventory();
-                    GivePreset(player);
-                }
+                AddProperties(player, spawnReason, assignInventory);
             }
-
-            Log.Debug($"{Name} ({Id}): Setting health values.");
-            player.Health = MaxHealth;
-            player.MaxHealth = MaxHealth;
-            player.Scale = Scale;
-
-            Log.Debug($"{Name}: Setting player info");
-            player.InfoArea &= ~PlayerInfoArea.Role;
-            if (CustomInfo.ToLowerInvariant() != "none")
-                player.CustomInfo = CustomInfo;
-            if (CustomAbilities is not null)
-            {
-                foreach (CustomAbility ability in CustomAbilities)
-                    ability.AddAbility(player);
-            }
-
-            if (Extensions.InternalPlayerToCustomRoles.TryGetValue(player, out CustomRole cr))
-            {
-                Log.Error($"player: {player} already has custom role in AddRole: cr is {cr.Name} ({cr.Id})");
-                cr.TrackedPlayers.Remove(player);
-                Extensions.InternalPlayerToCustomRoles.Remove(player);
-            }
-
-            TrackedPlayers.Add(player);
-            Extensions.InternalPlayerToCustomRoles.Add(player, this);
-            ShowMessage(player);
-            RoleAdded(player);
-            player.UniqueRole = Name;
-            player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
         }
 
         /// <summary>
@@ -875,7 +885,7 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Loading events.");
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
             if (ReplacesBaseRole)
-                Exiled.Events.Handlers.Player.ChangingRole += OnInternalSpawned;
+                Exiled.Events.Handlers.Player.Spawning += OnInternalSpawning;
         }
 
         /// <summary>
@@ -889,7 +899,7 @@ namespace Exiled.CustomRoles.API.Features
             Log.Debug($"{Name}: Unloading events.");
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
             if (ReplacesBaseRole)
-                Exiled.Events.Handlers.Player.ChangingRole -= OnInternalSpawned;
+                Exiled.Events.Handlers.Player.Spawning -= OnInternalSpawning;
         }
 
         /// <summary>
@@ -923,14 +933,12 @@ namespace Exiled.CustomRoles.API.Features
             }
         }
 
-        private void OnInternalSpawned(ChangingRoleEventArgs ev)
+        private void OnInternalSpawning(SpawningEventArgs ev)
         {
-            if (Role != RoleTypeId.None && Role == ev.NewRole)
+            if (Role != RoleTypeId.None && ev.Player.Role == Role && !ev.Player.HasCustomRole() && !ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
             {
                 try
                 {
-                    if (!ev.Player.IsConnected || ev.Player.Role != Role || ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
-                        return;
                     AddRole(ev.Player, SpawnReason.ForceClass, RoleSpawnFlags.AssignInventory, false);
                 }
                 catch (Exception e)

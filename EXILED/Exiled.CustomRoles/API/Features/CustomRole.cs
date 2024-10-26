@@ -684,6 +684,8 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player" /> to remove the role from.</param>
         public virtual void RemoveRole(Player player)
         {
+            Log.Debug($"{Name}: (before) Removing role from {player.Nickname}");
+
             if (!TrackedPlayers.Contains(player))
                 return;
             Log.Debug($"{Name}: Removing role from {player.Nickname}");

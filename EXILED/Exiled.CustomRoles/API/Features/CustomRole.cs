@@ -657,13 +657,14 @@ namespace Exiled.CustomRoles.API.Features
                 Extensions.ToChangeRolePlayers[player] = this;
 
                 player.Role.Set(Role, spawnReason, flags);
-                Log.Debug($"{Name}: Set basic role to {player.Nickname} with flags: {flags}.");
+                Log.Debug($"{Name}: Set basic role (force) to {player.Nickname} with flags: {flags}.");
             }
             else
             {
                 if (SpawnProperties.IsAny && useSpawnpoint)
                     player.Position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
                 AddProperties(player, spawnReason, assignInventory);
+                Log.Debug($"{Name}: Set basic role (nonforce)  to {player.Nickname} with flags: {flags}.");
             }
         }
 
@@ -926,8 +927,7 @@ namespace Exiled.CustomRoles.API.Features
 
         private void OnInternalChangingRole(ChangingRoleEventArgs ev)
         {
-            if (Check(ev.Player) &&
-                ((ev.NewRole == RoleTypeId.Spectator && !KeepRoleOnDeath) || ev.NewRole != RoleTypeId.Spectator))
+            if (Check(ev.Player))
             {
                 RemoveRole(ev.Player);
             }

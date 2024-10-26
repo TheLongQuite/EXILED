@@ -664,7 +664,7 @@ namespace Exiled.CustomRoles.API.Features
                 if (SpawnProperties.IsAny && useSpawnpoint)
                     player.Position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
                 AddProperties(player, spawnReason, assignInventory);
-                Log.Debug($"{Name}: Set basic role (nonforce)  to {player.Nickname} with flags: {flags}.");
+                Log.Debug($"{Name}: Set basic role (nonforce) to {player.Nickname}");
             }
         }
 

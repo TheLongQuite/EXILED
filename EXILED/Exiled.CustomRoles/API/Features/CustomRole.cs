@@ -880,7 +880,10 @@ namespace Exiled.CustomRoles.API.Features
         protected virtual void SubscribeEvents()
         {
             Log.Debug($"{Name}: Loading events.");
+
             Exiled.Events.Handlers.Player.ChangingRole += OnInternalChangingRole;
+            Exiled.Events.Handlers.Player.Spawned += OnInternalSpawned;
+
             if (ReplacesBaseRole)
                 Exiled.Events.Handlers.Player.Spawning += OnInternalSpawning;
         }
@@ -894,7 +897,10 @@ namespace Exiled.CustomRoles.API.Features
                 RemoveRole(player);
 
             Log.Debug($"{Name}: Unloading events.");
+
             Exiled.Events.Handlers.Player.ChangingRole -= OnInternalChangingRole;
+            Exiled.Events.Handlers.Player.Spawned -= OnInternalSpawned;
+
             if (ReplacesBaseRole)
                 Exiled.Events.Handlers.Player.Spawning -= OnInternalSpawning;
         }

@@ -600,12 +600,6 @@ namespace Exiled.CustomRoles.API.Features
             if (CustomInfo.ToLowerInvariant() != "none")
                 player.CustomInfo = CustomInfo;
 
-            if (CustomAbilities is not null)
-            {
-                foreach (CustomAbility ability in CustomAbilities)
-                    ability.AddAbility(player);
-            }
-
             if (Extensions.InternalPlayerToCustomRoles.TryGetValue(player, out CustomRole cr))
             {
                 Log.Error($"player: {player} already has custom role in AddRole: cr is {cr.Name} ({cr.Id})");
@@ -616,7 +610,6 @@ namespace Exiled.CustomRoles.API.Features
             TrackedPlayers.Add(player);
             Extensions.InternalPlayerToCustomRoles.Add(player, this);
             ShowMessage(player);
-            RoleAdded(player);
             player.UniqueRole = Name;
             player.TryAddCustomRoleFriendlyFire(Name, CustomRoleFFMultiplier);
         }
@@ -664,6 +657,7 @@ namespace Exiled.CustomRoles.API.Features
                 if (SpawnProperties.IsAny && useSpawnpoint)
                     player.Position = SpawnProperties.GetRandomPoint() + (Vector3.up * 1.5f);
                 AddProperties(player, spawnReason, assignInventory);
+                RoleAdded(player);
                 Log.Debug($"{Name}: Set basic role (nonforce) to {player.Nickname}");
             }
         }
@@ -917,6 +911,11 @@ namespace Exiled.CustomRoles.API.Features
         /// <param name="player">The <see cref="Player" /> the role was added to.</param>
         protected virtual void RoleAdded(Player player)
         {
+            if (CustomAbilities is not null)
+            {
+                foreach (CustomAbility ability in CustomAbilities)
+                    ability.AddAbility(player);
+            }
         }
 
         /// <summary>
@@ -947,6 +946,14 @@ namespace Exiled.CustomRoles.API.Features
                 {
                     Log.Error($"[{nameof(CustomRole)}.{nameof(OnInternalChangingRole)}] [{Name}] Failed to add customRole-replacer of basic {Role}:\n{e}");
                 }
+            }
+        }
+
+        private void OnInternalSpawned(SpawnedEventArgs ev)
+        {
+            if (Check(ev.Player))
+            {
+                RoleAdded(ev.Player);
             }
         }
     }

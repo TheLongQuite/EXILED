@@ -7,9 +7,10 @@
 
 namespace Exiled.Events.Patches.Fixes
 {
+#pragma warning disable SA1402
+#pragma warning disable SA1313
     using System;
 
-#pragma warning disable SA1402
     using System.Collections.Generic;
     using System.Reflection.Emit;
 
@@ -49,7 +50,7 @@ namespace Exiled.Events.Patches.Fixes
     [HarmonyPatch(typeof(CandyBlack), nameof(CandyBlack.GetRandomDoor))]
     internal class CandyBlackTest
     {
-        private static bool Prefix()
+        private static bool Prefix(ref bool __result)
         {
             int index1 = 0;
             try
@@ -71,7 +72,10 @@ namespace Exiled.Events.Patches.Fixes
             }
 
             if (index1 == 0)
-                return CandyBlack.GetWhitelistedDoors().RandomItem<DoorVariant>();
+            {
+                __result = CandyBlack.GetWhitelistedDoors().RandomItem<DoorVariant>();
+                return false;
+            }
 
             DoorVariant doorVariant = null;
             float num1 = float.MaxValue;
@@ -108,7 +112,8 @@ namespace Exiled.Events.Patches.Fixes
                 }
             }
 
-            return maxExclusive != 0 ? CandyBlack.DoorsNonAlloc[UnityEngine.Random.Range(0, maxExclusive)] : doorVariant;
+            __result = maxExclusive != 0 ? CandyBlack.DoorsNonAlloc[UnityEngine.Random.Range(0, maxExclusive)] : doorVariant;
+            return false;
         }
     }
 }

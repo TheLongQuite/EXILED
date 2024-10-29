@@ -26,7 +26,7 @@ namespace Exiled.Events.Patches.Fixes
     /// <summary>
     /// Fix for chamber lists weren't cleared.
     /// </summary>
-    // [HarmonyPatch(typeof(CandyBlack), MethodType.StaticConstructor)]
+    [HarmonyPatch(typeof(CandyBlack), MethodType.StaticConstructor)]
     internal class CandyBlackFix
     {
         private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)

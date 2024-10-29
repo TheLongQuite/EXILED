@@ -23,11 +23,7 @@ namespace Exiled.CustomRoles.API.Features
     using Exiled.API.Interfaces;
     using Exiled.Events.EventArgs.Player;
 
-    using FLXLib.Extensions;
     using FLXLib.Spawns;
-
-    using MainDatabasePlugin.Modules;
-
     using MEC;
 
     using PlayerRoles;
@@ -35,8 +31,6 @@ namespace Exiled.CustomRoles.API.Features
     using UnityEngine;
 
     using YamlDotNet.Serialization;
-
-    using CommonExtensions = FLXLib.Extensions.CommonExtensions;
 
     /// <summary>
     ///     The custom role base class.
@@ -540,13 +534,13 @@ namespace Exiled.CustomRoles.API.Features
         {
             try
             {
-                player.TryGetSessionVariable(PrivilegeModule.ItemBuffKey, out short itemsBuff);
+                player.TryGetSessionVariable("buffitems", out short itemsBuff);
                 foreach (Dictionary<string, short> slot in Inventory)
                 {
                     foreach (KeyValuePair<string, short> item in slot)
                     {
                         byte chance = (byte)Mathf.Clamp(item.Value + itemsBuff, 0, 100);
-                        if (!CommonExtensions.ChanceChecker(chance))
+                        if (UnityEngine.Random.Range(0, 101) > chance)
                             continue;
 
                         try

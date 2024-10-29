@@ -50,7 +50,7 @@ namespace Exiled.Events.Patches.Fixes
     [HarmonyPatch(typeof(CandyBlack), nameof(CandyBlack.GetRandomDoor))]
     internal class CandyBlackTest
     {
-        private static bool Prefix(ref bool __result)
+        private static bool Prefix(ref DoorVariant __result)
         {
             int index1 = 0;
             try

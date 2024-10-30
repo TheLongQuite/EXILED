@@ -10,20 +10,14 @@ namespace Exiled.CustomRoles.Commands.Admin
     using System;
     using System.Collections.Generic;
     using System.Linq;
-
     using API;
     using API.Features;
-
     using CommandSystem;
-
     using Exiled.API.Enums;
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
-
     using Permissions.Extensions;
-
     using PlayerRoles;
-
     using RemoteAdmin;
 
     /// <summary>
@@ -31,33 +25,38 @@ namespace Exiled.CustomRoles.Commands.Admin
     /// </summary>
     internal sealed class Give : ICommand
     {
-        /// <inheritdoc />
-        public string Command { get; } = "give";
+        public string Command { get; set; } = "give";
 
-        /// <inheritdoc />
-        public string[] Aliases { get; } = { "g" };
+        public string[] Aliases { get; set; } = { "g" };
 
-        /// <inheritdoc />
         public string Description { get; set; } = "Gives the specified custom role to the indicated player(s).";
+
+        private string NoPermissionMessage { get; set; } = "Не хватает прав!";
+        private string NoRoleFoundMessage { get; set; } = "Кастомная роль {0} не найдена!";
+        private string PlayerNotFoundMessage { get; set; } = "Игрок не найден.";
+        private string RoleGivenMessage { get; set; } = "Кастомная роль {0} дана игроку {1}.";
+        private string AllPlayersRoleGivenMessage { get; set; } = "Кастомная роль {0} дана всем игрокам.";
+        private string PlayerNotFoundErrorMessage { get; set; } = "Игрок {0} не найден";
+        private string UsageMessage { get; set; } = "{0} <Название/ID кастомной роли> [Никнейм/ID/SteamID игрока или all/*]";
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customroles.give"))
             {
-                response = "Не хватает прав!";
+                response = NoPermissionMessage;
                 return false;
             }
 
             if (arguments.Count == 0)
             {
-                response = "give <Название/ID кастомной роли> [Никнейм/ID/SteamID игрока или all/*]";
+                response = string.Format(UsageMessage, Command);
                 return false;
             }
 
             if (!CustomRole.TryGet(arguments.At(0), out CustomRole? role) || role is null)
             {
-                response = $"Кастомная роль {arguments.At(0)} не найдена!";
+                response = string.Format(NoRoleFoundMessage, arguments.At(0));
                 return false;
             }
 
@@ -68,11 +67,11 @@ namespace Exiled.CustomRoles.Commands.Admin
                     Player player = Player.Get(playerCommandSender);
 
                     TryAddRole(player, role);
-                    response = $"Кастомная роль {role.Name} дана игроку {player.Nickname}.";
+                    response = string.Format(RoleGivenMessage, role.Name, player.Nickname);
                     return true;
                 }
 
-                response = "Игрок не найден.";
+                response = PlayerNotFoundMessage;
                 return false;
             }
 
@@ -87,18 +86,18 @@ namespace Exiled.CustomRoles.Commands.Admin
                     foreach (Player player in players)
                         TryAddRole(player, role);
 
-                    response = $"Кастомная роль {role.Name} дана всем игрокам.";
+                    response = string.Format(AllPlayersRoleGivenMessage, role.Name);
                     ListPool<Player>.Pool.Return(players);
                     return true;
                 default:
-                    if (Player.Get(identifier) is not Player ply)
+                    if (Player.Get(identifier) is not { } ply)
                     {
-                        response = $"Игрок {identifier} не найден";
+                        response = string.Format(PlayerNotFoundErrorMessage, identifier);
                         return false;
                     }
 
                     TryAddRole(ply, role);
-                    response = $"Кастомная роль {role.Name} дана игроку {ply.Nickname}.";
+                    response = string.Format(RoleGivenMessage, role.Name, ply.Nickname);
                     return true;
             }
         }

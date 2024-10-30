@@ -4,6 +4,7 @@
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
+
 namespace Exiled.CustomRoles.Commands.User
 {
     using System;
@@ -24,14 +25,39 @@ namespace Exiled.CustomRoles.Commands.User
     [CommandHandler(typeof(ClientCommandHandler))]
     public class RoleInfo : ICommand
     {
-        /// <inheritdoc />
-        public string Command => "roleinfo";
+        /// <summary>
+        /// Gets or sets.
+        /// </summary>
+        public static string PassiveAbilitiesHeaderText { get; set; } = "Пассивные способности:";
+
+        /// <summary>
+        /// Gets or sets.
+        /// </summary>
+        public static string ActiveAbilitiesHeaderText { get; set; } = "Активные способности:";
+
+        /// <summary>
+        /// Gets or sets.
+        /// </summary>
+        public static string InstantDurationText { get; set; } = "Мгновенно";
+
+        /// <summary>
+        /// Gets or sets.
+        /// </summary>
+        public string PlayerNotFoundResponse { get; set; } = "Попробуйте позже";
+
+        /// <summary>
+        /// Gets or sets.
+        /// </summary>
+        public string NoCustomRoleResponse { get; set; } = "У вас нет особых ролей!";
 
         /// <inheritdoc />
-        public string[] Aliases { get; } = { "rinfo" };
+        public string Command { get; set; } = "roleinfo";
 
         /// <inheritdoc />
-        public string Description => "Даёт справку по вашей текущей особой роли и её способностях.";
+        public string[] Aliases { get; set; } = { "rinfo" };
+
+        /// <inheritdoc />
+        public string Description { get; set; } = "Даёт справку по вашей текущей особой роли и её способностях.";
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
@@ -39,13 +65,13 @@ namespace Exiled.CustomRoles.Commands.User
             Player player = Player.Get(sender);
             if (player == null)
             {
-                response = "Попробуйте позже";
+                response = PlayerNotFoundResponse;
                 return false;
             }
 
             if (!player.TryGetCustomRole(out CustomRole? customRole))
             {
-                response = "У вас нет особых ролей!";
+                response = NoCustomRoleResponse;
                 return false;
             }
 
@@ -87,7 +113,7 @@ namespace Exiled.CustomRoles.Commands.User
 
             if (includePassive && passiveAbilities.Any())
             {
-                stringBuilder.AppendFormat(CustomRoles.Instance!.Config.AbilityBlockFormat + '\n', "Пассивные способности:");
+                stringBuilder.AppendFormat(CustomRoles.Instance!.Config.AbilityBlockFormat + '\n', PassiveAbilitiesHeaderText);
                 for (int i = 0; i < passiveAbilities.Count; i++)
                     stringBuilder.AppendFormat(CustomRoles.Instance!.Config.PassiveAbilityLineFormat + '\n', i + 1, passiveAbilities[i].Name, passiveAbilities[i].Description);
 
@@ -96,7 +122,7 @@ namespace Exiled.CustomRoles.Commands.User
 
             if (activeAbilities.Any() || scp079ActiveAbilities.Any())
             {
-                stringBuilder.AppendFormat(CustomRoles.Instance!.Config.AbilityBlockFormat + '\n', "Активные способности:");
+                stringBuilder.AppendFormat(CustomRoles.Instance!.Config.AbilityBlockFormat + '\n', ActiveAbilitiesHeaderText);
                 for (int i = 0; i < activeAbilities.Count; i++)
                     stringBuilder.AppendFormat(CustomRoles.Instance!.Config.ActiveAbilityLineFormat + '\n', i + 1, activeAbilities[i].Name, activeAbilities[i].Description, GetAbilityDuration(activeAbilities[i]), activeAbilities[i].Cooldown);
 
@@ -109,6 +135,6 @@ namespace Exiled.CustomRoles.Commands.User
             return StringBuilderPool.Shared.ToStringReturn(stringBuilder);
         }
 
-        private static string GetAbilityDuration(ActiveAbility activeAbility) => activeAbility.Duration <= 0 ? "Мгновенно" : activeAbility.Duration.ToString(CultureInfo.InvariantCulture);
+        private static string GetAbilityDuration(ActiveAbility activeAbility) => activeAbility.Duration <= 0 ? InstantDurationText : activeAbility.Duration.ToString(CultureInfo.InvariantCulture);
     }
 }

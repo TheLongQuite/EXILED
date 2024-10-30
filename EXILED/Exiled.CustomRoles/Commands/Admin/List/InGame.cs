@@ -9,15 +9,10 @@ namespace Exiled.CustomRoles.Commands.Admin.List
 {
     using System;
     using System.Text;
-
     using API.Features;
-
     using CommandSystem;
-
     using Exiled.API.Features;
-
     using NorthwoodLib.Pools;
-
     using Permissions.Extensions;
 
     /// <inheritdoc />
@@ -32,12 +27,19 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         /// <inheritdoc />
         public string Description { get; set; } = "Получает все кастомные роли которые сейчас учавствуют в раунде.";
 
+        private string Permission { get; set; } = "customroles.list.ingame";
+        private string NoPermissionMessage { get; set; } = "Не хватает прав!";
+        private string NoCustomRolesMessage { get; set; } = "Кастомные роли не найдены.";
+        private string CustomRolesHeaderFormat { get; set; } = "[Текущие живые кастомные роли: ({0})]{1}";
+        private string CustomRoleFormat { get; set; } = "[{0}. {1} ({2}) {{ {3} }}]{1}";
+        private string PlayerFormat { get; set; } = "{0} ({1}) ({2}) [{3}]";
+
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            if (!sender.CheckPermission("customroles.list.ingame"))
+            if (!sender.CheckPermission(Permission))
             {
-                response = "Не хватает прав!";
+                response = NoPermissionMessage;
                 return false;
             }
 
@@ -51,21 +53,22 @@ namespace Exiled.CustomRoles.Commands.Admin.List
                     continue;
 
                 message.AppendLine()
-                    .Append('[').Append(customRole.Id).Append(". ").Append(customRole.Name).Append(" (").Append(customRole.Role).Append(')')
-                    .Append(" {").Append(customRole.TrackedPlayers.Count).AppendLine("}]").AppendLine();
+                    .AppendFormat(CustomRoleFormat, customRole.Id, customRole.Name, customRole.Role, customRole.TrackedPlayers.Count)
+                    .AppendLine();
 
                 count += customRole.TrackedPlayers.Count;
 
                 foreach (Player owner in customRole.TrackedPlayers)
                 {
-                    message.Append(owner.Nickname).Append(" (").Append(owner.UserId).Append(") (").Append(owner.Id).Append(") [").Append(owner.Role.Type).AppendLine("]");
+                    message.AppendFormat(PlayerFormat, owner.Nickname, owner.UserId, owner.Id, owner.Role.Type)
+                        .AppendLine();
                 }
             }
 
             if (message.Length == 0)
-                message.Append("Кастомные роли не найдены.");
+                message.Append(NoCustomRolesMessage);
             else
-                message.Insert(0, Environment.NewLine + "[Текущие живые кастомные роли: (" + count + ")]" + Environment.NewLine);
+                message.Insert(0, string.Format(CustomRolesHeaderFormat, count, Environment.NewLine));
 
             response = StringBuilderPool.Shared.ToStringReturn(message);
             return true;

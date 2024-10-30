@@ -29,27 +29,32 @@ namespace Exiled.CustomItems.Commands.List
         /// <inheritdoc/>
         public string Description { get; set; } = "Получает все зарегистрированные кастомные предметы.";
 
+        public string NoPermissionMessage { get; set; } = "Не хватает прав!";
+        public string NoCustomItemsMessage { get; set; } = "На сервере нет кастомных предметов.";
+        public string CustomItemsHeader { get; set; } = "[Кастомные предметы ({0})]";
+        public string CustomItemFormat { get; set; } = "[{0}. {1} ({2})]";
+
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.list.registered"))
             {
-                response = "Не хватает прав!";
+                response = NoPermissionMessage;
                 return false;
             }
 
             if (CustomItem.Registered.Count == 0)
             {
-                response = "На сервере нет кастомных предметов.";
+                response = NoCustomItemsMessage;
                 return false;
             }
 
             StringBuilder message = StringBuilderPool.Pool.Get().AppendLine();
 
-            message.Append("[Кастомные предметы (").Append(CustomItem.Registered.Count).AppendLine(")]");
+            message.Append(string.Format(CustomItemsHeader, CustomItem.Registered.Count));
 
             foreach (CustomItem customItem in CustomItem.Registered.OrderBy(item => item.Id))
-                message.Append('[').Append(customItem.Id).Append(". ").Append(customItem.Name).Append(" (").Append(customItem.Type).Append(')').AppendLine("]");
+                message.Append(string.Format(CustomItemFormat, customItem.Id, customItem.Name, customItem.Type)).AppendLine();
 
             response = StringBuilderPool.Pool.ToStringReturn(message);
             return true;

@@ -10,34 +10,33 @@ namespace Exiled.CustomItems.Commands.List
     using System;
     using System.Linq;
     using System.Text;
-
     using CommandSystem;
-
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
     using Exiled.CustomItems.API.Features;
     using Exiled.Permissions.Extensions;
-
     using RemoteAdmin;
 
     /// <inheritdoc/>
     internal sealed class Tracked : ICommand
     {
-        /// <inheritdoc/>
-        public string Command { get; } = "insideinventories";
-
-        /// <inheritdoc/>
-        public string[] Aliases { get; } = { "ii", "inside", "inv", "inventories" };
-
-        /// <inheritdoc/>
+        public string Command { get; set; } = "insideinventories";
+        public string[] Aliases { get; set; } = { "ii", "inside", "inv", "inventories" };
         public string Description { get; set; } = "Получает все предметы которые лежат в инвенторях игроков.";
+        public string NoPermissionMessage { get; set; } = "Не хватает прав!";
+        public string NoCustomItemsMessage { get; set; } = "Кастомные предметы не найдены.";
+        public string TitleFormat { get; set; } = "[Custom items inside inventories ({0})]";
+        public string ItemFormat { get; set; } = "[{0}. {1} ({2}) {{ {3} }}]";
+        public string SerialFormat { get; set; } = "{0}. ";
+        public string NoOwnerMessage { get; set; } = "Никто";
+        public string OwnerFormat { get; set; } = "{0} ({1}) ({2}) [{3}]";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
             if (!sender.CheckPermission("customitems.list.insideinventories") && sender is PlayerCommandSender playerSender && !playerSender.FullPermissions)
             {
-                response = "Не хватает прав!";
+                response = NoPermissionMessage;
                 return false;
             }
 
@@ -51,8 +50,8 @@ namespace Exiled.CustomItems.Commands.List
                     continue;
 
                 message.AppendLine()
-                    .Append('[').Append(customItem.Id).Append(". ").Append(customItem.Name).Append(" (").Append(customItem.Type).Append(')')
-                    .Append(" {").Append(customItem.TrackedSerials.Count).AppendLine("}]").AppendLine();
+                    .AppendFormat(ItemFormat, customItem.Id, customItem.Name, customItem.Type, customItem.TrackedSerials.Count)
+                    .AppendLine();
 
                 count += customItem.TrackedSerials.Count;
 
@@ -60,19 +59,19 @@ namespace Exiled.CustomItems.Commands.List
                 {
                     Player owner = Player.List.FirstOrDefault(player => player.Inventory.UserInventory.Items.Any(item => item.Key == insideInventory));
 
-                    message.Append(insideInventory).Append(". ");
+                    message.AppendFormat(SerialFormat, insideInventory);
 
                     if (owner is null)
-                        message.AppendLine("Никто");
+                        message.AppendLine(NoOwnerMessage);
                     else
-                        message.Append(owner.Nickname).Append(" (").Append(owner.UserId).Append(") (").Append(owner.Id).Append(") [").Append(owner.Role).AppendLine("]");
+                        message.AppendFormat(OwnerFormat, owner.Nickname, owner.UserId, owner.Id, owner.Role).AppendLine();
                 }
             }
 
             if (message.Length == 0)
-                message.Append("Кастомные предметы не найдены.");
+                message.Append(NoCustomItemsMessage);
             else
-                message.Insert(0, Environment.NewLine + "[Custom items inside inventories (" + count + ")]" + Environment.NewLine);
+                message.Insert(0, Environment.NewLine + string.Format(TitleFormat, count) + Environment.NewLine);
 
             response = StringBuilderPool.Pool.ToStringReturn(message);
             return true;

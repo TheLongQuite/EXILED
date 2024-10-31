@@ -31,13 +31,45 @@ namespace Exiled.CustomRoles.Commands.Admin
 
         /// <inheritdoc />
         public string Description { get; set; } = "Информация про кастомную роль.";
+
+        /// <summary>
+        /// Gets or sets the usage message for the command.
+        /// </summary>
         public string Usage { get; set; } = "info [Название/ID кастомной роли]";
+
+        /// <summary>
+        /// Gets or sets the error message displayed when a role is not found.
+        /// </summary>
         public string ErrorNoRole { get; set; } = "{0} не идентификатор кастомной роли.";
+
+        /// <summary>
+        /// Gets or sets the first color used in the role information display.
+        /// </summary>
         public string Color1 { get; set; } = "#E6AC00";
+
+        /// <summary>
+        /// Gets or sets the second color used in the role information display.
+        /// </summary>
         public string Color2 { get; set; } = "#00D639";
+
+        /// <summary>
+        /// Gets or sets the third color used in the role information display.
+        /// </summary>
         public string Color3 { get; set; } = "#05C4E8";
+
+        /// <summary>
+        /// Gets or sets the format string used to display role information.
+        /// </summary>
         public string RoleInfoFormat { get; set; } = "- {0} ({1}) - {2}";
+
+        /// <summary>
+        /// Gets or sets the format string used to display role health information.
+        /// </summary>
         public string RoleHealthFormat { get; set; } = "- Здоровье: {0}";
+
+        /// <summary>
+        /// Gets or sets the error message displayed when the user lacks permissions.
+        /// </summary>
         public string NoPermissions { get; set; } = "Не хватает прав!";
 
         /// <inheritdoc/>

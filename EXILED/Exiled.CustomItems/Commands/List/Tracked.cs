@@ -10,6 +10,7 @@ namespace Exiled.CustomItems.Commands.List
     using System;
     using System.Linq;
     using System.Text;
+
     using CommandSystem;
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
@@ -20,15 +21,56 @@ namespace Exiled.CustomItems.Commands.List
     /// <inheritdoc/>
     internal sealed class Tracked : ICommand
     {
+        /// <inheritdoc/>
         public string Command { get; set; } = "insideinventories";
+
+        /// <inheritdoc/>
         public string[] Aliases { get; set; } = { "ii", "inside", "inv", "inventories" };
+
+        /// <inheritdoc/>
         public string Description { get; set; } = "Получает все предметы которые лежат в инвенторях игроков.";
+
+        /// <summary>
+        /// Gets or sets the message displayed when a user does not have the required permission.
+        /// </summary>
         public string NoPermissionMessage { get; set; } = "Не хватает прав!";
+
+        /// <summary>
+        /// Gets or sets the message displayed when no custom items are found.
+        /// </summary>
         public string NoCustomItemsMessage { get; set; } = "Кастомные предметы не найдены.";
+
+        /// <summary>
+        /// Gets or sets the format for the title of the custom items list, where {0} is the count of items.
+        /// </summary>
         public string TitleFormat { get; set; } = "[Custom items inside inventories ({0})]";
+
+        /// <summary>
+        /// Gets or sets the format for a single custom item in the list, where:
+        /// {0} is the item ID,
+        /// {1} is the item name,
+        /// {2} is the item type,
+        /// {3} is the count of items.
+        /// </summary>
         public string ItemFormat { get; set; } = "[{0}. {1} ({2}) {{ {3} }}]";
+
+        /// <summary>
+        /// Gets or sets the format for a serial number in the list, where {0} is the serial number.
+        /// </summary>
         public string SerialFormat { get; set; } = "{0}. ";
+
+        /// <summary>
+        /// Gets or sets the message displayed when an item has no owner.
+        /// </summary>
         public string NoOwnerMessage { get; set; } = "Никто";
+
+        /// <summary>
+        /// Gets or sets the format for an item owner, where:
+        /// {0} is the owner's nickname,
+        /// {1} is the owner's user ID,
+        /// {2} is the owner's ID,
+        /// {3} is the owner's role.
+        /// </summary>
         public string OwnerFormat { get; set; } = "{0} ({1}) ({2}) [{3}]";
 
         /// <inheritdoc/>

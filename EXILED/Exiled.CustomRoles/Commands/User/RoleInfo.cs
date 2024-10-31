@@ -26,28 +26,33 @@ namespace Exiled.CustomRoles.Commands.User
     public class RoleInfo : ICommand
     {
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the header text for passive abilities.
         /// </summary>
+        /// <value>The header text for passive abilities.</value>
         public static string PassiveAbilitiesHeaderText { get; set; } = "Пассивные способности:";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the header text for active abilities.
         /// </summary>
+        /// <value>The header text for active abilities.</value>
         public static string ActiveAbilitiesHeaderText { get; set; } = "Активные способности:";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the text to display for instant duration abilities.
         /// </summary>
+        /// <value>The text to display for instant duration abilities.</value>
         public static string InstantDurationText { get; set; } = "Мгновенно";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response message to display when a player is not found.
         /// </summary>
+        /// <value>The response message to display when a player is not found.</value>
         public string PlayerNotFoundResponse { get; set; } = "Попробуйте позже";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response message to display when a player has no custom role.
         /// </summary>
+        /// <value>The response message to display when a player has no custom role.</value>
         public string NoCustomRoleResponse { get; set; } = "У вас нет особых ролей!";
 
         /// <inheritdoc />

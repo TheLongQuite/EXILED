@@ -9,6 +9,7 @@ namespace Exiled.CustomItems.Commands
 {
     using System;
     using System.Text;
+
     using CommandSystem;
     using Exiled.API.Features.Pools;
     using Exiled.API.Features.Spawn;
@@ -20,15 +21,57 @@ namespace Exiled.CustomItems.Commands
     /// </summary>
     internal sealed class Info : ICommand
     {
+        /// <summary>
+        /// Gets or sets the permission required to execute the info command.
+        /// </summary>
         public string Permission { get; set; } = "customitems.info";
+
+        /// <summary>
+        /// Gets or sets the message displayed when the user does not have the required permission.
+        /// </summary>
         public string NoPermissionMessage { get; set; } = "Не хватает прав!";
+
+        /// <summary>
+        /// Gets or sets the usage message displayed when the user provides invalid arguments.
+        /// </summary>
         public string UsageMessage { get; set; } = "info [Название/ID кастомного предмета]";
+
+        /// <summary>
+        /// Gets or sets the message displayed when the specified item is not found.
+        /// </summary>
+        /// <remarks>The {0} placeholder will be replaced with the item name or ID.</remarks>
         public string NotFoundMessage { get; set; } = "{0} не найден.";
+
+        /// <summary>
+        /// Gets or sets the first color used in the item information display.
+        /// </summary>
         public string Color1 { get; set; } = "#E6AC00";
+
+        /// <summary>
+        /// Gets or sets the second color used in the item information display.
+        /// </summary>
         public string Color2 { get; set; } = "#00D639";
+
+        /// <summary>
+        /// Gets or sets the third color used in the item information display.
+        /// </summary>
         public string Color3 { get; set; } = "#05C4EB";
+
+        /// <summary>
+        /// Gets or sets the label used to display the spawn limit.
+        /// </summary>
         public string SpawnLimitLabel { get; set; } = "- Лимит спавна: ";
+
+        /// <summary>
+        /// Gets or sets the label used to display the spawn points.
+        /// </summary>
+        /// <remarks>The {0} placeholder will be replaced with the number of spawn points.</remarks>
         public string SpawnPointsLabel { get; set; } = "[Локации ({0})]";
+
+        /// <summary>
+        /// Gets or sets the format used to display individual spawn points.
+        /// </summary>
+        /// <remarks>The {0} placeholder will be replaced with the spawn point name, {1} with the position, and {2} with the chance.</remarks>
         public string SpawnPointFormat { get; set; } = "{0} {1} Шанс: {2}%";
 
         /// <inheritdoc/>

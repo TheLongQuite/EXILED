@@ -10,6 +10,7 @@ namespace Exiled.CustomRoles.Commands.Admin.List
     using System;
     using System.Linq;
     using System.Text;
+
     using API.Features;
     using CommandSystem;
     using Exiled.API.Features.Pools;
@@ -19,32 +20,32 @@ namespace Exiled.CustomRoles.Commands.Admin.List
     internal sealed class Registered : ICommand
     {
         /// <summary>
-        /// The command aliases.
+        /// Gets or sets the command aliases.
         /// </summary>
         public string[] Aliases { get; set; } = { "r", "reg" };
 
         /// <summary>
-        /// The command description.
+        /// Gets or sets the command description.
         /// </summary>
         public string Description { get; set; } = "Список всех кастомных ролей.";
 
         /// <summary>
-        /// The message to display when the sender lacks permission.
+        /// Gets or sets the message to display when the sender lacks permission.
         /// </summary>
         public string NoPermissionMessage { get; set; } = "Не хватает прав!";
 
         /// <summary>
-        /// The message to display when there are no custom roles.
+        /// Gets or sets the message to display when there are no custom roles.
         /// </summary>
         public string NoCustomRolesMessage { get; set; } = "На сервере нет кастомных ролей.";
 
         /// <summary>
-        /// The format for the custom roles list.
+        /// Gets or sets the format for the custom roles list.
         /// </summary>
         public string CustomRolesListFormat { get; set; } = "[Кастомные роли ({0})]";
 
         /// <summary>
-        /// The format for a single custom role.
+        /// Gets or sets the format for a single custom role.
         /// </summary>
         public string CustomRoleFormat { get; set; } = "[{0}. {1} ({2})]";
 
@@ -54,7 +55,7 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)
         {
-            if (!sender.CheckPermission( "customroles.list.registered"))
+            if (!sender.CheckPermission("customroles.list.registered"))
             {
                 response = NoPermissionMessage;
                 return false;

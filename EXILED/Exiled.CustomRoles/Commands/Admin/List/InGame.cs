@@ -9,6 +9,7 @@ namespace Exiled.CustomRoles.Commands.Admin.List
 {
     using System;
     using System.Text;
+
     using API.Features;
     using CommandSystem;
     using Exiled.API.Features;
@@ -27,12 +28,35 @@ namespace Exiled.CustomRoles.Commands.Admin.List
         /// <inheritdoc />
         public string Description { get; set; } = "Получает все кастомные роли которые сейчас учавствуют в раунде.";
 
-        private string Permission { get; set; } = "customroles.list.ingame";
-        private string NoPermissionMessage { get; set; } = "Не хватает прав!";
-        private string NoCustomRolesMessage { get; set; } = "Кастомные роли не найдены.";
-        private string CustomRolesHeaderFormat { get; set; } = "[Текущие живые кастомные роли: ({0})]{1}";
-        private string CustomRoleFormat { get; set; } = "[{0}. {1} ({2}) {{ {3} }}]{1}";
-        private string PlayerFormat { get; set; } = "{0} ({1}) ({2}) [{3}]";
+        /// <summary>
+        /// Gets or sets the permission required to execute the command.
+        /// </summary>
+        public string Permission { get; set; } = "customroles.list.ingame";
+
+        /// <summary>
+        /// Gets or sets the message to display when the user does not have the required permission.
+        /// </summary>
+        public string NoPermissionMessage { get; set; } = "Не хватает прав!";
+
+        /// <summary>
+        /// Gets or sets the message to display when there are no custom roles found.
+        /// </summary>
+        public string NoCustomRolesMessage { get; set; } = "Кастомные роли не найдены.";
+
+        /// <summary>
+        /// Gets or sets the format of the header that displays the number of current in-game custom roles.
+        /// </summary>
+        public string CustomRolesHeaderFormat { get; set; } = "[Текущие живые кастомные роли: ({0})]{1}";
+
+        /// <summary>
+        /// Gets or sets the format of each custom role displayed in the list.
+        /// </summary>
+        public string CustomRoleFormat { get; set; } = "[{0}. {1} ({2}) {{ {3} }}]{1}";
+
+        /// <summary>
+        /// Gets or sets the format of each player displayed in the list.
+        /// </summary>
+        public string PlayerFormat { get; set; } = "{0} ({1}) ({2}) [{3}]";
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

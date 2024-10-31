@@ -31,27 +31,27 @@ namespace Exiled.CustomRoles.Commands.User
         public string Description => "Использует спецспособность";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response when no custom role is found.
         /// </summary>
         public string NoCustomRoleResponse { get; set; } = "У вас нет спецролей со спецспособностями";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response when no abilities detected.
         /// </summary>
         public string NoAbilitiesResponse { get; set; } = "У вашей спецроли нет спецспособностей!";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response when an invalid ability number is detected.
         /// </summary>
         public string InvalidAbilityNumberResponse { get; set; } = "Такая способность не существует!";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response when invalid arguments detected.
         /// </summary>
         public string InvalidArgumentResponse { get; set; } = "{0} не является числом!";
 
         /// <summary>
-        /// Gets or sets.
+        /// Gets or sets the response when an ability is already used.
         /// </summary>
         public string AbilityUsedResponse { get; set; } = "Способность {0} успешно использована!";
 

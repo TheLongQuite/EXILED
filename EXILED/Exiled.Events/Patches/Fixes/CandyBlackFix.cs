@@ -23,33 +23,16 @@ namespace Exiled.Events.Patches.Fixes
     using PlayerRoles;
     using PlayerRoles.PlayableScps;
 
-    /// <summary>
-    /// Fix for chamber lists weren't cleared.
-    /// </summary>
-    [HarmonyPatch(typeof(CandyBlack), MethodType.StaticConstructor)]
-    internal class CandyBlackFix
-    {
-        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
-        {
-            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
-
-            int index = newInstructions.FindIndex(i => i.LoadsConstant(64));
-
-            newInstructions[index].operand = 200;
-
-            for (int z = 0; z < newInstructions.Count; z++)
-                yield return newInstructions[z];
-
-            ListPool<CodeInstruction>.Pool.Return(newInstructions);
-        }
-    }
+    using static HarmonyLib.AccessTools;
 
     /// <summary>
     /// Fix for chamber lists weren't cleared.
     /// </summary>
     [HarmonyPatch(typeof(CandyBlack), nameof(CandyBlack.GetRandomDoor))]
-    internal class CandyBlackTest
+    internal class CandyBlackFix
     {
+        private static readonly DoorVariant[] NewCache = new DoorVariant[200];
+
         private static bool Prefix(ref DoorVariant __result)
         {
             int index1 = 0;
@@ -98,11 +81,11 @@ namespace Exiled.Events.Patches.Fixes
                 try
                 {
                     if (flag)
-                        CandyBlack.DoorsNonAlloc[maxExclusive++] = whitelistedDoor;
+                        NewCache[maxExclusive++] = whitelistedDoor;
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"[SIGMA2]\n{ex}\nIndex: {maxExclusive - 1}\nDoorsNonAlloc: {CandyBlack.DoorsNonAlloc.Length}");
+                    Log.Error($"[SIGMA2]\n{ex}\nIndex: {maxExclusive - 1}\nDoorsNonAlloc: {NewCache.Length}");
                 }
 
                 if (num2 < num1)
@@ -112,7 +95,7 @@ namespace Exiled.Events.Patches.Fixes
                 }
             }
 
-            __result = maxExclusive != 0 ? CandyBlack.DoorsNonAlloc[UnityEngine.Random.Range(0, maxExclusive)] : doorVariant;
+            __result = maxExclusive != 0 ? NewCache[UnityEngine.Random.Range(0, maxExclusive)] : doorVariant;
             return false;
         }
     }

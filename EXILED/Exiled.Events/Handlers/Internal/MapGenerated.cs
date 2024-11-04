@@ -51,7 +51,6 @@ namespace Exiled.Events.Handlers.Internal
         /// </remarks>
         public static void OnMapGenerated()
         {
-            AccessTools.Field(typeof(CandyBlack), nameof(CandyBlack.DoorsNonAlloc)).SetValue(null, new DoorVariant[200]);
             Map.ClearCache();
             PrefabHelper.LoadPrefabs();
             Locker.ClearCache();

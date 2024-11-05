@@ -42,8 +42,6 @@ namespace Exiled.Events.Patches.Fixes
                 }
             }
 
-            Log.Error(newInstructions.ToString(true));
-
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];
 

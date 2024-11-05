@@ -20,6 +20,8 @@ namespace Exiled.Events.Patches.Fixes
     using Interactables.Interobjects.DoorUtils;
     using InventorySystem.Items.Usables.Scp330;
 
+    using UnityEngine;
+
     using static HarmonyLib.AccessTools;
 
     /// <summary>
@@ -41,6 +43,28 @@ namespace Exiled.Events.Patches.Fixes
                     instruction.operand = Field(typeof(CandyBlackFix), nameof(CandyBlackFix.NewCache));
                 }
             }
+
+            for (int z = 0; z < newInstructions.Count; z++)
+                yield return newInstructions[z];
+
+            ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+    }
+
+    /// <summary>
+    /// Fix for chamber lists weren't cleared.
+    /// </summary>
+    [HarmonyPatch(typeof(CandyBlack), nameof(CandyBlack.ServerApplyEffects))]
+    internal class CandyBlackEffectFix
+    {
+        private static IEnumerable<CodeInstruction> Transpiler(IEnumerable<CodeInstruction> instructions, ILGenerator generator)
+        {
+            List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
+
+            int offset = -2;
+            int index = newInstructions.FindLastIndex(i => i.Calls(Method(typeof(Random), nameof(Random.Range), new[] { typeof(int), typeof(int) }))) + offset;
+
+            newInstructions.RemoveRange(index, 2);
 
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];

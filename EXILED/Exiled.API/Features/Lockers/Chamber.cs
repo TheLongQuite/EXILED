@@ -20,7 +20,7 @@ namespace Exiled.API.Features.Lockers
     /// <summary>
     /// A wrapper for <see cref="LockerChamber"/>.
     /// </summary>
-    public class Chamber : IWrapper<LockerChamber>, IWorldSpace
+    public class Chamber : IWrapper<LockerChamber>, IWorldSpace, IPermission
     {
         /// <summary>
         /// <see cref="Dictionary{TKey,TValue}"/> with <see cref="LockerChamber"/> and <see cref="Chamber"/>.
@@ -98,6 +98,16 @@ namespace Exiled.API.Features.Lockers
         /// <summary>
         /// Gets or sets required permissions to open this chamber.
         /// </summary>
+        public KeycardPermissions Permissions
+        {
+            get => (KeycardPermissions)Base.RequiredPermissions;
+            set => Base.RequiredPermissions = (Interactables.Interobjects.DoorUtils.KeycardPermissions)value;
+        }
+
+        /// <summary>
+        /// Gets or sets required permissions to open this chamber.
+        /// </summary>
+        [Obsolete]
         public KeycardPermissions RequiredPermissions
         {
             get => (KeycardPermissions)Base.RequiredPermissions;
@@ -147,9 +157,13 @@ namespace Exiled.API.Features.Lockers
         }
 
         /// <summary>
-        /// Gets a value indicating whether the chamber is currently open.
+        /// Gets or sets a value indicating whether the chamber is currently open.
         /// </summary>
-        public bool IsOpen => Base.IsOpen;
+        public bool IsOpen
+        {
+            get => Base.IsOpen;
+            set => Base.SetDoor(value, Locker.Base._grantedBeep);
+        }
 
         /// <summary>
         /// Gets the <see cref="Stopwatch"/> of current cooldown.

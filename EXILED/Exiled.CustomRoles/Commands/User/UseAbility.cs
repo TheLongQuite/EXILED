@@ -28,7 +28,7 @@ namespace Exiled.CustomRoles.Commands.User
         public string[] Aliases { get; set; } = { "a" };
 
         /// <inheritdoc />
-        public string Description => "Использует спецспособность";
+        public string Description { get; set; } = "Использует спецспособность";
 
         /// <summary>
         /// Gets or sets the response when no custom role is found.

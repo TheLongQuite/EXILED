@@ -13,6 +13,7 @@ namespace Exiled.API.Features
     using System.Reflection;
 
     using CommandSystem;
+    using Discord;
     using Enums;
     using Extensions;
     using Interfaces;
@@ -99,7 +100,7 @@ namespace Exiled.API.Features
         {
             foreach (Type type in Assembly.GetTypes())
             {
-                if (type.GetInterface("ICommand") != typeof(ICommand))
+                if (type.GetInterface(nameof(ICommand)) != typeof(ICommand))
                     continue;
 
                 if (!Attribute.IsDefined(type, typeof(CommandHandlerAttribute)))
@@ -153,7 +154,7 @@ namespace Exiled.API.Features
                 }
                 else
                 {
-                    Log.Error($"Invalid command handler type provided for command {command.Command}: {commandHandlerType}");
+                    Log.Error($"Invalid command handler type provided for command {command.Command} in {Name}: {commandHandlerType}");
                     return;
                 }
             }
@@ -164,6 +165,11 @@ namespace Exiled.API.Features
             }
 
             Commands[commandHandlerType][command.GetType()] = command;
+            if (command is global::ParentCommand)
+                Log.Send($"[{Name}.{nameof(RegisterCommand)}] Command '{command.Command}' uses obsolete ParentCommand class. Use {typeof(ParentCommand).FullName} instead of {typeof(global::ParentCommand).FullName}.", LogLevel.Debug, ConsoleColor.DarkGray);
+
+            if (!command.GetType().GetProperty(nameof(ICommand.Description))?.CanWrite ?? true)
+                Log.Send($"[{Name}.{nameof(RegisterCommand)}] Command '{command.Command}' has description without setter, making translation impossible. Consider fixing this.", LogLevel.Debug, ConsoleColor.DarkGray);
         }
 
         /// <inheritdoc/>

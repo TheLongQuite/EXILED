@@ -48,17 +48,16 @@ namespace Exiled.Loader
                 SortedDictionary<string, CommandTranslation> deserializedTranslations = new(StringComparer.Ordinal);
                 void LoadCommand(ICommand command)
                 {
-                    string commandName = command.GetType().FullName ?? "N/D";
-                    if (deserializedTranslations.ContainsKey(commandName))
-                    {
-                        return; // Так происходит, если команда есть в нескольких хэндлерах
-                    }
+                    string commandName = command.GetType().FullName!;
 
                     if (command is CommandHandler parentCommand)
                     {
                         foreach (ICommand childCommand in parentCommand.AllCommands)
                             LoadCommand(childCommand);
                     }
+
+                    if (deserializedTranslations.ContainsKey(commandName))
+                        return; // Так происходит, если команда есть в нескольких хэндлерах
 
                     deserializedTranslations.Add(commandName, command.LoadCommandTranslation(rawDeserializedTranslations));
                 }

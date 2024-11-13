@@ -18,7 +18,6 @@ namespace Exiled.Loader
     using System.Security.Principal;
     using System.Threading;
 
-    using API.Enums;
     using API.Interfaces;
     using CommandSystem.Commands.Shared;
     using Exiled.API.Features;
@@ -26,7 +25,6 @@ namespace Exiled.Loader
     using Features.Configs;
     using Features.Configs.CustomConverters;
     using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NodeDeserializers;
 
     /// <summary>
     /// Used to handle plugins.

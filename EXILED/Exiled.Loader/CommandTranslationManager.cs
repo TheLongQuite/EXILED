@@ -13,14 +13,9 @@ namespace Exiled.Loader
     using System.Linq;
     using System.Reflection;
 
-    using API.Enums;
-    using API.Extensions;
-    using API.Interfaces;
     using CommandSystem;
-    using Discord;
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
-    using MonoMod.Utils;
     using YamlDotNet.Core;
 
     /// <summary>

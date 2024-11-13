@@ -7,8 +7,6 @@
 
 namespace Exiled.Loader.Features
 {
-    using System;
-
     /// <summary>
     /// A class that contains the different EXILED loader messages.
     /// </summary>

@@ -51,13 +51,14 @@ namespace Exiled.Loader
                             LoadCommand(childCommand);
                     }
 
+                    CommandTranslation translation = command.LoadCommandTranslation(rawDeserializedTranslations);
                     if (deserializedTranslations.ContainsKey(commandName))
-                        return; // Так происходит, если команда есть в нескольких хэндлерах
+                        return; // Так происходит, если команда представлена в нескольких инстанциях.
 
-                    deserializedTranslations.Add(commandName, command.LoadCommandTranslation(rawDeserializedTranslations));
+                    deserializedTranslations.Add(commandName, translation);
                 }
 
-                foreach (ICommand command in Loader.Plugins.SelectMany(x => x.Commands.SelectMany(y => y.Value.Select(z => z.Value))))
+                foreach (ICommand command in Loader.Plugins.SelectMany(x => x.Commands.Select(y => y.Value.Item1)))
                     LoadCommand(command);
 
                 Log.Info("Plugin command translations loaded successfully!");

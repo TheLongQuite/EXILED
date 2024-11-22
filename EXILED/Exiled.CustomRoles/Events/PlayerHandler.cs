@@ -90,6 +90,7 @@ namespace Exiled.CustomRoles.Events
             {
                 Log.Debug($"[Name sync] Name reset for {ev.Player.Nickname} of {ev.Target.Nickname}.");
                 ev.Target.SetDispayNicknameForTargetOnly(ev.Player, ev.Player.CustomName);
+                ev.Player.SetDispayNicknameForTargetOnly(ev.Target, ev.Target.CustomName);
             }
         }
 

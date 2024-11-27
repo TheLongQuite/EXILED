@@ -72,8 +72,6 @@ namespace Exiled.Events.Patches.Events.Server
 
             newInstructions[index].labels.Add(jmp);
 
-
-
             // Удаляем бейзгеймовое определение победителя, ибо засунули его в свой метод
             index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stfld && x.operand == (object)Field(PrivateType, LeadingTeam)) - 16;
 

@@ -30,13 +30,13 @@ namespace Exiled.Events.Patches.Events.Player
     [HarmonyPatch(typeof(RoleSpawnpointManager), nameof(RoleSpawnpointManager.SetPosition))]
     internal static class Spawning
     {
-        private static bool Prefix(ReferenceHub hub, PlayerRoleBase prevRole, PlayerRoleBase newRole)
+        private static bool Prefix(ReferenceHub hub, PlayerRoleBase newRole)
         {
             if (newRole.ServerSpawnReason == RoleChangeReason.Destroyed || !Player.TryGet(hub, out Player player))
                 return true;
 
             Vector3 oldPosition = hub.transform.position;
-            float oldRotation = (prevRole as IFpcRole)?.FpcModule.MouseLook.CurrentVertical ?? 0;
+            float oldRotation = 0;
 
             if (newRole is IFpcRole fpcRole)
             {
@@ -46,7 +46,7 @@ namespace Exiled.Events.Patches.Events.Player
                     oldRotation = horizontalRot;
                 }
 
-                SpawningEventArgs ev = new(player, oldPosition, oldRotation, prevRole);
+                SpawningEventArgs ev = new(player, oldPosition, oldRotation);
 
                 Handlers.Player.OnSpawning(ev);
 
@@ -55,7 +55,7 @@ namespace Exiled.Events.Patches.Events.Player
             }
             else
             {
-                Handlers.Player.OnSpawning(new(player, oldPosition, oldRotation, prevRole));
+                Handlers.Player.OnSpawning(new(player, oldPosition, oldRotation));
             }
 
             return false;

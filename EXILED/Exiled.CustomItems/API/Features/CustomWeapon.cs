@@ -268,7 +268,7 @@ namespace Exiled.CustomItems.API.Features
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: Continuing with internal reload..");
             ev.IsAllowed = false;
 
-            byte remainingClip = ev.Firearm.Ammo;
+            int remainingClip = ev.Firearm.Ammo;
 
             if (remainingClip >= ClipSize)
             {

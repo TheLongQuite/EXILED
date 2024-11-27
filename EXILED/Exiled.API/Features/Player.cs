@@ -355,7 +355,7 @@ namespace Exiled.API.Features
             get => ReferenceHub.nicknameSync.Network_customPlayerInfoString;
             set
             {
-                // NW Client check.
+                if (!value.IsCustomInfoValid(out string denialReason))
                 {
                     Log.Error($"Invalid Custominfo:\n{denialReason}");
                     return;
@@ -1253,7 +1253,7 @@ namespace Exiled.API.Features
             if (UnverifiedPlayers.TryGetValue(gameObject, out player))
                 return player;
 
-            if (ReferenceHub.TryGetHub(gameObject, out ReferenceHub hub) && ReferenceHub.LocalHub != hub)
+            if (ReferenceHub.TryGetHub(gameObject, out ReferenceHub hub) && ReferenceHub.TryGetLocalHub(out ReferenceHub localHub) && localHub != hub)
                 return new(hub);
 
             return null;

@@ -246,7 +246,8 @@ namespace Exiled.API.Features.Roles
                 return false;
 
             HuntersAtlasAbility._estimatedCost = cost;
-            HuntersAtlasAbility.SetSubmerged(true);
+            HuntersAtlasAbility._syncSubmerged = true;
+
             Timing.CallDelayed(2f, () =>
             {
                 if (IsValid)

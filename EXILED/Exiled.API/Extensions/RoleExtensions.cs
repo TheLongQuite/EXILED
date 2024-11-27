@@ -240,6 +240,7 @@ namespace Exiled.API.Extensions
             return role.GlobalAppearance;
         }
 
+        /// <summary>
         /// Gets the <see cref="SpawnableFaction"/> of a <see cref="SpawnableWaveBase"/>.
         /// </summary>
         /// <param name="waveBase">A <see cref="SpawnableWaveBase"/> instance.</param>

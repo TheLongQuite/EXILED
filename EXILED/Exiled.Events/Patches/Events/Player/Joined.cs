@@ -22,7 +22,7 @@ namespace Exiled.Events.Patches.Events.Player
     {
         private static void Postfix(ReferenceHub __instance)
         {
-            if (ReferenceHub.HostHub == null)
+            if (ReferenceHub._hostHub == null)
             {
                 Server.Host = new Player(__instance);
             }

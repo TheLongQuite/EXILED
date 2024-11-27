@@ -179,72 +179,8 @@ namespace Exiled.API.Features
         /// <param name="userId">The userID of the NPC.</param>
         /// <param name="position">The position to spawn the NPC.</param>
         /// <returns>The <see cref="Npc"/> spawned.</returns>
-        [Obsolete("This method is marked as obsolete due to a bug that make player have the same id. Use Npc.Spawn(string) instead", true)]
-        public static Npc Spawn(string name, RoleTypeId role, int id = 0, string userId = PlayerAuthenticationManager.DedicatedId, Vector3? position = null)
-        {
-            GameObject newObject = UnityEngine.Object.Instantiate(Mirror.NetworkManager.singleton.playerPrefab);
-
-            Npc npc = new(newObject)
-            {
-                IsNPC = true,
-            };
-
-            if (!RecyclablePlayerId.FreeIds.Contains(id) && RecyclablePlayerId._autoIncrement >= id)
-            {
-                Log.Warn($"{Assembly.GetCallingAssembly().GetName().Name} tried to spawn an NPC with a duplicate PlayerID. Using auto-incremented ID instead to avoid an ID clash.");
-                id = new RecyclablePlayerId(true).Value;
-            }
-
-            try
-            {
-                if (userId == PlayerAuthenticationManager.DedicatedId)
-                {
-                    npc.ReferenceHub.authManager.SyncedUserId = userId;
-                    try
-                    {
-                        npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.DedicatedServer;
-                    }
-                    catch (Exception e)
-                    {
-                        Log.Debug($"Ignore: {e.Message}");
-                    }
-                }
-                else
-                {
-                    npc.ReferenceHub.authManager.InstanceMode = ClientInstanceMode.Unverified;
-                    npc.ReferenceHub.authManager._privUserId = userId == string.Empty ? $"Dummy@localhost" : userId;
-                }
-            }
-            catch (Exception e)
-            {
-                Log.Debug($"Ignore: {e.Message}");
-            }
-
-            try
-            {
-                npc.ReferenceHub.roleManager.InitializeNewRole(RoleTypeId.None, RoleChangeReason.None);
-            }
-            catch (Exception e)
-            {
-                Log.Debug($"Ignore: {e.Message}");
-            }
-
-            FakeConnection fakeConnection = new(id);
-            NetworkServer.AddPlayerForConnection(fakeConnection, newObject);
-
-            npc.ReferenceHub.nicknameSync.Network_myNickSync = name;
-            Dictionary.Add(newObject, npc);
-
-            Timing.CallDelayed(0.5f, () =>
-            {
-                npc.Role.Set(role, SpawnReason.RoundStart, position is null ? RoleSpawnFlags.All : RoleSpawnFlags.AssignInventory);
-
-                if (position is not null)
-                    npc.Position = position.Value;
-            });
-
-            return npc;
-        }
+        public static Npc Spawn(string name, RoleTypeId role, int id = 0, string userId = "", Vector3? position = null)
+            => Spawn(name, role, SpawnReason.RoundStart, RoleSpawnFlags.All, userId, position);
 
         /// <summary>
         /// Spawns an NPC based on the given parameters.

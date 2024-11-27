@@ -239,6 +239,7 @@ namespace Exiled.CustomItems.API.Features
                 ev.IsAllowed = false;
         }
 
+        // TODO:
         private void OnInternalReloading(ReloadingWeaponEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
@@ -291,7 +292,7 @@ namespace Exiled.CustomItems.API.Features
             if (amountToReload <= 0)
                 return;
 
-            ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
+            // ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
             ev.Player.ReferenceHub.playerEffectsController.GetEffect<Invisible>().Intensity = 0;
 
             ev.Player.Ammo[ammoType.GetItemType()] -= amountToReload;

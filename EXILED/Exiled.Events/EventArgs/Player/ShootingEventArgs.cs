@@ -39,8 +39,6 @@ namespace Exiled.Events.EventArgs.Player
         {
             Player = shooter;
             Firearm = Item.Get(firearm).As<Firearm>();
-
-            // ShotMessage = msg;
         }
 
         /// <summary>
@@ -55,55 +53,6 @@ namespace Exiled.Events.EventArgs.Player
 
         /// <inheritdoc/>
         public Item Item => Firearm;
-
-        /*
-        /// <summary>
-        /// Gets or sets the <see cref="ShotMessage" /> for the event.
-        /// </summary>
-        public ShotMessage ShotMessage { get; set; }
-
-        /// <summary>
-        /// Gets or sets the position of the shot.
-        /// </summary>
-        public Vector3 ShotPosition
-        {
-            get => ShotMessage.TargetPosition.Position;
-            set
-            {
-                ShotMessage msg = ShotMessage;
-                ShotMessage = new ShotMessage
-                {
-                    ShooterPosition = msg.ShooterPosition,
-                    ShooterCameraRotation = msg.ShooterCameraRotation,
-                    ShooterWeaponSerial = msg.ShooterWeaponSerial,
-                    TargetPosition = new RelativePosition(value),
-                    TargetRotation = msg.TargetRotation,
-                    TargetNetId = msg.TargetNetId,
-                };
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the netId of the target of the shot.
-        /// </summary>
-        public uint TargetNetId
-        {
-            get => ShotMessage.TargetNetId;
-            set
-            {
-                ShotMessage msg = ShotMessage;
-                ShotMessage = new ShotMessage
-                {
-                    ShooterPosition = msg.ShooterPosition,
-                    ShooterCameraRotation = msg.ShooterCameraRotation,
-                    ShooterWeaponSerial = msg.ShooterWeaponSerial,
-                    TargetPosition = msg.TargetPosition,
-                    TargetRotation = msg.TargetRotation,
-                    TargetNetId = value,
-                };
-            }
-        }
-        */
 
         /// <summary>
         /// Gets or sets a value indicating whether the shot can be fired.

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="ConfigManager.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="ConfigManager.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -146,7 +146,7 @@ namespace Exiled.Loader
         /// Saves default distribution configs.
         /// </summary>
         /// <param name="configs">The configs to be saved, already serialized in yaml format.</param>
-        /// <returns>Returns a value indicating whether the configs have been saved successfully or not.</returns>
+        /// <returns>Returns a value indicating whether the configs have been saved successfully.</returns>
         public static bool SaveDefaultConfig(string configs)
         {
             try
@@ -168,7 +168,7 @@ namespace Exiled.Loader
         /// </summary>
         /// <param name="pluginPrefix">The prefix of the plugin which its config is going to be saved.</param>
         /// <param name="configs">The configs to be saved, already serialized in yaml format.</param>
-        /// <returns>Returns a value indicating whether the configs have been saved successfully or not.</returns>
+        /// <returns>Returns a value indicating whether the configs have been saved successfully.</returns>
         public static bool SaveSeparatedConfig(this string pluginPrefix, string configs)
         {
             string configPath = Paths.GetConfigPath(pluginPrefix);
@@ -192,7 +192,7 @@ namespace Exiled.Loader
         /// Saves plugin configs.
         /// </summary>
         /// <param name="configs">The configs to be saved.</param>
-        /// <returns>Returns a value indicating whether the configs have been saved successfully or not.</returns>
+        /// <returns>Returns a value indicating whether the configs have been saved successfully.</returns>
         public static bool Save(SortedDictionary<string, IConfig> configs)
         {
             try
@@ -232,7 +232,7 @@ namespace Exiled.Loader
         /// <summary>
         /// Clears the configs.
         /// </summary>
-        /// <returns>Returns a value indicating whether configs have been cleared successfully or not.</returns>
+        /// <returns>Returns a value indicating whether configs have been cleared successfully.</returns>
         public static bool Clear()
         {
             try

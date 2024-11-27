@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="CollisionHandler.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="CollisionHandler.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -55,7 +55,7 @@ namespace Exiled.API.Features.Components
                     Log.Error($"Owner is null!");
                 if (collision.gameObject == null)
                     Log.Error("pepehm");
-                if (collision.gameObject == Owner || collision.gameObject.TryGetComponent<EffectGrenade>(out _))
+                if (collision.collider.gameObject == Owner || collision.collider.gameObject.TryGetComponent<EffectGrenade>(out _))
                     return;
 
                 onCollisionAction.Invoke();

@@ -7,7 +7,6 @@
 
 namespace Exiled.Events.Patches.Events.Server
 {
-#pragma warning disable SA1600
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
     using API.Features;
@@ -25,7 +24,6 @@ namespace Exiled.Events.Patches.Events.Server
             if (!__instance.isLocalPlayer)
                 return;
 
-            Log.Warn("Fundamental 1");
             Server.Host = new Player(__instance);
             Handlers.Server.OnWaitingForPlayers();
         }

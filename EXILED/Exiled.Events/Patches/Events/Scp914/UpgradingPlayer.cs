@@ -132,7 +132,7 @@ namespace Exiled.Events.Patches.Events.Scp914
                     new(OpCodes.Call, Method(typeof(Player), nameof(Player.Get), new[] { typeof(ReferenceHub) })),
 
                     // itemBase
-                    new(OpCodes.Ldloc_S, 10),
+                    new(OpCodes.Ldloc_S, 7),
 
                     // setting
                     new(OpCodes.Ldarg_S, 3),

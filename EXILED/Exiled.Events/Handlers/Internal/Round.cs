@@ -11,6 +11,8 @@ namespace Exiled.Events.Handlers.Internal
     using System.Linq;
 
     using CentralAuth;
+
+    using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features;
     using Exiled.API.Features.Items;

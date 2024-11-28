@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------
-// <copyright file="Joined.cs" company="ExMod Team">
+// <copyright file="WaitingForPlayers.cs" company="ExMod Team">
 // Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.Events.Patches.Events.Player
+namespace Exiled.Events.Patches.Events.Server
 {
 #pragma warning disable SA1600
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -14,18 +14,20 @@ namespace Exiled.Events.Patches.Events.Player
     using HarmonyLib;
 
     /// <summary>
-    ///     Patches <see cref="ReferenceHub.Start" />.
-    ///     Adds the <see cref="Handlers.Player.Joined" /> event.
+    ///     Patches <see cref="CharacterClassManager.Start" />.
+    ///     Adds the <see cref="Handlers.Server.WaitingForPlayers" /> event.
     /// </summary>
     [HarmonyPatch(typeof(ReferenceHub), nameof(ReferenceHub.Start))]
-    internal static class Joined
+    internal static class WaitingForPlayers
     {
         private static void Postfix(ReferenceHub __instance)
         {
-            if (ReferenceHub._hostHub == null)
-            {
-                Server.Host = new Player(__instance);
-            }
+            if (!__instance.isLocalPlayer)
+                return;
+
+            Log.Warn("Fundamental 1");
+            Server.Host = new Player(__instance);
+            Handlers.Server.OnWaitingForPlayers();
         }
     }
 }

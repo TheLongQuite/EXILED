@@ -565,6 +565,11 @@ namespace Exiled.Events.Handlers
         public static Event<SendingRoleEventArgs> SendingRole { get; set; } = new();
 
         /// <summary>
+        /// Invoked before a <see cref="API.Features.Player"/>'s rotates the revolver.
+        /// </summary>
+        public static Event<RotatingRevolverEventArgs> RotatingRevolver { get; set; } = new();
+
+        /// <summary>
         /// Called before reserved slot is resolved for a <see cref="API.Features.Player"/>.
         /// </summary>
         /// <param name="ev">The <see cref="ReservedSlotsCheckEventArgs"/> instance.</param>
@@ -1210,6 +1215,12 @@ namespace Exiled.Events.Handlers
         /// </summary>
         /// <param name="ev">The <see cref="SendingRoleEventArgs"/> instance.</param>
         public static void OnSendingRole(SendingRoleEventArgs ev) => SendingRole.InvokeSafely(ev);
+
+        /// <summary>
+        /// Called before a <see cref="API.Features.Player"/>'s rotates the revolver.
+        /// </summary>
+        /// <param name="ev">The <see cref="RotatingRevolverEventArgs"/> instance.</param>
+        public static void OnRotatingRevolver(RotatingRevolverEventArgs ev) => RotatingRevolver.InvokeSafely(ev);
 
         /// <summary>
         /// Called before pre-authenticating a <see cref="API.Features.Player"/>.

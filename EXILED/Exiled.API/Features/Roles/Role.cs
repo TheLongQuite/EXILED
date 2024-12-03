@@ -136,6 +136,10 @@ namespace Exiled.API.Features.Roles
         public bool IsValid => Owner != null && Owner.IsConnected && Base == Owner.RoleManager.CurrentRole;
 
         /// <summary>
+        /// Gets the life identifier for the role.
+        /// </summary>
+        public int LifeIdentifier => Base.UniqueLifeIdentifier;
+        
         /// Gets an overriden global <see cref="RoleTypeId"/> appearance.
         /// </summary>
         public RoleTypeId GlobalAppearance => fakeAppearance;

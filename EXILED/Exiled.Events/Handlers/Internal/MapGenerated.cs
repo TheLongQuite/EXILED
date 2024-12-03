@@ -7,30 +7,10 @@
 
 namespace Exiled.Events.Handlers.Internal
 {
-    using System;
-    using System.Collections.Generic;
-    using System.Linq;
-
     using API.Features;
-    using API.Features.Items;
-    using API.Features.Pools;
-    using API.Structs;
-
-    using Exiled.API.Enums;
-    using Exiled.API.Extensions;
     using Exiled.API.Features.Lockers;
 
-    using HarmonyLib;
-
-    using Interactables.Interobjects.DoorUtils;
-
-    using InventorySystem.Items.Firearms.Attachments;
-    using InventorySystem.Items.Firearms.Attachments.Components;
-    using InventorySystem.Items.Usables.Scp330;
-
     using MEC;
-
-    using Utils.NonAllocLINQ;
 
     /// <summary>
     /// Handles <see cref="Handlers.Map.Generated"/> event.
@@ -52,7 +32,6 @@ namespace Exiled.Events.Handlers.Internal
         public static void OnMapGenerated()
         {
             Map.ClearCache();
-            PrefabHelper.LoadPrefabs();
             Locker.ClearCache();
 
             // TODO: Fix For (https://git.scpslgame.com/northwood-qa/scpsl-bug-reporting/-/issues/377)

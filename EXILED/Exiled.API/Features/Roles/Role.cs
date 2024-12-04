@@ -139,7 +139,8 @@ namespace Exiled.API.Features.Roles
         /// Gets the life identifier for the role.
         /// </summary>
         public int LifeIdentifier => Base.UniqueLifeIdentifier;
-        
+
+        /// <summary>
         /// Gets an overriden global <see cref="RoleTypeId"/> appearance.
         /// </summary>
         public RoleTypeId GlobalAppearance => fakeAppearance;

@@ -153,11 +153,9 @@ namespace Exiled.CustomItems.API.Features
                 if (!Attachments.IsEmpty())
                     firearm.AddAttachment(Attachments);
 
-                if (firearm.Type != ItemType.GunShotgun)
-                {
-                    firearm.Ammo = ClipSize;
-                    firearm.MaxAmmo = ClipSize;
-                }
+                firearm.MagazineAmmo = firearm.MaxMagazineAmmo = ClipSize;
+
+                firearm.AmmoDrain = AmmoUsage;
             }
 
             return item;
@@ -239,7 +237,6 @@ namespace Exiled.CustomItems.API.Features
                 ev.IsAllowed = false;
         }
 
-        // TODO:
         private void OnInternalReloading(ReloadingWeaponEventArgs ev)
         {
             if (!Check(ev.Player.CurrentItem))
@@ -256,51 +253,6 @@ namespace Exiled.CustomItems.API.Features
             OnReloading(ev);
 
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: External event ended. {ev.IsAllowed}");
-
-            if (!ev.IsAllowed)
-            {
-                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: External event turned is allowed to false, returning.");
-                return;
-            }
-
-            if (ev.Firearm.Type == ItemType.GunShotgun)
-                return;
-
-            Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: Continuing with internal reload..");
-            ev.IsAllowed = false;
-
-            int remainingClip = ev.Firearm.Ammo;
-
-            if (remainingClip >= ClipSize)
-            {
-                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: remainingClip >= ClipSize, returning.");
-                return;
-            }
-
-            Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] is reloading a {Name} ({Id}) [{Type} ({remainingClip}/{ClipSize})]!");
-
-            AmmoType ammoType = ev.Firearm.AmmoType;
-
-            if (!ev.Player.Ammo.ContainsKey(ammoType.GetItemType()))
-            {
-                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: {ev.Player.Nickname} does not have ammo to reload this weapon.");
-                return;
-            }
-
-            byte amountToReload = (byte)Math.Min(ClipSize - remainingClip, ev.Player.Ammo[ammoType.GetItemType()]);
-
-            if (amountToReload <= 0)
-                return;
-
-            // ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
-            ev.Player.ReferenceHub.playerEffectsController.GetEffect<Invisible>().Intensity = 0;
-
-            ev.Player.Ammo[ammoType.GetItemType()] -= amountToReload;
-            ev.Player.Inventory.SendAmmoNextFrame = true;
-
-            ev.Firearm.Ammo = (byte)(ev.Firearm.Ammo + amountToReload);
-
-            Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] reloaded a {Name} ({Id}) [{Type} ({ev.Firearm.Ammo}/{ClipSize})]!");
         }
 
         private void OnInternalShooting(ShootingEventArgs ev)
@@ -316,31 +268,8 @@ namespace Exiled.CustomItems.API.Features
             }
 
             Firearm firearm = ev.Firearm;
-            if (ev.Item.Type != ItemType.GunShotgun && AmmoUsage > 1)
-            {
-                if (firearm.Ammo < AmmoUsage)
-                {
-                    ev.IsAllowed = false;
-                    Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo ({firearm.Ammo})");
-                    return;
-                }
 
-                checked
-                {
-                    try
-                    {
-                        firearm.Ammo -= (byte)(AmmoUsage - 1);
-                    }
-                    catch (OverflowException e)
-                    {
-                        Log.Error($"Failed to procced shot with custom ammo usage due to ArithmeticOverflow:\n{e}");
-                        ev.IsAllowed = false;
-                        return;
-                    }
-                }
-            }
-
-            if (FireCooldown > 0 && ClipSize > 1)
+            /*if (FireCooldown > 0 && ClipSize > 1)
             {
                 const string toReturnKey = "toReturnAmmo";
                 if (!AllowDoubleShot)
@@ -365,7 +294,7 @@ namespace Exiled.CustomItems.API.Features
                         Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
                     });
                 }
-            }
+            }*/
 
             OnShooting(ev);
         }

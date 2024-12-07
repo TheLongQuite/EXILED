@@ -80,42 +80,28 @@ namespace Exiled.Events.Patches.Events.Server
 
             newInstructions[index].labels.Add(jmp);
 
-            // Удаляем бейзгеймовое определение победителя, ибо засунули его в свой метод
-            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Stfld && x.operand == (object)Field(PrivateType, LeadingTeam)) - 16;
-
-            int targetIndex = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(PrivateType, LeadingTeam)) - 1;
-
-            newInstructions.RemoveRange(index, targetIndex - index);
-
+            offset = -1;
+            index = newInstructions.FindIndex(x => x.LoadsField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
             offset = -1;
             index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))) + offset;
             newInstructions.InsertRange(
                 index,
-                new CodeInstruction[]
+                new[]
                 {
-                    // RoundEnd.DefineBaseGameWinner(survivedFacilityforces, SurvivedChaos, SurvivedAnomalies)
-                    new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
-                    new(OpCodes.Ldfld, Field(PrivateType, survivedFacilityforces)),
-                    new CodeInstruction(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(PrivateType, SurvivedChaos)),
-                    new CodeInstruction(OpCodes.Ldarg_0),
-                    new(OpCodes.Ldfld, Field(PrivateType, SurvivedAnomalies)),
-                    new(OpCodes.Call, Method(typeof(RoundEnd), nameof(DefineBaseGameWinner))),
-
                     // this.newList
-                    new(OpCodes.Ldarg_0),
+                    new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
                     new(OpCodes.Ldfld, Field(PrivateType, NewList)),
-
-                    // shouldRoundEnd
-                    new(OpCodes.Ldloc_S, 4),
 
                     // isForceEnd
                     new(OpCodes.Ldloc_1),
                     new(OpCodes.Ldfld, Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))),
 
-                    // EndingRoundEventArgs evEndingRound = new(RoundSummary.LeadingTeam, RoundSummary.SumInfo_ClassList, bool, bool);
+                    // baseGameConditionsSatisfied
+                    new(OpCodes.Ldloc_S, 5),
+
+                    // EndingRoundEventArgs evEndingRound = new(RoundSummary.SumInfo_ClassList, bool, bool);
                     new(OpCodes.Newobj, GetDeclaredConstructors(typeof(EndingRoundEventArgs))[0]),
                     new(OpCodes.Dup),
 
@@ -132,14 +118,35 @@ namespace Exiled.Events.Patches.Events.Server
                     // flag = ev.IsAllowed
                     new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.IsAllowed))),
-                    new(OpCodes.Stloc_S, 4),
+                    new(OpCodes.Stloc_S, 5),
+                });
 
-                    // this.leadingTeam = ev.LeadingTeam
-                    new(OpCodes.Ldarg_0),
+            // Replace NW logic to LeadingTeam leadingTeam = ev.LeadingTeam
+            offset = 2;
+            index = newInstructions.FindLastIndex(x => x.LoadsField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
+            int offset2 = 1;
+            int index2 = newInstructions.FindLastIndex(x => x.opcode == OpCodes.Stloc_S && x.operand is LocalBuilder { LocalIndex: 7 }) + offset2;
+
+            newInstructions.RemoveRange(index, index2 - index);
+
+            offset = -1;
+            index = newInstructions.FindIndex(x => x.StoresField(Field(PrivateType, LeadingTeam))) + offset;
+
+            newInstructions.RemoveAt(index);
+            newInstructions.InsertRange(
+                index,
+                new CodeInstruction[]
+                {
                     new(OpCodes.Ldloc_S, evEndingRound.LocalIndex),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(EndingRoundEventArgs), nameof(EndingRoundEventArgs.LeadingTeam))),
-                    new(OpCodes.Stfld, Field(PrivateType, LeadingTeam)),
                 });
+
+            offset = 1;
+            index = newInstructions.FindIndex(x => x.StoresField(Field(PrivateType, LeadingTeam))) + offset;
+            offset2 = 1;
+            index2 = newInstructions.FindLastIndex(x => x.StoresField(Field(PrivateType, LeadingTeam))) + offset2;
+
+            newInstructions.RemoveRange(index, index2 - index);
 
             // Round.LastClassList = this.newList;
             offset = 1;
@@ -197,22 +204,6 @@ namespace Exiled.Events.Patches.Events.Server
                 yield return newInstructions[z];
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
-        }
-
-        private static RoundSummary.LeadingTeam DefineBaseGameWinner(int facilityForces, int chaosInsurgency, int anomalies)
-        {
-            int num4 = facilityForces > 0 ? 1 : 0;
-            bool flag1 = chaosInsurgency > 0;
-            bool flag2 = anomalies > 0;
-            RoundSummary.LeadingTeam leadingTeam = RoundSummary.LeadingTeam.Draw;
-            if (num4 != 0)
-                leadingTeam = RoundSummary.EscapedScientists >= RoundSummary.EscapedClassD ? RoundSummary.LeadingTeam.FacilityForces : RoundSummary.LeadingTeam.Draw;
-            else if (flag2)
-                leadingTeam = RoundSummary.EscapedClassD > RoundSummary.SurvivingSCPs ? RoundSummary.LeadingTeam.ChaosInsurgency : (RoundSummary.SurvivingSCPs > RoundSummary.EscapedScientists ? RoundSummary.LeadingTeam.Anomalies : RoundSummary.LeadingTeam.Draw);
-            else if (flag1)
-                leadingTeam = RoundSummary.EscapedClassD >= RoundSummary.EscapedScientists ? RoundSummary.LeadingTeam.ChaosInsurgency : RoundSummary.LeadingTeam.Draw;
-
-            return leadingTeam;
         }
     }
 }

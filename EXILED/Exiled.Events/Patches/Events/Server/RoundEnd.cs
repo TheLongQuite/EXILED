@@ -19,6 +19,7 @@ namespace Exiled.Events.Patches.Events.Server
     using Exiled.Events.EventArgs.Server;
 
     using HarmonyLib;
+
     using PlayerRoles;
 
     using static HarmonyLib.AccessTools;
@@ -54,9 +55,6 @@ namespace Exiled.Events.Patches.Events.Server
 
             const string LeadingTeam = "<leadingTeam>5__9";
             const string NewList = "<newList>5__3";
-            const string SurvivedAnomalies = "<anomalies>5__6";
-            const string SurvivedChaos = "<chaosInsurgency>5__5";
-            const string survivedFacilityforces = "<facilityForces>5__4";
 
             int offset = -1;
             int index = newInstructions.FindIndex(x => x.Calls(Method(typeof(PlayerRolesUtils), nameof(PlayerRolesUtils.GetTeam), new Type[] { typeof(ReferenceHub), }))) + offset;
@@ -84,8 +82,6 @@ namespace Exiled.Events.Patches.Events.Server
             index = newInstructions.FindIndex(x => x.LoadsField(Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded)))) + offset;
             LocalBuilder evEndingRound = generator.DeclareLocal(typeof(EndingRoundEventArgs));
 
-            offset = -1;
-            index = newInstructions.FindIndex(x => x.opcode == OpCodes.Ldfld && x.operand == (object)Field(typeof(RoundSummary), nameof(RoundSummary._roundEnded))) + offset;
             newInstructions.InsertRange(
                 index,
                 new[]

@@ -568,7 +568,7 @@ namespace Exiled.Events.Handlers
         /// Invoked before a <see cref="API.Features.Player"/>'s rotates the revolver.
         /// </summary>
         public static Event<RotatingRevolverEventArgs> RotatingRevolver { get; set; } = new();
-        
+
         /// <summary>
         /// Invoked before a player's emotion changed.
         /// </summary>

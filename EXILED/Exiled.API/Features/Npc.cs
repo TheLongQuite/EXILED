@@ -15,6 +15,7 @@ namespace Exiled.API.Features
 
     using CentralAuth;
     using CommandSystem;
+    using CommandSystem.Commands.RemoteAdmin.Dummies;
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
     using Exiled.API.Features.Components;
@@ -66,6 +67,113 @@ namespace Exiled.API.Features
                 base.Position = value;
                 if (Role is FpcRole fpcRole)
                     fpcRole.ClientRelativePosition = new(value);
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the player being followed.
+        /// </summary>
+        /// <remarks>The npc must have <see cref="PlayerFollower"/>.</remarks>
+        public Player? FollowedPlayer
+        {
+            get => !GameObject.TryGetComponent(out PlayerFollower follower) ? null : Player.Get(follower._hubToFollow);
+
+            set
+            {
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                {
+                    GameObject.AddComponent<PlayerFollower>()._hubToFollow = value?.ReferenceHub;
+                    return;
+                }
+
+                follower._hubToFollow = value?.ReferenceHub;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Max Distance of the npc.
+        /// </summary>
+        /// <remarks>The npc must have <see cref="PlayerFollower"/>.</remarks>
+        public float? MaxDistance
+        {
+            get
+            {
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                    return null;
+
+                return follower._maxDistance;
+            }
+
+            set
+            {
+                if(!value.HasValue)
+                    return;
+
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                {
+                    GameObject.AddComponent<PlayerFollower>()._maxDistance = value.Value;
+                    return;
+                }
+
+                follower._maxDistance = value.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Min Distance of the npc.
+        /// </summary>
+        /// <remarks>The npc must have <see cref="PlayerFollower"/>.</remarks>
+        public float? MinDistance
+        {
+            get
+            {
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                    return null;
+
+                return follower._minDistance;
+            }
+
+            set
+            {
+                if(!value.HasValue)
+                    return;
+
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                {
+                    GameObject.AddComponent<PlayerFollower>()._minDistance = value.Value;
+                    return;
+                }
+
+                follower._minDistance = value.Value;
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Speed of the npc.
+        /// </summary>
+        /// <remarks>The npc must have <see cref="PlayerFollower"/>.</remarks>
+        public float? Speed
+        {
+            get
+            {
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                    return null;
+
+                return follower._speed;
+            }
+
+            set
+            {
+                if(!value.HasValue)
+                    return;
+
+                if (!GameObject.TryGetComponent(out PlayerFollower follower))
+                {
+                    GameObject.AddComponent<PlayerFollower>()._speed = value.Value;
+                    return;
+                }
+
+                follower._speed = value.Value;
             }
         }
 
@@ -138,27 +246,6 @@ namespace Exiled.API.Features
         /// <param name="conn">The NetworkConnection to retrieve the NPC for.</param>
         /// <returns>The NPC associated with the NetworkConnection, or <c>null</c> if not found.</returns>
         public static new Npc? Get(NetworkConnection conn) => Player.Get(conn) as Npc;
-
-        /// <summary>
-        /// Docs.
-        /// </summary>
-        /// <param name="name">Docs1.</param>
-        /// <param name="role">Docs2.</param>
-        /// <param name="position">Docs3.</param>
-        /// <returns>Docs4.</returns>
-        public static Npc Create(string name, RoleTypeId role, Vector3 position)
-        {
-            // TODO: Test this.
-            Npc npc = new(DummyUtils.SpawnDummy(name))
-            {
-                IsNPC = true,
-            };
-
-            npc.Role.Set(role);
-            npc.Position = position;
-
-            return npc;
-        }
 
         /// <summary>
         /// Spawns an NPC based on the given parameters.
@@ -249,6 +336,7 @@ namespace Exiled.API.Features
 
             Round.IgnoredPlayers.Add(npc.ReferenceHub);
 
+            Dictionary.Add(npc.GameObject, npc);
             return npc;
         }
 

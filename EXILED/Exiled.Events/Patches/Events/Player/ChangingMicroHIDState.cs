@@ -68,7 +68,7 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Brfalse_S, returnLabel),
 
                 // value = ev.NewPhase;
-                new(OpCodes.Ldarg_S, ev.LocalIndex),
+                new(OpCodes.Ldloc_S, ev.LocalIndex),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(ChangingMicroHIDStateEventArgs), nameof(ChangingMicroHIDStateEventArgs.NewPhase))),
                 new(OpCodes.Starg_S, 1),
             });

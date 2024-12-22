@@ -50,7 +50,11 @@ namespace Exiled.API.Features.Pickups
         /// <summary>
         /// Gets or sets the MicroHID Energy Level.
         /// </summary>
-        public float Energy { get; set; }
+        public float Energy
+        {
+            get => EnergyManagerModule.GetEnergy(Serial);
+            set => EnergyManagerModule.SyncEnergy[Serial] = value;
+        }
 
         /// <summary>
         /// Gets or sets the <see cref="MicroHidPhase"/>.
@@ -144,16 +148,5 @@ namespace Exiled.API.Features.Pickups
         /// </summary>
         /// <returns>A string containing MicroHIDPickup related data.</returns>
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* |{Energy}|";
-
-        /// <inheritdoc/>
-        internal override void ReadItemInfo(Item item)
-        {
-            base.ReadItemInfo(item);
-
-            if (item.Is(out MicroHid microHid))
-            {
-                Energy = microHid.Energy;
-            }
-        }
     }
 }

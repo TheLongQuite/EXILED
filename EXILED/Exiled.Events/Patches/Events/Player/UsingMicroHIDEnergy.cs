@@ -37,22 +37,23 @@ namespace Exiled.Events.Patches.Events.Player
 
             LocalBuilder ev = generator.DeclareLocal(typeof(UsingMicroHIDEnergyEventArgs));
 
-            int offset = -1;
-            int index = newInstructions.FindLastIndex(instruction => instruction.opcode == OpCodes.Ldarg_0) + offset;
+            int offset = -4;
+            int index = newInstructions.FindLastIndex(i => i.Calls(Method(typeof(EnergyManagerModule), nameof(EnergyManagerModule.ServerSetEnergy)))) + offset;
 
             newInstructions.InsertRange(index, new CodeInstruction[]
             {
                 // this.MicroHID
-                new(OpCodes.Ldarg_0),
+                new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(EnergyManagerModule), nameof(EnergyManagerModule.MicroHid))),
 
-                // energy
+                // newEnergy
                 new(OpCodes.Ldloc_0),
 
                 // true
                 new(OpCodes.Ldc_I4_1),
 
-                // UsingMicroHIDEnergyEventArgs ev = new(this.MicroHID, energy, true);
+                // calculate drain by delta between old energy and new energy
+                // UsingMicroHIDEnergyEventArgs ev = new(this.MicroHID, newEnergy, true);
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(UsingMicroHIDEnergyEventArgs))[0]),
                 new(OpCodes.Dup),
                 new(OpCodes.Dup),
@@ -66,7 +67,7 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Callvirt, PropertyGetter(typeof(UsingMicroHIDEnergyEventArgs), nameof(UsingMicroHIDEnergyEventArgs.IsAllowed))),
                 new(OpCodes.Brfalse_S, returnLabel),
 
-                // energy = this.Energy - ev.Drain;
+                // newEnergy = this.Energy - ev.Drain;
                 new(OpCodes.Ldarg_0),
                 new(OpCodes.Callvirt, PropertyGetter(typeof(EnergyManagerModule), nameof(EnergyManagerModule.Energy))),
                 new(OpCodes.Ldloc_S, ev.LocalIndex),

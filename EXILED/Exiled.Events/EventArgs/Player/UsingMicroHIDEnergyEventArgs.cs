@@ -25,16 +25,16 @@ namespace Exiled.Events.EventArgs.Player
         /// <param name="microHIDitem">
         /// <inheritdoc cref="MicroHID" />
         /// </param>
-        /// <param name="drain">
+        /// <param name="newEnergy">
         /// <inheritdoc cref="Drain" />
         /// </param>
         /// <param name="isAllowed">
         /// <inheritdoc cref="IsAllowed" />
         /// </param>
-        public UsingMicroHIDEnergyEventArgs(MicroHIDItem microHIDitem, float drain, bool isAllowed = true)
+        public UsingMicroHIDEnergyEventArgs(MicroHIDItem microHIDitem, float newEnergy, bool isAllowed = true)
         {
             MicroHID = Item.Get<MicroHid>(microHIDitem);
-            Drain = MicroHID.Energy - drain;
+            Drain = MicroHID.Energy - newEnergy;
             IsAllowed = isAllowed;
         }
 

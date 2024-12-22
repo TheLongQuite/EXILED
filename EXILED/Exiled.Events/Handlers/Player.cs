@@ -1237,6 +1237,7 @@ namespace Exiled.Events.Handlers
         /// <param name="ev">The <see cref="RotatingRevolverEventArgs"/> instance.</param>
         public static void OnRotatingRevolver(RotatingRevolverEventArgs ev) => RotatingRevolver.InvokeSafely(ev);
 
+        /// <summary>
         /// Called before disruptor's mode is changed.
         /// </summary>
         /// <param name="ev">The <see cref="ChangingDisruptorModeEventArgs"/> instance.</param>

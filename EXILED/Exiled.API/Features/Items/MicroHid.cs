@@ -219,16 +219,5 @@ namespace Exiled.API.Features.Items
         /// </summary>
         /// <returns>A string containing MicroHid-related data.</returns>
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* |{Energy}| -{State}-";
-
-        /// <inheritdoc />
-        internal override void ReadPickupInfo(Pickup pickup)
-        {
-            base.ReadPickupInfo(pickup);
-
-            if (pickup.Is(out Pickups.MicroHIDPickup microHidPickup))
-            {
-                Energy = microHidPickup.Energy;
-            }
-        }
     }
 }

@@ -93,6 +93,11 @@ namespace Exiled.Events.EventArgs.Player
         }
 
         /// <summary>
+        /// Gets a value indicating whether the current event is safe to do some actions with player.
+        /// </summary>
+        public bool IsSafe => NewRole != RoleTypeId.Destroyed && Reason != SpawnReason.Destroyed;
+
+        /// <summary>
         /// Gets base items that the player will receive.
         /// </summary>
         public List<ItemType> Items { get; } = ListPool<ItemType>.Pool.Get();

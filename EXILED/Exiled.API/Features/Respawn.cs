@@ -209,24 +209,26 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
-        /// Summons the NTF chopper.
+        /// Play the spawn effect of a target <see cref="SpawnableFaction"/>.
         /// </summary>
-        public static void SummonNtfChopper()
+        /// <param name="spawnableFaction">The <see cref="SpawnableFaction"/> whose effect should be played.</param>
+        public static void PlayEffect(SpawnableFaction spawnableFaction)
         {
-            if (TryGetWaveBase(SpawnableFaction.NtfWave, out SpawnableWaveBase wave))
+            if (TryGetWaveBase(spawnableFaction, out SpawnableWaveBase wave))
                 PlayEffect(wave);
         }
+
+        /// <summary>
+        /// Summons the NTF chopper.
+        /// </summary>
+        public static void SummonNtfChopper() => PlayEffect(SpawnableFaction.NtfWave);
 
         /// <summary>
         /// Summons the Chaos Insurgency van.
         /// </summary>
         /// <remarks>This will also trigger Music effect.</remarks>
         /// <!--not sure if it actually plays the music, needs to be tested-->
-        public static void SummonChaosInsurgencyVan()
-        {
-            if (TryGetWaveBase(SpawnableFaction.ChaosWave, out SpawnableWaveBase wave))
-                PlayEffect(wave);
-        }
+        public static void SummonChaosInsurgencyVan() => PlayEffect(SpawnableFaction.ChaosWave);
 
         /// <summary>
         /// Grants tokens to a given <see cref="Faction"/>'s <see cref="ILimitedWave"/>s.

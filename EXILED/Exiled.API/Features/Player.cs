@@ -1754,12 +1754,7 @@ namespace Exiled.API.Features
         {
             if (CurrentItem is Firearm firearm)
             {
-                // TODO not finish
-                /*
-                bool result = firearm.Base.Ammo.ServerTryReload();
-                Connection.Send(new RequestMessage(firearm.Serial, RequestType.Reload));
-                return result;
-                */
+                firearm.Reload();
             }
 
             return false;

@@ -117,7 +117,15 @@ namespace Exiled.API.Features
         /// <summary>
         /// Gets the time untill next wave spawn.
         /// </summary>
-        public static TimeSpan TimeUntillNextWave => Waves.WaveTimer.GetWaveTimers().Where(wave => wave.IsPaused).OrderBy(wave => wave.TimeLeft.TotalSeconds).First().TimeLeft;
+        /// <remarks>Returns <c>TimeSpan.MaxValue</c> when there are no avaible waves.</remarks>
+        public static TimeSpan TimeUntillNextWave
+        {
+            get
+            {
+                Waves.WaveTimer timer = Waves.WaveTimer.GetWaveTimers().Where(wave => !wave.IsPaused).OrderBy(wave => wave.TimeLeft.TotalSeconds).FirstOrDefault();
+                return timer == null ? TimeSpan.MaxValue : timer.TimeLeft;
+            }
+        }
 
         /// <summary>
         /// Tries to get a <see cref="SpawnableWaveBase"/>.

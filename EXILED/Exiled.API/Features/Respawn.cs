@@ -294,6 +294,21 @@ namespace Exiled.API.Features
         }
 
         /// <summary>
+        /// Gets the tokens of a given <see cref="SpawnableFaction"/>'s <see cref="ILimitedWave"/>.
+        /// </summary>
+        /// <param name="spawnableFaction">The <see cref="SpawnableFaction"/> from whose <see cref="ILimitedWave"/> to get the tokens.</param>
+        /// <returns>Target tokens of a given <see cref="SpawnableFaction"/>'s <see cref="ILimitedWave"/>.</returns>
+        public static int GetTokens(SpawnableFaction spawnableFaction)
+        {
+            if (TryGetWaveBase(spawnableFaction, out SpawnableWaveBase waveBase) && waveBase is ILimitedWave limitedWave)
+            {
+                return limitedWave.RespawnTokens;
+            }
+
+            return 0;
+        }
+
+        /// <summary>
         /// Tries to get the tokens of a given <see cref="SpawnableFaction"/>'s <see cref="ILimitedWave"/>.
         /// </summary>
         /// <param name="spawnableFaction">The <see cref="SpawnableFaction"/> from whose <see cref="ILimitedWave"/> to get the tokens.</param>

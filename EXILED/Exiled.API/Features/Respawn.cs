@@ -115,6 +115,11 @@ namespace Exiled.API.Features
         public static List<Team> ProtectedTeams => SpawnProtected.ProtectedTeams;
 
         /// <summary>
+        /// Gets the time untill next wave spawn.
+        /// </summary>
+        public static TimeSpan TimeUntillNextWave => Waves.WaveTimer.GetWaveTimers().Where(wave => wave.IsPaused).OrderBy(wave => wave.TimeLeft.TotalSeconds).First().TimeLeft;
+
+        /// <summary>
         /// Tries to get a <see cref="SpawnableWaveBase"/>.
         /// </summary>
         /// <param name="spawnableWaveBase">The found <see cref="SpawnableWaveBase"/>.</param>

@@ -10,9 +10,12 @@ namespace Exiled.Events.Features
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Interfaces;
+    using Exiled.Events.EventArgs.Player;
+
     using MEC;
 
     /// <summary>
@@ -65,6 +68,11 @@ namespace Exiled.Events.Features
         /// <returns>The <see cref="Event{T}"/> with the handler subscribed to it.</returns>
         public static Event<T> operator +(Event<T> @event, CustomEventHandler<T> handler)
         {
+            if (typeof(T) == typeof(ChangingRoleEventArgs) || typeof(T) == typeof(SpawnedEventArgs))
+            {
+                Log.Error($"[IRaacle] Подписка на ивент{typeof(T).Name}: {Assembly.GetCallingAssembly().FullName}");
+            }
+
             @event.Subscribe(handler);
             return @event;
         }

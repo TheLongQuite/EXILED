@@ -65,7 +65,7 @@ namespace Exiled.Events.Patches.Events.Player
 
                 // bool allowed = CallPickupEvent(Serial, phase)
                 new CodeInstruction(OpCodes.Ldarg_0).WithLabels(pickupLabel),
-                new(OpCodes.Ldfld, Method(typeof(CycleController), nameof(CycleController.Serial))),
+                new(OpCodes.Ldfld, Field(typeof(CycleController), nameof(CycleController.Serial))),
                 new(OpCodes.Ldarga_S, 1),
                 new(OpCodes.Call, Method(typeof(ChangingMicroHIDState), nameof(ChangingMicroHIDState.CallPickupEvent))),
 

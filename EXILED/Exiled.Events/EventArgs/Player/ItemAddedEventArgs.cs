@@ -20,7 +20,7 @@ namespace Exiled.Events.EventArgs.Player
     /// <summary>
     /// Contains all information after adding an item to a player's inventory.
     /// </summary>
-    public class ItemAddedEventArgs : IPlayerEvent, IItemEvent, IPickupEvent
+    public class ItemAddedEventArgs : IItemEvent, IPickupEvent
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ItemAddedEventArgs"/> class.

@@ -36,7 +36,6 @@ namespace Exiled.Events.EventArgs.Player
         public ChangingMicroHIDStateEventArgs(ItemBase microHID, MicroHidPhase newPhase, bool isAllowed = true)
         {
             MicroHID = (MicroHid)Item.Get(microHID);
-            Player = MicroHID.Owner;
             NewPhase = newPhase;
             IsAllowed = isAllowed;
         }
@@ -60,6 +59,6 @@ namespace Exiled.Events.EventArgs.Player
         public Item Item => MicroHID;
 
         /// <inheritdoc/>
-        public Player Player { get; }
+        public Player Player => MicroHID.Owner;
     }
 }

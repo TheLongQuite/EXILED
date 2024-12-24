@@ -60,10 +60,7 @@ namespace Exiled.API.Features.Items.FirearmModules.Barrel
         {
             get => AutomaticBarrel.ChamberSize;
 
-            set
-            {
-                AutomaticBarrel.ChamberSize = Mathf.Clamp(value, 0, 16);
-            }
+            set => AutomaticBarrel.ChamberSize = Mathf.Clamp(value, 0, 16);
         }
 
         /// <inheritdoc/>
@@ -98,7 +95,7 @@ namespace Exiled.API.Features.Items.FirearmModules.Barrel
         }
 
         /// <summary>
-        /// Gets the fire rate of the firearm, if it is an automatic weapon.
+        /// Gets the fire rate of the firearm.
         /// </summary>
         public float FireRate => AutomaticBarrel.BaseFireRate;
 

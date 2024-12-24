@@ -44,7 +44,7 @@ namespace Exiled.Events.Patches.Events.Player
             {
                 // Item.Get(this.Serial);
                 new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
-                new(OpCodes.Call, Field(typeof(CycleController), nameof(CycleController._prevItem))),
+                new(OpCodes.Ldfld, Field(typeof(CycleController), nameof(CycleController._prevItem))),
 
                 // value
                 new(OpCodes.Ldarg_1),

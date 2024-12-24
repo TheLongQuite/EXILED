@@ -644,8 +644,9 @@ namespace Exiled.API.Features.Pickups
         {
             Item item = Item.Create(Type);
             item.Serial = Serial;
+            item.ReadPickupInfoBefore(this);
             item.Base.OnAdded(Base);
-            item.ReadPickupInfo(this);
+            item.ReadPickupInfoAfter(this);
 
             return item;
         }

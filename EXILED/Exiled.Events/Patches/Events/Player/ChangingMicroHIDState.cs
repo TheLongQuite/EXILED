@@ -44,8 +44,7 @@ namespace Exiled.Events.Patches.Events.Player
             {
                 // Item.Get(this.Serial);
                 new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
-                new(OpCodes.Ldfld, Field(typeof(CycleController), nameof(CycleController.Serial))),
-                new(OpCodes.Call, GetDeclaredMethods(typeof(Item)).Find(x => !x.IsGenericMethod && x.IsStatic && x.GetParameters().FirstOrDefault()?.ParameterType == typeof(ushort))),
+                new(OpCodes.Call, Field(typeof(CycleController), nameof(CycleController._prevItem))),
 
                 // value
                 new(OpCodes.Ldarg_1),
@@ -53,7 +52,7 @@ namespace Exiled.Events.Patches.Events.Player
                 // true
                 new(OpCodes.Ldc_I4_1),
 
-                // ChangerMicroHIDStateEventArgs ev = new(Item.Get(this.Serial), value, true);
+                // ChangerMicroHIDStateEventArgs ev = new(_prevItem, value, true);
                 new(OpCodes.Newobj, GetDeclaredConstructors(typeof(ChangingMicroHIDStateEventArgs))[0]),
                 new(OpCodes.Dup),
                 new(OpCodes.Dup),

@@ -41,7 +41,7 @@ namespace Exiled.Events.EventArgs.Scp173
             Player = player;
             Scp173 = player.Role.As<Scp173Role>();
             BlinkPosition = blinkPos;
-            Targets = targets.AsReadOnly();
+            Targets = targets;
             BlinkCooldown = Scp173BlinkTimer.CooldownBaseline;
         }
 

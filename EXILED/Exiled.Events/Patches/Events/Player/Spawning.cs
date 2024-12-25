@@ -17,6 +17,8 @@ namespace Exiled.Events.Patches.Events.Player
     using Exiled.Events.EventArgs.Player;
     using HarmonyLib;
 
+    using PlayerRoles;
+    using PlayerRoles.FirstPersonControl;
     using PlayerRoles.FirstPersonControl.Spawnpoints;
     using UnityEngine;
 
@@ -35,10 +37,21 @@ namespace Exiled.Events.Patches.Events.Player
         {
             List<CodeInstruction> newInstructions = ListPool<CodeInstruction>.Pool.Get(instructions);
 
-            int offset = -1;
+            int offset = -2;
+            int index = newInstructions.FindIndex(i => i.Calls(PropertyGetter(typeof(IFpcRole), nameof(IFpcRole.SpawnpointHandler))));
+
+            newInstructions.InsertRange(index, new[]
+            {
+                // CallEventForNonFpc(hub, newRole)
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new(OpCodes.Ldarg_1),
+                new(OpCodes.Call, Method(typeof(Spawning), nameof(CallEventForNonFpc))),
+            });
+
+            offset = -1;
 
             // Locate the call to `Transform.position` setter to determine where to insert new instructions.
-            int index = newInstructions.FindIndex(instr => instr.Calls(PropertySetter(typeof(Transform), nameof(Transform.position)))) + offset;
+            index = newInstructions.FindIndex(instr => instr.Calls(PropertySetter(typeof(Transform), nameof(Transform.position)))) + offset;
 
             // Declare the `SpawningEventArgs` local variable.
             LocalBuilder ev = generator.DeclareLocal(typeof(SpawningEventArgs));
@@ -85,6 +98,18 @@ namespace Exiled.Events.Patches.Events.Player
                 yield return newInstructions[z];
 
             ListPool<CodeInstruction>.Pool.Return(newInstructions);
+        }
+
+        private static void CallEventForNonFpc(ReferenceHub hub, PlayerRoleBase newRole)
+        {
+            Player player = Player.Get(hub);
+            if (player == null)
+                return;
+            if (player.IsVerified || player.IsNPC)
+            {
+                SpawningEventArgs ev = new SpawningEventArgs(player, player.Position, 0.0f, newRole);
+                Handlers.Player.OnSpawning(ev);
+            }
         }
     }
 }

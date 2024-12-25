@@ -68,11 +68,6 @@ namespace Exiled.Events.Features
         /// <returns>The <see cref="Event{T}"/> with the handler subscribed to it.</returns>
         public static Event<T> operator +(Event<T> @event, CustomEventHandler<T> handler)
         {
-            if (typeof(T) == typeof(ChangingRoleEventArgs) || typeof(T) == typeof(SpawnedEventArgs))
-            {
-                Log.Error($"[IRaacle] Подписка на ивент{typeof(T).Name}: {Assembly.GetCallingAssembly().FullName}");
-            }
-
             @event.Subscribe(handler);
             return @event;
         }

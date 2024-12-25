@@ -48,6 +48,17 @@ namespace Exiled.Events.Patches.Events.Player
                 new(OpCodes.Call, Method(typeof(Spawning), nameof(CallEventForNonFpc))),
             });
 
+            offset = 6;
+            index = newInstructions.FindIndex(i => i.Calls(PropertyGetter(typeof(PlayerRoleBase), nameof(PlayerRoleBase.ServerSpawnFlags))));
+
+            newInstructions.InsertRange(index, new[]
+            {
+                // CallEventForNonFpc(hub, newRole)
+                new CodeInstruction(OpCodes.Ldarg_0),
+                new(OpCodes.Ldarg_1),
+                new(OpCodes.Call, Method(typeof(Spawning), nameof(CallEventForNonFpc))),
+            });
+
             offset = -1;
 
             // Locate the call to `Transform.position` setter to determine where to insert new instructions.

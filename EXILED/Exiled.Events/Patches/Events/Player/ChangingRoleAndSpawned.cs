@@ -212,7 +212,7 @@ namespace Exiled.Events.Patches.Events.Player
         {
             try
             {
-                if (!NetworkServer.active || ev == null || !ev.SpawnFlags.HasFlag(RoleSpawnFlags.AssignInventory))
+                if (ev.ShouldPreserveInventory)
                     return;
 
                 Inventory inventory = ev.Player.Inventory;

@@ -35,7 +35,7 @@ namespace Exiled.Events.EventArgs.Player
         /// </param>
         public ChangingMicroHIDStateEventArgs(ItemBase microHID, MicroHidPhase newPhase, bool isAllowed = true)
         {
-            MicroHID = (MicroHid)Item.Get(microHID);
+            MicroHID = Item.Get<MicroHid>(microHID);
             NewPhase = newPhase;
             IsAllowed = isAllowed;
         }

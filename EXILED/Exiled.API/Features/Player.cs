@@ -2932,8 +2932,11 @@ namespace Exiled.API.Features
         /// <seealso cref="DropItems()"/>
         public void ClearItems(bool destroy = true)
         {
-            if (CurrentArmor is Armor armor)
-                armor.RemoveExcessOnDrop = false;
+            foreach (Item item in Items)
+            {
+                if (item is Armor armor)
+                    armor.RemoveExcessOnDrop = false;
+            }
 
             while (Items.Count > 0)
                 RemoveItem(Items.ElementAt(0), destroy);

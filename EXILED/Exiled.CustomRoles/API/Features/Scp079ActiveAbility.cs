@@ -87,7 +87,9 @@ namespace Exiled.CustomRoles.API.Features
         protected override void AbilityAdded(Player player)
         {
             if (player.Role.Type != RoleTypeId.Scp079)
-                throw new Exception($"Unable to give {nameof(Scp079ActiveAbility)} to non-SCP079 player!");
+            {
+                throw new Exception($"Unable to give {nameof(Scp079ActiveAbility)} to non-SCP079 player {player.Role.Type}!");
+            }
         }
 
         /// <inheritdoc />

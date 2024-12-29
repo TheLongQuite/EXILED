@@ -84,15 +84,6 @@ namespace Exiled.CustomRoles.API.Features
             player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel && (!CustomRoles.Instance!.Config.HideUnavailableHighLevelAbilities || scp079Role.Level >= MinRequiredLevel);
 
         /// <inheritdoc />
-        protected override void AbilityAdded(Player player)
-        {
-            if (player.Role.Type != RoleTypeId.Scp079)
-            {
-                throw new Exception($"Unable to give {nameof(Scp079ActiveAbility)} to non-SCP079 player {player.Role.Type}!");
-            }
-        }
-
-        /// <inheritdoc />
         protected override void AbilityUsed(Player player)
         {
             if (player.Role.Is(out Scp079Role role))

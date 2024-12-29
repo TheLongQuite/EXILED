@@ -22,6 +22,9 @@ namespace Exiled.API.Extensions
     using Features;
     using Features.Pools;
 
+    using InventorySystem.Items.Firearms;
+    using InventorySystem.Items.Firearms.Modules;
+
     using Mirror;
 
     using PlayerRoles;
@@ -172,6 +175,10 @@ namespace Exiled.API.Extensions
         /// <param name="audioClipId">GunAudioMessage's audioClipId to set (default = 0).</param>
         public static void PlayGunSound(this Player player, Vector3 position, ItemType itemType, byte volume, byte audioClipId = 0)
         {
+            if (itemType.GetItemBase<Firearm>() is not Firearm firearm || !firearm.TryGetModule(out AudioModule module))
+            {
+                return;
+            }
             // TODO: Not finish
             /*
             GunAudioMessage message = new()

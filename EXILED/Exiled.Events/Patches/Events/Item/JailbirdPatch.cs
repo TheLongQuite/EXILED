@@ -88,7 +88,15 @@ namespace Exiled.Events.Patches.Events.Item
                     ChargingJailbirdEventArgs ev = new(instance.Owner, instance);
 
                     Item.OnChargingJailbird(ev);
-                    return true;
+
+                    if (ev.IsAllowed)
+                        return true;
+
+                    API.Features.Items.Item item = ev.Item;
+                    ev.Player.RemoveHeldItem(destroy: false);
+                    ev.Player.AddItem(item);
+
+                    return false;
                 }
 
                 default:

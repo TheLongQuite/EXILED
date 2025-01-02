@@ -628,7 +628,6 @@ namespace Exiled.CustomRoles.API.Features
         {
             Log.Debug($"{Name}: Adding role to {player.Nickname} with flags {spawnFlags}.");
 
-            Vector3 position = Vector3.zero;
             bool useSpawnpoint = spawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint);
             bool assignInventory = spawnFlags.HasFlag(RoleSpawnFlags.AssignInventory);
 
@@ -936,7 +935,7 @@ namespace Exiled.CustomRoles.API.Features
 
         private void OnInternalSpawning(SpawningEventArgs ev)
         {
-            if (Role != RoleTypeId.None && ev.Player.Role == Role && !ev.Player.HasCustomRole() && !ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
+            if (Role != RoleTypeId.None && ev.NewRole == Role && !ev.Player.HasCustomRole() && !ev.Player.SessionVariables.Remove(SkipBaseRoleReplaceKey))
             {
                 try
                 {

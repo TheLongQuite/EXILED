@@ -11,9 +11,7 @@ namespace Exiled.Events.Patches.Events.Player
     using System.Reflection.Emit;
 
     using API.Features.Pools;
-
-    using Exiled.API.Extensions;
-    using Exiled.Events.Attributes;
+    using Attributes;
     using Exiled.Events.EventArgs.Player;
     using HarmonyLib;
     using InventorySystem.Items.Firearms.Modules;
@@ -35,12 +33,13 @@ namespace Exiled.Events.Patches.Events.Player
             int offset = 2;
             int index = newInstructions.FindIndex(x => x.Calls(Method(typeof(IReloadUnloadValidatorModule), nameof(IReloadUnloadValidatorModule.ValidateUnload)))) + offset;
 
-            Label skip = (Label)newInstructions[index - 1].operand;
+            Label returnLabel = generator.DefineLabel();
+
             newInstructions.InsertRange(
                 index,
                 new[]
                 {
-                    // this.Firearm
+                    // player
                     new CodeInstruction(OpCodes.Ldarg_0),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(AnimatorReloaderModuleBase), nameof(AnimatorReloaderModuleBase.Firearm))),
 
@@ -52,10 +51,12 @@ namespace Exiled.Events.Patches.Events.Player
                     new(OpCodes.Call, Method(typeof(Handlers.Player), nameof(Handlers.Player.OnUnloadingWeapon))),
 
                     // if (!ev.IsAllowed)
-                    //    goto skip;
+                    //    return;
                     new(OpCodes.Callvirt, PropertyGetter(typeof(UnloadingWeaponEventArgs), nameof(UnloadingWeaponEventArgs.IsAllowed))),
-                    new(OpCodes.Brfalse, skip),
+                    new(OpCodes.Brfalse, returnLabel),
                 });
+
+            newInstructions[newInstructions.Count - 1].WithLabels(returnLabel);
 
             for (int z = 0; z < newInstructions.Count; z++)
                 yield return newInstructions[z];

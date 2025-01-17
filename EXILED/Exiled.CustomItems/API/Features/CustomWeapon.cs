@@ -263,38 +263,19 @@ namespace Exiled.CustomItems.API.Features
             if (cooldownedPlayers.Contains(ev.Player))
             {
                 ev.IsAllowed = false;
+                ev.Player.ShowHint(string.Format(WeaponNotReady, FireCooldown));
                 Log.Debug($"Disallowed shot from cooldowned on {Name} player {ev.Player.Nickname}");
                 return;
             }
 
-            Firearm firearm = ev.Firearm;
+            if (!AllowDoubleShot)
+                cooldownedPlayers.Add(ev.Player);
 
-            /*if (FireCooldown > 0 && ClipSize > 1)
+            Timing.CallDelayed(FireCooldown, () =>
             {
-                const string toReturnKey = "toReturnAmmo";
-                if (!AllowDoubleShot)
-                    cooldownedPlayers.Add(ev.Player);
-                byte? remainingAmmo = firearm.Ammo != 0 ? (byte)(firearm.Ammo - 1) : null;
-                if (ev.Player.TryGetSessionVariable(toReturnKey, out byte remAmmo))
-                    ev.Player.SessionVariables[toReturnKey] = --remAmmo;
-                else if (remainingAmmo.HasValue)
-                    ev.Player.SessionVariables[toReturnKey] = remainingAmmo.Value;
-
-                firearm.Ammo = 1;
-                if (remainingAmmo.HasValue)
-                {
-                    Timing.CallDelayed(FireCooldown, () =>
-                    {
-                        if (!ev.Player.TryGetSessionVariable(toReturnKey, out byte toRet))
-                            return;
-
-                        cooldownedPlayers.Remove(ev.Player);
-                        firearm.Ammo = toRet;
-                        ev.Player.SessionVariables.Remove(toReturnKey);
-                        Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
-                    });
-                }
-            }*/
+                cooldownedPlayers.Remove(ev.Player);
+                Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
+            });
 
             OnShooting(ev);
         }

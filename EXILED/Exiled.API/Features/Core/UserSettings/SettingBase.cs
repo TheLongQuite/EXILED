@@ -36,12 +36,12 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <param name="settingBase">A <see cref="ServerSpecificSettingBase"/> instance.</param>
         /// <param name="header"><inheritdoc cref="Header"/></param>
-        /// <param name="onChanged"><inheritdoc cref="OnChanged"/></param>
-        internal SettingBase(ServerSpecificSettingBase settingBase, HeaderSetting header, Action<Player, SettingBase> onChanged)
+        /// <param name="onTriggered"><inheritdoc cref="OnTriggered"/></param>
+        internal SettingBase(ServerSpecificSettingBase settingBase, HeaderSetting header, Action<Player, SettingBase> onTriggered)
         {
             Base = settingBase;
             Header = header;
-            OnChanged = onChanged;
+            OnTriggered = onTriggered;
             Settings.Add(settingBase.SettingId, this);
         }
 
@@ -56,7 +56,7 @@ namespace Exiled.API.Features.Core.UserSettings
             if (OriginalDefinition != null)
             {
                 Header = OriginalDefinition.Header;
-                OnChanged = OriginalDefinition.OnChanged;
+                OnTriggered = OriginalDefinition.OnTriggered;
                 Label = OriginalDefinition.Label;
                 HintDescription = OriginalDefinition.HintDescription;
                 return;
@@ -118,14 +118,14 @@ namespace Exiled.API.Features.Core.UserSettings
         public HeaderSetting Header { get; set; }
 
         /// <summary>
-        /// Gets or sets penis.
+        /// Gets or sets the action to be executed when this setting is triggered.
         /// </summary>
         public Action<Player, SettingBase> OnTriggered { get; set; }
 
         /// <summary>
-        /// Gets or sets the action to be executed when this setting is changed.
+        /// Gets or sets the predicate for syncing this setting when a player joins.
         /// </summary>
-        public Action<Player, SettingBase> OnChanged { get; set; }
+        public Predicate<Player> SyncOnJoin { get; set; }
 
         /// <summary>
         /// Tries to get the setting with the specified id.

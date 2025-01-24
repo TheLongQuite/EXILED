@@ -26,9 +26,9 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="preventInteractionOnGUI"><inheritdoc cref="PreventInteractionOnGUI"/></param>
         /// <param name="hintDescription"><inheritdoc cref="SettingBase.HintDescription"/></param>
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
-        /// <param name="onChanged"><inheritdoc cref="SettingBase.OnChanged"/></param>
-        public KeybindSetting(string label, KeyCode suggested, bool preventInteractionOnGUI = false, string hintDescription = "", HeaderSetting header = null, Action<Player, SettingBase> onChanged = null)
-            : base(new SSKeybindSetting(NextId++, label, suggested, preventInteractionOnGUI, hintDescription), header, onChanged)
+        /// <param name="onTriggered"><inheritdoc cref="SettingBase.OnTriggered"/></param>
+        public KeybindSetting(string label, KeyCode suggested, bool preventInteractionOnGUI = false, string hintDescription = "", HeaderSetting header = null, Action<Player, SettingBase> onTriggered = null)
+            : base(new SSKeybindSetting(NextId++, label, suggested, preventInteractionOnGUI, hintDescription), header, onTriggered)
         {
             Base = (SSKeybindSetting)base.Base;
         }

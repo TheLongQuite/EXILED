@@ -26,9 +26,9 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="holdTime"><inheritdoc cref="HoldTime"/></param>
         /// <param name="hintDescription"><inheritdoc cref="SettingBase.HintDescription"/></param>
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
-        /// <param name="onChanged"><inheritdoc cref="SettingBase.OnChanged"/></param>
-        public ButtonSetting(string label, string buttonText, float holdTime = 0.0f, string hintDescription = null, HeaderSetting header = null, Action<Player, SettingBase> onChanged = null)
-            : base(new SSButton(NextId++, label, buttonText, holdTime, hintDescription), header, onChanged)
+        /// <param name="onTriggered"><inheritdoc cref="SettingBase.OnTriggered"/></param>
+        public ButtonSetting(string label, string buttonText, float holdTime = 0.0f, string hintDescription = null, HeaderSetting header = null, Action<Player, SettingBase> onTriggered = null)
+            : base(new SSButton(NextId++, label, buttonText, holdTime, hintDescription), header, onTriggered)
         {
             Base = (SSButton)base.Base;
         }

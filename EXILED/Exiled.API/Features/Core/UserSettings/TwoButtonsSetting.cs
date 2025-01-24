@@ -26,9 +26,9 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="defaultIsSecond"><inheritdoc cref="IsSecondDefault"/></param>
         /// <param name="hintDescription"><inheritdoc cref="SettingBase.HintDescription"/></param>
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
-        /// <param name="onChanged"><inheritdoc cref="SettingBase.OnChanged"/></param>
-        public TwoButtonsSetting(string label, string firstOption, string secondOption, bool defaultIsSecond = false, string hintDescription = "", HeaderSetting header = null, Action<Player, SettingBase> onChanged = null)
-            : base(new SSTwoButtonsSetting(NextId++, label, firstOption, secondOption, defaultIsSecond, hintDescription), header, onChanged)
+        /// <param name="onTriggered"/><inheritdoc cref="SettingBase.OnTriggered"/>
+        public TwoButtonsSetting(string label, string firstOption, string secondOption, bool defaultIsSecond = false, string hintDescription = "", HeaderSetting header = null, Action<Player, SettingBase> onTriggered = null)
+            : base(new SSTwoButtonsSetting(NextId++, label, firstOption, secondOption, defaultIsSecond, hintDescription), header, onTriggered)
         {
             Base = (SSTwoButtonsSetting)base.Base;
         }

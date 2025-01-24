@@ -20,7 +20,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="TwoButtonsSetting"/> class.
         /// </summary>
-        /// <param name="id"><inheritdoc cref="SettingBase.Id"/></param>
         /// <param name="label"><inheritdoc cref="SettingBase.Label"/></param>
         /// <param name="firstOption"><inheritdoc cref="FirstOption"/></param>
         /// <param name="secondOption"><inheritdoc cref="SecondOption"/></param>
@@ -28,8 +27,8 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="hintDescription"><inheritdoc cref="SettingBase.HintDescription"/></param>
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
         /// <param name="onChanged"><inheritdoc cref="SettingBase.OnChanged"/></param>
-        public TwoButtonsSetting(int id, string label, string firstOption, string secondOption, bool defaultIsSecond = false, string hintDescription = "", HeaderSetting header = null, Action<Player, SettingBase> onChanged = null)
-            : base(new SSTwoButtonsSetting(id, label, firstOption, secondOption, defaultIsSecond, hintDescription), header, onChanged)
+        public TwoButtonsSetting(string label, string firstOption, string secondOption, bool defaultIsSecond = false, string hintDescription = "", HeaderSetting header = null, Action<Player, SettingBase> onChanged = null)
+            : base(new SSTwoButtonsSetting(NextId++, label, firstOption, secondOption, defaultIsSecond, hintDescription), header, onChanged)
         {
             Base = (SSTwoButtonsSetting)base.Base;
         }

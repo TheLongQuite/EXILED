@@ -21,7 +21,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="TextInputSetting"/> class.
         /// </summary>
-        /// <param name="id"><inheritdoc cref="SettingBase.Id"/></param>
         /// <param name="label"><inheritdoc cref="SettingBase.Label"/></param>
         /// <param name="foldoutMode"><inheritdoc cref="FoldoutMode"/></param>
         /// <param name="alignment"><inheritdoc cref="Alignment"/></param>
@@ -29,14 +28,13 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
         /// <param name="onChanged"><inheritdoc cref="SettingBase.OnChanged"/></param>
         public TextInputSetting(
-            int id,
             string label,
             SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable,
             TextAlignmentOptions alignment = TextAlignmentOptions.TopLeft,
             string hintDescription = null,
             HeaderSetting header = null,
             Action<Player, SettingBase> onChanged = null)
-            : base(new SSTextArea(id, label, foldoutMode, hintDescription, alignment), header, onChanged)
+            : base(new SSTextArea(NextId++, label, foldoutMode, hintDescription, alignment), header, onChanged)
         {
             Base = (SSTextArea)base.Base;
         }

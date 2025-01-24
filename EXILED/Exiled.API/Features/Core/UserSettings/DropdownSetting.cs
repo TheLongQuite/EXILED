@@ -22,7 +22,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Initializes a new instance of the <see cref="DropdownSetting"/> class.
         /// </summary>
-        /// <param name="id"><inheritdoc cref="SettingBase.Id"/></param>
         /// <param name="label"><inheritdoc cref="SettingBase.Label"/></param>
         /// <param name="options"><inheritdoc cref="Options"/></param>
         /// <param name="defaultOptionIndex"><inheritdoc cref="DefaultOptionIndex"/></param>
@@ -31,7 +30,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
         /// <param name="onChanged"><inheritdoc cref="SettingBase.OnChanged"/></param>
         public DropdownSetting(
-            int id,
             string label,
             IEnumerable<string> options,
             int defaultOptionIndex = 0,
@@ -39,7 +37,7 @@ namespace Exiled.API.Features.Core.UserSettings
             string hintDescription = null,
             HeaderSetting header = null,
             Action<Player, SettingBase> onChanged = null)
-            : base(new SSDropdownSetting(id, label, options.ToArray(), defaultOptionIndex, dropdownEntryType, hintDescription), header, onChanged)
+            : base(new SSDropdownSetting(NextId++, label, options.ToArray(), defaultOptionIndex, dropdownEntryType, hintDescription), header, onChanged)
         {
             Base = (SSDropdownSetting)base.Base;
         }

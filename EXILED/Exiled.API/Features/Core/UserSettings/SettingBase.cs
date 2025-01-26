@@ -40,7 +40,6 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = settingBase;
             Header = header;
-            Log.Info($"Добавляем новую настройку {this}");
             Settings.Add(settingBase.SettingId, this);
         }
 
@@ -54,7 +53,6 @@ namespace Exiled.API.Features.Core.UserSettings
 
             if (OriginalDefinition != null)
             {
-                Log.Info($"Настройка {this} уже существовала, заменяем");
                 Header = OriginalDefinition.Header;
                 OnTriggered = OriginalDefinition.OnTriggered;
                 Label = OriginalDefinition.Label;
@@ -62,9 +60,13 @@ namespace Exiled.API.Features.Core.UserSettings
                 return;
             }
 
-            Log.Info($"Добавляем новую настройку {this}");
             Settings.Add(settingBase.SettingId, this);
         }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when this setting is triggered.
+        /// </summary>
+        public event Action<Player, SettingBase> OnTriggered;
 
         /// <summary>
         /// Gets or sets next Id to give.
@@ -117,11 +119,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <remarks>Can be <c>null</c>.</remarks>
         public HeaderSetting Header { get; set; }
-
-        /// <summary>
-        /// Gets or sets the action to be executed when this setting is triggered.
-        /// </summary>
-        public Action<Player, SettingBase> OnTriggered { get; set; }
 
         /// <summary>
         /// Gets or sets the predicate for syncing this setting when a player joins.
@@ -189,9 +186,7 @@ namespace Exiled.API.Features.Core.UserSettings
         public static void AddAndSendToAll(List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-            {
                 AddAndSendToPlayer(player, collection, predicate);
-            }
         }
 
         /// <summary>
@@ -202,9 +197,7 @@ namespace Exiled.API.Features.Core.UserSettings
         public static void AddAndSendToAll(SettingBase setting, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-            {
                 AddAndSendToPlayer(player, setting, predicate);
-            }
         }
 
         /// <summary>
@@ -216,31 +209,21 @@ namespace Exiled.API.Features.Core.UserSettings
         public static void AddAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
             if (predicate != null && !predicate(player))
-            {
-                Log.Info("Не прокнул предикат, умираем");
                 return;
-            }
 
             if (PlayerSettings.TryGetValue(player, out List<SettingBase> list))
             {
-                Log.Info("Получилось достать список, добавляем туда");
                 Log.Info(setting.ToString());
                 list.Add(setting);
             }
             else
             {
-                Log.Info("Не достали список, создаём новый");
                 list = new List<SettingBase> { setting };
                 PlayerSettings.Add(player, list);
             }
 
-            if (setting is not HeaderSetting)
-            {
-                Log.Info($"Интегрируем {setting}");
-                ServerSpecificSettingsSync.ServerOnSettingValueReceived += setting.OnRandomSettingTriggered;
-            }
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
+            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -252,31 +235,21 @@ namespace Exiled.API.Features.Core.UserSettings
         public static void AddAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             if (predicate != null && !predicate(player))
-            {
-                Log.Info("Не прокнул предикат, умираем");
                 return;
-            }
 
             if (PlayerSettings.TryGetValue(player, out List<SettingBase> list))
             {
-                Log.Info("Получилось достать список, добавляем туда");
                 Log.Info(collection.ToString(true));
                 list.AddRange(collection);
             }
             else
             {
-                Log.Info("Не достали список, создаём новый");
                 list = collection;
                 PlayerSettings.Add(player, list);
             }
 
-            foreach (SettingBase setting in collection.Where(x => x is not HeaderSetting))
-            {
-                Log.Info($"Интегрируем {setting}");
-                ServerSpecificSettingsSync.ServerOnSettingValueReceived += setting.OnRandomSettingTriggered;
-            }
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
+            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -287,9 +260,7 @@ namespace Exiled.API.Features.Core.UserSettings
         public static void RemoveAndSendToAll(List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-            {
                 RemoveAndSendToPlayer(player, collection, predicate);
-            }
         }
 
         /// <summary>
@@ -300,9 +271,7 @@ namespace Exiled.API.Features.Core.UserSettings
         public static void RemoveAndSendToAll(SettingBase setting, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-            {
                 RemoveAndSendToPlayer(player, setting, predicate);
-            }
         }
 
         /// <summary>
@@ -313,30 +282,12 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void RemoveAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
-            if (predicate != null && !predicate(player))
-            {
-                Log.Info("Не прокнул предикат, умираем");
+            if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out List<SettingBase> list))
                 return;
-            }
 
-            if (!PlayerSettings.TryGetValue(player, out List<SettingBase> list))
-            {
-                Log.Info("Не достали список, умираем");
-                return;
-            }
-
-            Log.Info("Список до удаления");
-            Log.Info(list.ToString(true));
             list.RemoveAll(collection.Contains);
-            Log.Info("Список после удаления:");
-            Log.Info(list.ToString(true));
-            foreach (SettingBase setting in collection.Where(x => x is not HeaderSetting))
-            {
-                Log.Info($"Удаляем {setting}");
-                ServerSpecificSettingsSync.ServerOnSettingValueReceived -= setting.OnRandomSettingTriggered;
-            }
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
+            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -347,30 +298,12 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void RemoveAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
-            if (predicate != null && !predicate(player))
-            {
-                Log.Info("Не прокнул предикат, умираем");
+            if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out List<SettingBase> list))
                 return;
-            }
 
-            if (!PlayerSettings.TryGetValue(player, out List<SettingBase> list))
-            {
-                Log.Info("Не достали список, умираем");
-                return;
-            }
-
-            Log.Info("Список до удаления");
-            Log.Info(list.ToString(true));
             list.Remove(setting);
-            Log.Info("Список после удаления:");
-            Log.Info(list.ToString(true));
-            if (setting is not HeaderSetting)
-            {
-                Log.Info($"Удаляем {setting}");
-                ServerSpecificSettingsSync.ServerOnSettingValueReceived -= setting.OnRandomSettingTriggered;
-            }
-
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
+            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -379,27 +312,20 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="settings">A collection of settings to register.</param>
         /// <returns>A <see cref="IEnumerable{T}"/> of <see cref="SettingBase"/> instances that were successfully registered.</returns>
         /// <remarks>This method is used to sync new settings with players.</remarks>
-        public static IEnumerable<SettingBase> SortByHeaders(IEnumerable<SettingBase> settings)
+        public static IEnumerable<SettingBase> GroupByHeaders(IEnumerable<SettingBase> settings)
         {
-            List<SettingBase> list = ListPool<SettingBase>.Pool.Get(settings.Where(x => x != null));
-            List<SettingBase> list2 = new(list.Count);
+            IEnumerable<IGrouping<HeaderSetting, SettingBase>> grouped = settings.Where(s => s != null).GroupBy(s => s.Header);
 
-            while (list.Exists(x => x.Header != null))
+            List<SettingBase> result = new();
+            foreach (IGrouping<HeaderSetting, SettingBase> grouping in grouped)
             {
-                SettingBase setting = list.Find(x => x.Header != null);
-                SettingBase header = list.Find(x => x == setting.Header);
-                List<SettingBase> range = list.FindAll(x => x.Header?.Id == setting.Header.Id);
+                if (grouping.Key != null)
+                    result.Add(grouping.Key);
 
-                list2.Add(header);
-                list2.AddRange(range);
-
-                list.Remove(header);
-                list.RemoveAll(x => x.Header?.Id == setting.Header.Id);
+                result.AddRange(grouping);
             }
 
-            list2.AddRange(list);
-            ListPool<SettingBase>.Pool.Return(list);
-            return list2;
+            return result;
         }
 
         /// <summary>
@@ -407,27 +333,12 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <param name="referenceHub"> f.</param>
         /// <param name="settingBase"> fuck you man.</param>
-        public void OnRandomSettingTriggered(ReferenceHub referenceHub, ServerSpecificSettingBase settingBase)
+        public static void OnRandomSettingTriggered(ReferenceHub referenceHub, ServerSpecificSettingBase settingBase)
         {
-            if (!Player.TryGet(referenceHub, out Player player))
-            {
-                Log.Info("Игрока нет, умираем");
+            if (!Player.TryGet(referenceHub, out Player player) || !Settings.TryGetValue(settingBase.SettingId, out SettingBase setting))
                 return;
-            }
 
-            if (!Settings.TryGetValue(settingBase.SettingId, out SettingBase setting))
-            {
-                Log.Info("Обёртки нет, умираем");
-                return;
-            }
-
-            if (setting != this)
-            {
-                Log.Info("Не та настройка, умираем");
-                return;
-            }
-
-            OnTriggered(player, setting);
+            setting.OnTriggered?.Invoke(player, setting);
         }
 
         /// <summary>

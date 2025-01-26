@@ -22,10 +22,11 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="hintDescription"><inheritdoc cref="SettingBase.HintDescription"/></param>
         /// <param name="paddling"><inheritdoc cref="ReducedPaddling"/></param>
         public HeaderSetting(string name, string hintDescription = "", bool paddling = false)
-            : this(new SSGroupHeader(name, paddling, hintDescription))
+            : base(new SSGroupHeader(name, paddling, hintDescription))
         {
             Base = (SSGroupHeader)base.Base;
             Base.SetId(NextId++, name);
+            Log.Info($"Добавляем новую настройку {ToString()}");
         }
 
         /// <summary>
@@ -37,6 +38,7 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = settingBase;
             Base.SetId(NextId++, settingBase.Label);
+            Log.Info($"Добавляем новую настройку {ToString()}");
         }
 
         /// <inheritdoc/>
@@ -55,9 +57,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// Returns a representation of this <see cref="HeaderSetting"/>.
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
-        public override string ToString()
-        {
-            return base.ToString() + $" /{ReducedPaddling}/";
-        }
+        public override string ToString() => base.ToString() + $" /{Label}/";
     }
 }

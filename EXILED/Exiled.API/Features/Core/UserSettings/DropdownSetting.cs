@@ -116,9 +116,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// Gets a string representation of this <see cref="DropdownSetting"/>.
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
-        public override string ToString()
-        {
-            return base.ToString() + $" ={DefaultOptionIndex}= -{SelectedIndex}- /{string.Join(";", Options)}/";
-        }
+        public override string ToString() => base.ToString() + $" ={DefaultOptionIndex}= -{SelectedIndex}- /{string.Join(";", Options)}/";
     }
 }

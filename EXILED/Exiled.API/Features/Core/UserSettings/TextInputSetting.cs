@@ -81,9 +81,6 @@ namespace Exiled.API.Features.Core.UserSettings
         /// Returns a representation of this <see cref="TextInputSetting"/>.
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
-        public override string ToString()
-        {
-            return base.ToString() + $" /{FoldoutMode}/ *{Alignment}*";
-        }
+        public override string ToString() => base.ToString() + $" /{FoldoutMode}/ *{Alignment}*";
     }
 }

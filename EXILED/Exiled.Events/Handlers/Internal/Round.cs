@@ -29,6 +29,7 @@ namespace Exiled.Events.Handlers.Internal
     using InventorySystem.Items.Usables;
     using PlayerRoles;
     using PlayerRoles.RoleAssign;
+    using UserSettings.ServerSpecific;
     using Utils.NonAllocLINQ;
 
     /// <summary>
@@ -51,6 +52,7 @@ namespace Exiled.Events.Handlers.Internal
             if (Events.Instance.Config.ShouldReloadTranslationsAtRoundRestart)
                 TranslationManager.Reload();
 
+            ServerSpecificSettingsSync.ServerOnSettingValueReceived += SettingBase.OnRandomSettingTriggered;
             RoundSummary.RoundLock = false;
         }
 

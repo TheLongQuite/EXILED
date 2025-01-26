@@ -11,6 +11,7 @@ namespace Exiled.API.Features.Core.UserSettings
 
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
+    using Interfaces;
 
     /// <summary>
     /// Represents a button setting.
@@ -82,7 +83,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for ButtonSetting.
         /// </summary>
-        public struct ButtonConfig
+        public struct ButtonConfig : IServerSpecificConfig
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="ButtonConfig"/> struct.
@@ -144,7 +145,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a ButtonSetting instanse.
             /// </summary>
             /// <returns>ButtonSetting.</returns>
-            public ButtonSetting Create() => new(Label, ButtonText, HoldTime, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public SettingBase Create() => new ButtonSetting(Label, ButtonText, HoldTime, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

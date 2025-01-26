@@ -9,6 +9,7 @@ namespace Exiled.API.Features.Core.UserSettings
 {
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
+    using Interfaces;
 
     /// <summary>
     /// Represents a two-button setting.
@@ -103,7 +104,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
-        public struct TwoButtonsConfig
+        public struct TwoButtonsConfig : IServerSpecificConfig
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="TwoButtonsConfig"/> struct.
@@ -172,7 +173,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a TwoButtonsSetting instanse.
             /// </summary>
             /// <returns>TwoButtonsSetting.</returns>
-            public TwoButtonsSetting Create() => new(Label, FirstOption, SecondOption, DefaultIsSecond, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public SettingBase Create() => new TwoButtonsSetting(Label, FirstOption, SecondOption, DefaultIsSecond, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

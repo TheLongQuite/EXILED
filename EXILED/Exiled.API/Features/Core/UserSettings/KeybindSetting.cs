@@ -7,10 +7,9 @@
 
 namespace Exiled.API.Features.Core.UserSettings
 {
-    using System;
-
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
+    using Interfaces;
     using UnityEngine;
 
     /// <summary>
@@ -79,7 +78,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for KeybindSetting.
         /// </summary>
-        public struct KeybindConfig
+        public struct KeybindConfig : IServerSpecificConfig
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="KeybindConfig"/> struct.
@@ -141,7 +140,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a KeybindSetting instanse.
             /// </summary>
             /// <returns>KeybindSetting.</returns>
-            public KeybindSetting Create() => new(Label, KeyCode, PreventInteractionOnGUI, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public SettingBase Create() => new KeybindSetting(Label, KeyCode, PreventInteractionOnGUI, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

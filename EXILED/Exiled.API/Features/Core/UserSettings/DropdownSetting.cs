@@ -11,6 +11,7 @@ namespace Exiled.API.Features.Core.UserSettings
     using System.Collections.Generic;
     using System.Linq;
 
+    using Exiled.API.Features.Core.Interfaces;
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
 
@@ -121,7 +122,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for DropdownSetting.
         /// </summary>
-        public struct DropdownConfig
+        public struct DropdownConfig : IServerSpecificConfig
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="DropdownConfig"/> struct.
@@ -191,7 +192,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a DropdownSetting instanse.
             /// </summary>
             /// <returns>DropdownSetting.</returns>
-            public DropdownSetting Create() => new(Label, Options, DefaultOptionIndex, DropdownEntryType, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public SettingBase Create() => new DropdownSetting(Label, Options, DefaultOptionIndex, DropdownEntryType, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

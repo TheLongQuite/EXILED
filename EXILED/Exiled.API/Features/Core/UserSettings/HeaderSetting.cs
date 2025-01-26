@@ -9,6 +9,7 @@ namespace Exiled.API.Features.Core.UserSettings
 {
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
+    using Interfaces;
 
     /// <summary>
     /// Represents a header setting.
@@ -60,7 +61,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for KeybindSetting.
         /// </summary>
-        public struct HeaderConfig
+        public struct HeaderConfig : IServerSpecificConfig
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="HeaderConfig"/> struct.
@@ -94,7 +95,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a HeaderSetting instanse.
             /// </summary>
             /// <returns>HeaderSetting.</returns>
-            public HeaderSetting Create() => new(Name, Description, Paddling);
+            public SettingBase Create() => new HeaderSetting(Name, Description, Paddling);
         }
     }
 }

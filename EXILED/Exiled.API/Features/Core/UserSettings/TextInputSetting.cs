@@ -9,6 +9,7 @@ namespace Exiled.API.Features.Core.UserSettings
 {
     using System;
 
+    using Exiled.API.Features.Core.Interfaces;
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
     using TMPro;
@@ -87,7 +88,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
-        public struct TextInputConfig
+        public struct TextInputConfig : IServerSpecificConfig
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="TextInputConfig"/> struct.
@@ -149,7 +150,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a TextInputSetting instanse.
             /// </summary>
             /// <returns>TextInputSetting.</returns>
-            public TextInputSetting Create() => new(Label, FoldoutMode, TextAlignmentOptions, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public SettingBase Create() => new TextInputSetting(Label, FoldoutMode, TextAlignmentOptions, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

@@ -117,5 +117,81 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" ={DefaultOptionIndex}= -{SelectedIndex}- /{string.Join(";", Options)}/";
+
+        /// <summary>
+        /// Represents a config for DropdownSetting.
+        /// </summary>
+        public struct DropdownConfig
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="DropdownConfig"/> struct.
+            /// </summary>
+            /// <param name="label"/>
+            /// <param name="options"><inheritdoc cref="Options"/></param>
+            /// <param name="defaultOptionIndex"><inheritdoc cref="DefaultOptionIndex"/></param>
+            /// <param name="hintDescription"><inheritdoc cref="HintDescription"/></param>
+            /// <param name="headerName"><inheritdoc cref="HeaderName"/></param>
+            /// <param name="headerDescription"><inheritdoc cref="HeaderDescription"/></param>
+            /// <param name="headerPaddling"><inheritdoc cref="HeaderPaddling"/></param>
+            /// <param name="dropdownEntryType"></param>
+            /// <inheritdoc cref="Label"/>
+            public DropdownConfig(string label, IEnumerable<string> options, int defaultOptionIndex, SSDropdownSetting.DropdownEntryType dropdownEntryType = SSDropdownSetting.DropdownEntryType.Regular, string hintDescription = null, string headerName = null, string headerDescription = null, bool headerPaddling = false)
+            {
+                Label = label;
+                Options = options;
+                DefaultOptionIndex = defaultOptionIndex;
+                DropdownEntryType = dropdownEntryType;
+                HintDescription = hintDescription;
+                HeaderName = headerName;
+                HeaderDescription = headerDescription;
+                HeaderPaddling = headerPaddling;
+            }
+
+            /// <summary>
+            /// Gets or sets label of a DropdownConfig.
+            /// </summary>
+            public string Label { get; set; }
+
+            /// <summary>
+            /// Gets or sets Options of a DropdownConfig.
+            /// </summary>
+            public IEnumerable<string> Options { get; set; }
+
+            /// <summary>
+            /// Gets or sets DefaultOptionIndex of a DropdownConfig.
+            /// </summary>
+            public int DefaultOptionIndex { get; set; }
+
+            /// <summary>
+            /// Gets or sets DropdownEntryType of a DropdownConfig.
+            /// </summary>
+            public SSDropdownSetting.DropdownEntryType DropdownEntryType { get; set; }
+
+            /// <summary>
+            /// Gets or sets HintDescription of a DropdownConfig.
+            /// </summary>
+            public string HintDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderName of a DropdownConfig.
+            /// </summary>
+            public string HeaderName { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderDescription of a DropdownConfig.
+            /// </summary>
+            public string HeaderDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether HeaderPaddling is needed.
+            /// </summary>
+            public bool HeaderPaddling { get; set; }
+
+            /// <summary>
+            /// Creates a DropdownSetting instanse.
+            /// </summary>
+            /// <returns>DropdownSetting.</returns>
+            public DropdownSetting Create() => new(Label, Options, DefaultOptionIndex, DropdownEntryType, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+        }
     }
 }

@@ -75,5 +75,73 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" /{Label}/ *{KeyCode}* +{PreventInteractionOnGUI}+";
+
+        /// <summary>
+        /// Represents a config for KeybindSetting.
+        /// </summary>
+        public struct KeybindConfig
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="KeybindConfig"/> struct.
+            /// </summary>
+            /// <param name="label"/><inheritdoc cref="Label"/>
+            /// <param name="keyCode"><inheritdoc cref="KeyCode"/></param>
+            /// <param name="headerName"><inheritdoc cref="HeaderName"/></param>
+            /// <param name="preventInteractionOnGui"><inheritdoc cref="PreventInteractionOnGUI"/></param>
+            /// <param name="hintDescription"><inheritdoc cref="HintDescription"/></param>
+            /// <param name="headerDescription"><inheritdoc cref="HeaderDescription"/></param>
+            /// <param name="headerPaddling"><inheritdoc cref="HeaderPaddling"/></param>
+            public KeybindConfig(string label, KeyCode keyCode, string hintDescription = null, bool preventInteractionOnGui = false, string headerName = null, string headerDescription = null, bool headerPaddling = false)
+            {
+                Label = label;
+                KeyCode = keyCode;
+                HintDescription = hintDescription;
+                PreventInteractionOnGUI = preventInteractionOnGui;
+                HeaderName = headerName;
+                HeaderDescription = headerDescription;
+                HeaderPaddling = headerPaddling;
+            }
+
+            /// <summary>
+            /// Gets or sets label of a KeybindConfig.
+            /// </summary>
+            public string Label { get; set; }
+
+            /// <summary>
+            /// Gets or sets ButtonText of a KeybindConfig.
+            /// </summary>
+            public KeyCode KeyCode { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether interaction on GUI would be prevented.
+            /// </summary>
+            public bool PreventInteractionOnGUI { get; set; }
+
+            /// <summary>
+            /// Gets or sets HintDescription of a KeybindConfig.
+            /// </summary>
+            public string HintDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderName of a KeybindConfig.
+            /// </summary>
+            public string HeaderName { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderDescription of a KeybindConfig.
+            /// </summary>
+            public string HeaderDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether HeaderPaddling is needed.
+            /// </summary>
+            public bool HeaderPaddling { get; set; }
+
+            /// <summary>
+            /// Creates a KeybindSetting instanse.
+            /// </summary>
+            /// <returns>KeybindSetting.</returns>
+            public KeybindSetting Create() => new(Label, KeyCode, PreventInteractionOnGUI, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+        }
     }
 }

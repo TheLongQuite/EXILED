@@ -12,6 +12,7 @@ namespace Exiled.API.Features.Core.UserSettings
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
     using TMPro;
+    using UnityEngine;
 
     /// <summary>
     /// Represents a text input setting.
@@ -82,5 +83,73 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" /{FoldoutMode}/ *{Alignment}*";
+
+        /// <summary>
+        /// Represents a config for TextInputSetting.
+        /// </summary>
+        public struct TextInputConfig
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="TextInputConfig"/> struct.
+            /// </summary>
+            /// <param name="label"/><inheritdoc cref="Label"/>
+            /// <param name="headerName"><inheritdoc cref="HeaderName"/></param>
+            /// <param name="textAlignmentOptions"><inheritdoc cref="TextAlignmentOptions"/></param>
+            /// <param name="hintDescription"><inheritdoc cref="HintDescription"/></param>
+            /// <param name="headerDescription"><inheritdoc cref="HeaderDescription"/></param>
+            /// <param name="headerPaddling"><inheritdoc cref="HeaderPaddling"/></param>
+            /// <param name="foldoutMode"></param><inheritdoc cref="FoldoutMode"/>
+            public TextInputConfig(string label, SSTextArea.FoldoutMode foldoutMode, TextAlignmentOptions textAlignmentOptions, string hintDescription = null, string headerName = null, string headerDescription = null, bool headerPaddling = false)
+            {
+                Label = label;
+                HintDescription = hintDescription;
+                FoldoutMode = foldoutMode;
+                TextAlignmentOptions = textAlignmentOptions;
+                HeaderName = headerName;
+                HeaderDescription = headerDescription;
+                HeaderPaddling = headerPaddling;
+            }
+
+            /// <summary>
+            /// Gets or sets label of a TextInputConfig.
+            /// </summary>
+            public string Label { get; set; }
+
+            /// <summary>
+            /// Gets or sets FoldoutMode of a TextInputConfig.
+            /// </summary>
+            public SSTextArea.FoldoutMode FoldoutMode { get; set; }
+
+            /// <summary>
+            /// Gets or sets TextAlignmentOptions for TextInputConfig.
+            /// </summary>
+            public TextAlignmentOptions TextAlignmentOptions { get; set; }
+
+            /// <summary>
+            /// Gets or sets HintDescription of a TextInputConfig.
+            /// </summary>
+            public string HintDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderName of a TextInputConfig.
+            /// </summary>
+            public string HeaderName { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderDescription of a TextInputConfig.
+            /// </summary>
+            public string HeaderDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether HeaderPaddling is needed.
+            /// </summary>
+            public bool HeaderPaddling { get; set; }
+
+            /// <summary>
+            /// Creates a TextInputSetting instanse.
+            /// </summary>
+            /// <returns>TextInputSetting.</returns>
+            public TextInputSetting Create() => new(Label, FoldoutMode, TextAlignmentOptions, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+        }
     }
 }

@@ -7,7 +7,6 @@
 
 namespace Exiled.API.Features.Core.UserSettings
 {
-    using System;
     using System.Diagnostics;
 
     using Exiled.API.Interfaces;
@@ -79,5 +78,73 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" ={Text}= -{HoldTime}- /{LastPress}/";
+
+        /// <summary>
+        /// Represents a config for ButtonSetting.
+        /// </summary>
+        public struct ButtonConfig
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="ButtonConfig"/> struct.
+            /// </summary>
+            /// <param name="label"/><inheritdoc cref="Label"/>
+            /// <param name="buttonText"><inheritdoc cref="ButtonText"/></param>
+            /// <param name="headerName"><inheritdoc cref="HeaderName"/></param>
+            /// <param name="holdTime"><inheritdoc cref="HoldTime"/></param>
+            /// <param name="hintDescription"><inheritdoc cref="HintDescription"/></param>
+            /// <param name="headerDescription"><inheritdoc cref="HeaderDescription"/></param>
+            /// <param name="headerPaddling"><inheritdoc cref="HeaderPaddling"/></param>
+            public ButtonConfig(string label, string buttonText, string headerName = null, float holdTime = 0.0f, string hintDescription = null, string headerDescription = null, bool headerPaddling = false)
+            {
+                Label = label;
+                ButtonText = buttonText;
+                HoldTime = holdTime;
+                HintDescription = hintDescription;
+                HeaderName = headerName;
+                HeaderDescription = headerDescription;
+                HeaderPaddling = headerPaddling;
+            }
+
+            /// <summary>
+            /// Gets or sets label of a ButtonConfig.
+            /// </summary>
+            public string Label { get; set; }
+
+            /// <summary>
+            /// Gets or sets ButtonText of a ButtonConfig.
+            /// </summary>
+            public string ButtonText { get; set; }
+
+            /// <summary>
+            /// Gets or sets HoldTime of a ButtonConfig.
+            /// </summary>
+            public float HoldTime { get; set; }
+
+            /// <summary>
+            /// Gets or sets HintDescription of a ButtonConfig.
+            /// </summary>
+            public string HintDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderName of a ButtonConfig.
+            /// </summary>
+            public string HeaderName { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderDescription of a ButtonConfig.
+            /// </summary>
+            public string HeaderDescription { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether HeaderPaddling is needed.
+            /// </summary>
+            public bool HeaderPaddling { get; set; }
+
+            /// <summary>
+            /// Creates a ButtonSetting instanse.
+            /// </summary>
+            /// <returns>ButtonSetting.</returns>
+            public ButtonSetting Create() => new(Label, ButtonText, HoldTime, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+        }
     }
 }

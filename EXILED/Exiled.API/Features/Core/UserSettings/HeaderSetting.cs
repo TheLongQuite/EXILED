@@ -25,8 +25,7 @@ namespace Exiled.API.Features.Core.UserSettings
             : base(new SSGroupHeader(name, paddling, hintDescription))
         {
             Base = (SSGroupHeader)base.Base;
-            Base.SetId(NextId++, name);
-            Log.Info($"Добавляем новую настройку {ToString()}");
+            Base.SetId(null, name);
         }
 
         /// <summary>
@@ -37,8 +36,7 @@ namespace Exiled.API.Features.Core.UserSettings
             : base(settingBase)
         {
             Base = settingBase;
-            Base.SetId(NextId++, settingBase.Label);
-            Log.Info($"Добавляем новую настройку {ToString()}");
+            Base.SetId(null, settingBase.Label);
         }
 
         /// <inheritdoc/>
@@ -58,5 +56,45 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" /{Label}/";
+
+        /// <summary>
+        /// Represents a config for KeybindSetting.
+        /// </summary>
+        public struct HeaderConfig
+        {
+            /// <summary>
+            /// Initializes a new instance of the <see cref="HeaderConfig"/> struct.
+            /// </summary>
+            /// <param name="name"/><inheritdoc cref="Name"/>
+            /// <param name="description"><inheritdoc cref="Description"/></param>
+            /// <param name="paddling"><inheritdoc cref="Paddling"/></param>
+            public HeaderConfig(string name = null, string description = null, bool paddling = false)
+            {
+                Name = name;
+                Description = description;
+                Paddling = paddling;
+            }
+
+            /// <summary>
+            /// Gets or sets HeaderName of a HeaderConfig.
+            /// </summary>
+            public string Name { get; set; }
+
+            /// <summary>
+            /// Gets or sets HeaderDescription of a HeaderConfig.
+            /// </summary>
+            public string Description { get; set; }
+
+            /// <summary>
+            /// Gets or sets a value indicating whether HeaderPaddling is needed.
+            /// </summary>
+            public bool Paddling { get; set; }
+
+            /// <summary>
+            /// Creates a HeaderSetting instanse.
+            /// </summary>
+            /// <returns>HeaderSetting.</returns>
+            public HeaderSetting Create() => new HeaderSetting(Name, Description, Paddling);
+        }
     }
 }

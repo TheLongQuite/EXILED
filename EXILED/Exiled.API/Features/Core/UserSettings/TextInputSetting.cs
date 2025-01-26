@@ -26,15 +26,13 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="alignment"><inheritdoc cref="Alignment"/></param>
         /// <param name="hintDescription"><inheritdoc cref="SettingBase.HintDescription"/></param>
         /// <param name="header"><inheritdoc cref="SettingBase.Header"/></param>
-        /// <param name="onTriggered"><inheritdoc cref="SettingBase.OnTriggered"/></param>
         public TextInputSetting(
             string label,
             SSTextArea.FoldoutMode foldoutMode = SSTextArea.FoldoutMode.NotCollapsable,
             TextAlignmentOptions alignment = TextAlignmentOptions.TopLeft,
             string hintDescription = null,
-            HeaderSetting header = null,
-            Action<Player, SettingBase> onTriggered = null)
-            : base(new SSTextArea(NextId++, label, foldoutMode, hintDescription, alignment), header, onTriggered)
+            HeaderSetting header = null)
+            : base(new SSTextArea(NextId++, label, foldoutMode, hintDescription, alignment), header)
         {
             Base = (SSTextArea)base.Base;
         }

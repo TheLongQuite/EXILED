@@ -9,12 +9,12 @@ namespace Exiled.API.Features.Core.UserSettings
 {
     using System;
     using System.Collections.Generic;
-    using System.Collections.ObjectModel;
     using System.Linq;
 
-    using Exiled.API.Features.Pools;
     using Exiled.API.Interfaces;
+    using Extensions;
     using global::UserSettings.ServerSpecific;
+    using Pools;
 
     /// <summary>
     /// A base class for all Server Specific Settings.
@@ -36,12 +36,11 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <param name="settingBase">A <see cref="ServerSpecificSettingBase"/> instance.</param>
         /// <param name="header"><inheritdoc cref="Header"/></param>
-        /// <param name="onTriggered"><inheritdoc cref="OnTriggered"/></param>
-        internal SettingBase(ServerSpecificSettingBase settingBase, HeaderSetting header, Action<Player, SettingBase> onTriggered)
+        internal SettingBase(ServerSpecificSettingBase settingBase, HeaderSetting header)
         {
             Base = settingBase;
             Header = header;
-            OnTriggered = onTriggered;
+            Log.Info($"Добавляем новую настройку {this}");
             Settings.Add(settingBase.SettingId, this);
         }
 
@@ -55,6 +54,7 @@ namespace Exiled.API.Features.Core.UserSettings
 
             if (OriginalDefinition != null)
             {
+                Log.Info($"Настройка {this} уже существовала, заменяем");
                 Header = OriginalDefinition.Header;
                 OnTriggered = OriginalDefinition.OnTriggered;
                 Label = OriginalDefinition.Label;
@@ -62,6 +62,7 @@ namespace Exiled.API.Features.Core.UserSettings
                 return;
             }
 
+            Log.Info($"Добавляем новую настройку {this}");
             Settings.Add(settingBase.SettingId, this);
         }
 
@@ -214,20 +215,31 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void AddAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
-            if (predicate == null || !predicate(player))
+            if (predicate != null && !predicate(player))
+            {
+                Log.Info("Не прокнул предикат, умираем");
                 return;
+            }
 
             if (PlayerSettings.TryGetValue(player, out List<SettingBase> list))
             {
+                Log.Info("Получилось достать список, добавляем туда");
+                Log.Info(setting.ToString());
                 list.Add(setting);
             }
             else
             {
+                Log.Info("Не достали список, создаём новый");
                 list = new List<SettingBase> { setting };
                 PlayerSettings.Add(player, list);
             }
 
-            ServerSpecificSettingsSync.ServerOnSettingValueReceived += setting.OnRandomSettingTriggered;
+            if (setting is not HeaderSetting)
+            {
+                Log.Info($"Интегрируем {setting}");
+                ServerSpecificSettingsSync.ServerOnSettingValueReceived += setting.OnRandomSettingTriggered;
+            }
+
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
         }
 
@@ -239,21 +251,30 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void AddAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
-            if (predicate == null || !predicate(player))
-             return;
+            if (predicate != null && !predicate(player))
+            {
+                Log.Info("Не прокнул предикат, умираем");
+                return;
+            }
 
             if (PlayerSettings.TryGetValue(player, out List<SettingBase> list))
             {
+                Log.Info("Получилось достать список, добавляем туда");
+                Log.Info(collection.ToString(true));
                 list.AddRange(collection);
             }
             else
             {
+                Log.Info("Не достали список, создаём новый");
                 list = collection;
                 PlayerSettings.Add(player, list);
             }
 
-            foreach (SettingBase setting in collection)
+            foreach (SettingBase setting in collection.Where(x => x is not HeaderSetting))
+            {
+                Log.Info($"Интегрируем {setting}");
                 ServerSpecificSettingsSync.ServerOnSettingValueReceived += setting.OnRandomSettingTriggered;
+            }
 
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
         }
@@ -292,15 +313,28 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void RemoveAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
-            if (predicate == null || !predicate(player))
+            if (predicate != null && !predicate(player))
+            {
+                Log.Info("Не прокнул предикат, умираем");
                 return;
+            }
 
             if (!PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            {
+                Log.Info("Не достали список, умираем");
                 return;
+            }
 
+            Log.Info("Список до удаления");
+            Log.Info(list.ToString(true));
             list.RemoveAll(collection.Contains);
-            foreach (SettingBase setting in collection)
+            Log.Info("Список после удаления:");
+            Log.Info(list.ToString(true));
+            foreach (SettingBase setting in collection.Where(x => x is not HeaderSetting))
+            {
+                Log.Info($"Удаляем {setting}");
                 ServerSpecificSettingsSync.ServerOnSettingValueReceived -= setting.OnRandomSettingTriggered;
+            }
 
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
         }
@@ -313,14 +347,29 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void RemoveAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
-            if (predicate == null || !predicate(player))
+            if (predicate != null && !predicate(player))
+            {
+                Log.Info("Не прокнул предикат, умираем");
                 return;
+            }
 
             if (!PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            {
+                Log.Info("Не достали список, умираем");
                 return;
+            }
 
+            Log.Info("Список до удаления");
+            Log.Info(list.ToString(true));
             list.Remove(setting);
-            ServerSpecificSettingsSync.ServerOnSettingValueReceived -= setting.OnRandomSettingTriggered;
+            Log.Info("Список после удаления:");
+            Log.Info(list.ToString(true));
+            if (setting is not HeaderSetting)
+            {
+                Log.Info($"Удаляем {setting}");
+                ServerSpecificSettingsSync.ServerOnSettingValueReceived -= setting.OnRandomSettingTriggered;
+            }
+
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub, SortByHeaders(list).Select(x => x.Base).ToArray());
         }
 
@@ -360,9 +409,23 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="settingBase"> fuck you man.</param>
         public void OnRandomSettingTriggered(ReferenceHub referenceHub, ServerSpecificSettingBase settingBase)
         {
-            if (!Player.TryGet(referenceHub, out Player player) ||
-                !Settings.TryGetValue(settingBase.SettingId, out SettingBase setting) || setting != this)
+            if (!Player.TryGet(referenceHub, out Player player))
+            {
+                Log.Info("Игрока нет, умираем");
                 return;
+            }
+
+            if (!Settings.TryGetValue(settingBase.SettingId, out SettingBase setting))
+            {
+                Log.Info("Обёртки нет, умираем");
+                return;
+            }
+
+            if (setting != this)
+            {
+                Log.Info("Не та настройка, умираем");
+                return;
+            }
 
             OnTriggered(player, setting);
         }

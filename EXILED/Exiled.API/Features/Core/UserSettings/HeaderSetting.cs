@@ -25,8 +25,7 @@ namespace Exiled.API.Features.Core.UserSettings
             : this(new SSGroupHeader(name, paddling, hintDescription))
         {
             Base = (SSGroupHeader)base.Base;
-
-            Base.SetId(null, name);
+            Base.SetId(NextId++, name);
         }
 
         /// <summary>
@@ -37,7 +36,7 @@ namespace Exiled.API.Features.Core.UserSettings
             : base(settingBase)
         {
             Base = settingBase;
-            Base.SetId(null, settingBase.Label);
+            Base.SetId(NextId++, settingBase.Label);
         }
 
         /// <inheritdoc/>

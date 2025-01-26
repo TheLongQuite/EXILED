@@ -94,7 +94,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a HeaderSetting instanse.
             /// </summary>
             /// <returns>HeaderSetting.</returns>
-            public HeaderSetting Create() => new HeaderSetting(Name, Description, Paddling);
+            public HeaderSetting Create() => new(Name, Description, Paddling);
         }
     }
 }

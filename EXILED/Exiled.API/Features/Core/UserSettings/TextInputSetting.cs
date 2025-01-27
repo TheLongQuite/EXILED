@@ -88,10 +88,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
-        public struct TextInputConfig : IServerSpecificConfig
+        public class TextInputConfig : IServerSpecificConfig
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TextInputConfig"/> struct.
+            /// Initializes a new instance of the <see cref="TextInputConfig"/> class.
             /// </summary>
             /// <param name="label"/><inheritdoc cref="Label"/>
             /// <param name="headerName"><inheritdoc cref="HeaderName"/></param>

@@ -61,10 +61,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for KeybindSetting.
         /// </summary>
-        public struct HeaderConfig : IServerSpecificConfig
+        public class HeaderConfig : IServerSpecificConfig
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="HeaderConfig"/> struct.
+            /// Initializes a new instance of the <see cref="HeaderConfig"/> class.
             /// </summary>
             /// <param name="name"/><inheritdoc cref="Name"/>
             /// <param name="description"><inheritdoc cref="Description"/></param>

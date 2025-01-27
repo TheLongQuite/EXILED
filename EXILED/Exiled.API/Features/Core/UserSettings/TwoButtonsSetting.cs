@@ -104,10 +104,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
-        public struct TwoButtonsConfig : IServerSpecificConfig
+        public class TwoButtonsConfig : IServerSpecificConfig
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="TwoButtonsConfig"/> struct.
+            /// Initializes a new instance of the <see cref="TwoButtonsConfig"/> class.
             /// </summary>
             /// <param name="label"></param>
             /// <param name="firstOption"/><inheritdoc cref="FirstOption"/>
@@ -126,7 +126,7 @@ namespace Exiled.API.Features.Core.UserSettings
                 HintDescription = hintDescription;
                 HeaderName = headerName;
                 HeaderPaddling = headerPaddling;
-                HeaderDescription = hintDescription;
+                HeaderDescription = headerDescription;
             }
 
             /// <summary>

@@ -12,9 +12,7 @@ namespace Exiled.API.Features.Core.UserSettings
     using System.Linq;
 
     using Exiled.API.Interfaces;
-    using Extensions;
     using global::UserSettings.ServerSpecific;
-    using Pools;
 
     /// <summary>
     /// A base class for all Server Specific Settings.
@@ -24,7 +22,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// A <see cref="Dictionary{TKey,TValue}"/> that contains <see cref="SettingBase"/> that are currently with players.
         /// </summary>
-        public static readonly Dictionary<Player, List<SettingBase>> PlayerSettings = new();
+        public static readonly Dictionary<Player, HashSet<SettingBase>> PlayerSettings = new();
 
         /// <summary>
         /// A <see cref="Dictionary{TKey,TValue}"/> that contains <see cref="int"/> Id and <see cref="SettingBase"/> with this Id.
@@ -138,7 +136,7 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             setting = null;
 
-            if (!PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            if (!PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
                 return false;
 
             setting = (T)list.FirstOrDefault(x => x.Id == id);
@@ -211,14 +209,14 @@ namespace Exiled.API.Features.Core.UserSettings
             if (predicate != null && !predicate(player))
                 return;
 
-            if (PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            if (PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
             {
                 Log.Info(setting.ToString());
                 list.Add(setting);
             }
             else
             {
-                list = new List<SettingBase> { setting };
+                list = new HashSet<SettingBase> { setting };
                 PlayerSettings.Add(player, list);
             }
 
@@ -237,14 +235,13 @@ namespace Exiled.API.Features.Core.UserSettings
             if (predicate != null && !predicate(player))
                 return;
 
-            if (PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            if (PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
             {
-                Log.Info(collection.ToString(true));
-                list.AddRange(collection);
+                list = list.Concat(collection).ToHashSet();
             }
             else
             {
-                list = collection;
+                list = collection.ToHashSet();
                 PlayerSettings.Add(player, list);
             }
 
@@ -282,10 +279,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void RemoveAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
-            if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
                 return;
 
-            list.RemoveAll(collection.Contains);
+            list.RemoveWhere(collection.Contains);
             ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
             ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
@@ -298,7 +295,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="predicate">A requirement to meet.</param>
         public static void RemoveAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
-            if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out List<SettingBase> list))
+            if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
                 return;
 
             list.Remove(setting);

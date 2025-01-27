@@ -83,10 +83,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for ButtonSetting.
         /// </summary>
-        public struct ButtonConfig : IServerSpecificConfig
+        public class ButtonConfig : IServerSpecificConfig
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="ButtonConfig"/> struct.
+            /// Initializes a new instance of the <see cref="ButtonConfig"/> class.
             /// </summary>
             /// <param name="label"/><inheritdoc cref="Label"/>
             /// <param name="buttonText"><inheritdoc cref="ButtonText"/></param>

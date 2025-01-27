@@ -122,10 +122,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <summary>
         /// Represents a config for DropdownSetting.
         /// </summary>
-        public struct DropdownConfig : IServerSpecificConfig
+        public class DropdownConfig : IServerSpecificConfig
         {
             /// <summary>
-            /// Initializes a new instance of the <see cref="DropdownConfig"/> struct.
+            /// Initializes a new instance of the <see cref="DropdownConfig"/> class.
             /// </summary>
             /// <param name="label"/>
             /// <param name="options"><inheritdoc cref="Options"/></param>

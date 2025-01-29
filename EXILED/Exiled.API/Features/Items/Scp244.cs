@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Scp244.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Scp244.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -51,7 +51,7 @@ namespace Exiled.API.Features.Items
         public new Scp244Item Base { get; }
 
         /// <summary>
-        /// Gets or sets a value indicating whether or not SCP-244 will spawn primed.
+        /// Gets or sets a value indicating whether SCP-244 will spawn primed.
         /// </summary>
         public bool Primed
         {
@@ -119,9 +119,9 @@ namespace Exiled.API.Features.Items
         public override string ToString() => $"{Type} ({Serial}) [{Weight}] *{Scale}* -{Primed}-";
 
         /// <inheritdoc/>
-        internal override void ReadPickupInfo(Pickup pickup)
+        internal override void ReadPickupInfoBefore(Pickup pickup)
         {
-            base.ReadPickupInfo(pickup);
+            base.ReadPickupInfoBefore(pickup);
             if (pickup is Scp244Pickup scp244)
             {
                 Health = scp244.Health;

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="IPlugin.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="IPlugin.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -46,8 +46,9 @@ namespace Exiled.API.Interfaces
 
         /// <summary>
         /// Gets the plugin commands.
+        /// TypeOfCommand, (CommandInstance, ListOfHandlers).
         /// </summary>
-        Dictionary<Type, Dictionary<Type, ICommand>> Commands { get; }
+        Dictionary<Type, (ICommand, HashSet<Type>)> Commands { get; }
 
         /// <summary>
         /// Gets the plugin priority.

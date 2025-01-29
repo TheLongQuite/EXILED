@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Enable.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Enable.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -23,11 +23,6 @@ namespace Exiled.Events.Commands.PluginManager
     /// </summary>
     public sealed class Enable : ICommand
     {
-        /// <summary>
-        /// Gets static instance of the <see cref="Enable"/> command.
-        /// </summary>
-        public static Enable Instance { get; } = new();
-
         /// <inheritdoc/>
         public string Command { get; } = "enable";
 
@@ -35,7 +30,7 @@ namespace Exiled.Events.Commands.PluginManager
         public string[] Aliases { get; } = { "e", "en" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Enable a plugin";
+        public string Description { get; set; } = "Enable a plugin";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

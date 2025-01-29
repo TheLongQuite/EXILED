@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Scp079ActiveAbility.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Scp079ActiveAbility.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -82,13 +82,6 @@ namespace Exiled.CustomRoles.API.Features
         /// <returns>skibidi ohio rizz.</returns>
         internal bool IsAvailable(Player player) =>
             player.Role.Is(out Scp079Role scp079Role) && scp079Role.Level <= MaxRequiredLevel && (!CustomRoles.Instance!.Config.HideUnavailableHighLevelAbilities || scp079Role.Level >= MinRequiredLevel);
-
-        /// <inheritdoc />
-        protected override void AbilityAdded(Player player)
-        {
-            if (player.Role.Type != RoleTypeId.Scp079)
-                throw new Exception($"Unable to give {nameof(Scp079ActiveAbility)} to non-SCP079 player!");
-        }
 
         /// <inheritdoc />
         protected override void AbilityUsed(Player player)

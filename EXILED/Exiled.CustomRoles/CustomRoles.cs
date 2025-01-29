@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="CustomRoles.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="CustomRoles.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -40,6 +40,8 @@ namespace Exiled.CustomRoles
 
             Server.WaitingForPlayers += playerHandler.OnWaitingForPlayers;
 
+            Player.Spawning += playerHandler.OnSpawning;
+
             Player.ChangingRole += playerHandler.OnChangingRole;
             Player.SendingRole += playerHandler.OnSendingRole;
             Player.ChangedNickname += playerHandler.OnChangedNickname;
@@ -51,6 +53,8 @@ namespace Exiled.CustomRoles
         public override void OnDisabled()
         {
             Server.WaitingForPlayers -= playerHandler.OnWaitingForPlayers;
+
+            Player.Spawning -= playerHandler.OnSpawning;
 
             Player.ChangingRole -= playerHandler.OnChangingRole;
             Player.SendingRole -= playerHandler.OnSendingRole;

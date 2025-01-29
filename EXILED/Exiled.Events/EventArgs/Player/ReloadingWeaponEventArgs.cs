@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="ReloadingWeaponEventArgs.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="ReloadingWeaponEventArgs.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -20,26 +20,19 @@ namespace Exiled.Events.EventArgs.Player
         /// <summary>
         /// Initializes a new instance of the <see cref="ReloadingWeaponEventArgs" /> class.
         /// </summary>
-        /// <param name="player">
-        /// <inheritdoc cref="Player" />
-        /// </param>
         /// <param name="firearm">
         /// <inheritdoc cref="Firearm" />
         /// </param>
-        /// <param name="isAllowed">
-        /// <inheritdoc cref="IsAllowed" />
-        /// </param>
-        public ReloadingWeaponEventArgs(Player player, Firearm firearm, bool isAllowed = true)
+        public ReloadingWeaponEventArgs(InventorySystem.Items.Firearms.Firearm firearm)
         {
-            Firearm = firearm;
-            Player = player;
-            IsAllowed = isAllowed;
+            Firearm = Item.Get<Firearm>(firearm);
+            Player = Firearm.Owner;
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether or not the weapon can be reloaded.
+        /// Gets or sets a value indicating whether the weapon can be reloaded.
         /// </summary>
-        public bool IsAllowed { get; set; }
+        public bool IsAllowed { get; set; } = true;
 
         /// <summary>
         /// Gets the <see cref="API.Features.Items.Firearm" /> being reloaded.

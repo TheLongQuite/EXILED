@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Item.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Item.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -54,6 +54,11 @@ namespace Exiled.Events.Handlers
         public static Event<UsingRadioPickupBatteryEventArgs> UsingRadioPickupBattery { get; set; } = new();
 
         /// <summary>
+        /// Invoked before a<see cref="API.Features.Pickups.MicroHIDPickup"/> state is changed.
+        /// </summary>
+        public static Event<ChangingMicroHIDPickupStateEventArgs> ChangingMicroHIDPickupState { get; set; } = new();
+
+        /// <summary>
         /// Called before the ammo of an firearm is changed.
         /// </summary>
         /// <param name="ev">The <see cref="ChangingAmmoEventArgs"/> instance.</param>
@@ -94,5 +99,11 @@ namespace Exiled.Events.Handlers
         /// </summary>
         /// <param name="ev">The <see cref="UsingRadioPickupBatteryEventArgs"/> instance.</param>
         public static void OnUsingRadioPickupBattery(UsingRadioPickupBatteryEventArgs ev) => UsingRadioPickupBattery.InvokeSafely(ev);
+
+        /// <summary>
+        /// Called before a <see cref="API.Features.Pickups.MicroHIDPickup"/> state is changed.
+        /// </summary>
+        /// <param name="ev">The <see cref="ChangingMicroHIDPickupStateEventArgs"/> instance.</param>
+        public static void OnChangingMicroHIDPickupState(ChangingMicroHIDPickupStateEventArgs ev) => ChangingMicroHIDPickupState.InvokeSafely(ev);
     }
 }

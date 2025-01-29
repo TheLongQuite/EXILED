@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Configs.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Configs.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -22,11 +22,6 @@ namespace Exiled.Events.Commands.Reload
     /// </summary>
     public class Configs : ICommand
     {
-        /// <summary>
-        /// Gets static instance of the <see cref="Configs"/> command.
-        /// </summary>
-        public static Configs Instance { get; } = new();
-
         /// <inheritdoc/>
         public string Command { get; } = "configs";
 
@@ -34,7 +29,7 @@ namespace Exiled.Events.Commands.Reload
         public string[] Aliases { get; } = new[] { "cfgs" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Reload plugin configs.";
+        public string Description { get; set; } = "Reload plugin configs.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

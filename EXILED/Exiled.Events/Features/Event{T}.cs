@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Event{T}.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Event{T}.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -10,9 +10,12 @@ namespace Exiled.Events.Features
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
 
     using Exiled.API.Features;
     using Exiled.Events.EventArgs.Interfaces;
+    using Exiled.Events.EventArgs.Player;
+
     using MEC;
 
     /// <summary>
@@ -182,7 +185,7 @@ namespace Exiled.Events.Features
                 }
                 catch (Exception ex)
                 {
-                    Log.Error($"Method \"{handler.Method.Name}\" of the class \"{handler.Method.ReflectedType.FullName}\" caused an exception when handling the event \"{GetType().FullName}\"\n{ex}");
+                    Log.Error($"Method \"{handler.Method.Name}\" of the class \"{handler.Method.ReflectedType.FullName}\" caused an exception when handling the event \"{typeof(T).FullName}\"\n{ex}");
                 }
             }
         }

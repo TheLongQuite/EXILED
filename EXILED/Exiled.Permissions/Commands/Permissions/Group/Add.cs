@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Add.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Add.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace Exiled.Permissions.Commands.Permissions.Group
         public string[] Aliases { get; } = new string[] { };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Adds a group to a permission.";
+        public string Description { get; set; } = "Adds a group to a permission.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

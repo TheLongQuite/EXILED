@@ -1,11 +1,11 @@
 // -----------------------------------------------------------------------
-// <copyright file="Jailbird914CoarseFix.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Jailbird914CoarseFix.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
 
-namespace Exiled.Events.Patches.Events.Player
+namespace Exiled.Events.Patches.Fixes
 {
 #pragma warning disable IDE0060
 
@@ -23,7 +23,7 @@ namespace Exiled.Events.Patches.Events.Player
 
     /// <summary>
     /// Patches <see cref="JailbirdDeteriorationTracker.Setup(JailbirdItem, JailbirdHitreg)" />.
-    /// Bug reported to NW (https://trello.com/c/kyr3hV9B).
+    /// Bug reported to NW (https://git.scpslgame.com/northwood-qa/scpsl-bug-reporting/-/issues/88).
     /// </summary>
     [HarmonyPatch(typeof(JailbirdDeteriorationTracker), nameof(JailbirdDeteriorationTracker.Setup))]
     internal static class Jailbird914CoarseFix

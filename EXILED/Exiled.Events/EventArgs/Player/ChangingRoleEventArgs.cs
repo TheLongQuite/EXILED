@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="ChangingRoleEventArgs.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="ChangingRoleEventArgs.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -93,6 +93,11 @@ namespace Exiled.Events.EventArgs.Player
         }
 
         /// <summary>
+        /// Gets a value indicating whether the current event is safe to do some actions with player.
+        /// </summary>
+        public bool IsSafe => NewRole != RoleTypeId.Destroyed && Reason != SpawnReason.Destroyed;
+
+        /// <summary>
         /// Gets base items that the player will receive.
         /// </summary>
         public List<ItemType> Items { get; } = ListPool<ItemType>.Pool.Get();
@@ -103,12 +108,12 @@ namespace Exiled.Events.EventArgs.Player
         public Dictionary<ItemType, ushort> Ammo { get; } = DictionaryPool<ItemType, ushort>.Pool.Get();
 
         /// <summary>
-        /// Gets or sets a value indicating whether the inventory will be preserved or not.
+        /// Gets or sets a value indicating whether the inventory will be preserved.
         /// </summary>
         public bool ShouldPreserveInventory
         {
             get => !SpawnFlags.HasFlag(RoleSpawnFlags.AssignInventory);
-            set => SpawnFlags = value ? (SpawnFlags & ~RoleSpawnFlags.AssignInventory) : (SpawnFlags | RoleSpawnFlags.AssignInventory);
+            set => SpawnFlags = SpawnFlags.ModifyFlags(!value, RoleSpawnFlags.AssignInventory);
         }
 
         /// <summary>

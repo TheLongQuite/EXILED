@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Permissions.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Permissions.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -19,11 +19,6 @@ namespace Exiled.Events.Commands.Reload
     /// </summary>
     public class Permissions : ICommand
     {
-        /// <summary>
-        /// Gets static instance of the <see cref="Permissions"/> command.
-        /// </summary>
-        public static Permissions Instance { get; } = new();
-
         /// <inheritdoc/>
         public string Command { get; } = "permissions";
 
@@ -31,7 +26,7 @@ namespace Exiled.Events.Commands.Reload
         public string[] Aliases { get; } = new[] { "perms" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Reload permissions.";
+        public string Description { get; set; } = "Reload permissions.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

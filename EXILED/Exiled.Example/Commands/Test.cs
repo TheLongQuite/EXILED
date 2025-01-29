@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Test.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Test.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -27,7 +27,7 @@ namespace Exiled.Example.Commands
         public string[] Aliases { get; } = new[] { "t" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "A simple test command.";
+        public string Description { get; set; } = "A simple test command.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

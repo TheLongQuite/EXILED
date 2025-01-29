@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Reporting.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Reporting.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -12,7 +12,6 @@ namespace Exiled.Events.Patches.Events.Server
 
     using API.Features.Pools;
     using Exiled.Events.Attributes;
-    using Exiled.Events.EventArgs.Player;
     using Exiled.Events.EventArgs.Server;
     using Exiled.Events.Handlers;
 
@@ -84,7 +83,7 @@ namespace Exiled.Events.Patches.Events.Server
                     new(OpCodes.Starg_S, 2),
                 });
 
-            offset = -2;
+            offset = -11;
             index = newInstructions.FindLastIndex(
                 instruction => instruction.StoresField(Field(typeof(CheaterReport), nameof(CheaterReport._lastReport)))) + offset;
 

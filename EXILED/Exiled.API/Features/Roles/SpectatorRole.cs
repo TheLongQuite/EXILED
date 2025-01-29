@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="SpectatorRole.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="SpectatorRole.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -54,7 +54,7 @@ namespace Exiled.API.Features.Roles
         public Vector3 DeathPosition => Base.DeathPosition.Position;
 
         /// <summary>
-        /// Gets a value indicating whether the <see cref="Player"/> is ready to respawn or not.
+        /// Gets a value indicating whether the <see cref="Player"/> is ready to respawn.
         /// </summary>
         public bool IsReadyToRespawn => Base.ReadyToRespawn;
 

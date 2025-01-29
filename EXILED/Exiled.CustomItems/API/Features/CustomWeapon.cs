@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="CustomWeapon.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="CustomWeapon.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -11,7 +11,6 @@ namespace Exiled.CustomItems.API.Features
     using System.ComponentModel;
     using System.Linq;
 
-    using AudioSystem.Models.SoundConfigs;
     using CustomPlayerEffects;
     using Exiled.API.Enums;
     using Exiled.API.Extensions;
@@ -85,11 +84,6 @@ namespace Exiled.CustomItems.API.Features
         public bool AllowAttachmentsChange { get; set; } = true;
 
         /// <summary>
-        ///     Gets or sets a value indicating what sound will be played on shot.
-        /// </summary>
-        public LocalSoundConfig? ShotAudio { get; set; }
-
-        /// <summary>
         ///     Gets or sets a value indicating shot cooldown.
         /// </summary>
         [Description("Кулдаун на выстрелы. Работает только при ClipSize > 1 и FireCooldown > 0. -1 для отключения.")]
@@ -159,11 +153,9 @@ namespace Exiled.CustomItems.API.Features
                 if (!Attachments.IsEmpty())
                     firearm.AddAttachment(Attachments);
 
-                if (firearm.Type != ItemType.GunShotgun)
-                {
-                    firearm.Ammo = ClipSize;
-                    firearm.MaxAmmo = ClipSize;
-                }
+                firearm.MagazineAmmo = firearm.MaxMagazineAmmo = ClipSize;
+
+                firearm.AmmoDrain = AmmoUsage;
             }
 
             return item;
@@ -261,51 +253,6 @@ namespace Exiled.CustomItems.API.Features
             OnReloading(ev);
 
             Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: External event ended. {ev.IsAllowed}");
-
-            if (!ev.IsAllowed)
-            {
-                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: External event turned is allowed to false, returning.");
-                return;
-            }
-
-            if (ev.Firearm.Type == ItemType.GunShotgun)
-                return;
-
-            Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: Continuing with internal reload..");
-            ev.IsAllowed = false;
-
-            byte remainingClip = ev.Firearm.Ammo;
-
-            if (remainingClip >= ClipSize)
-            {
-                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: remainingClip >= ClipSize, returning.");
-                return;
-            }
-
-            Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] is reloading a {Name} ({Id}) [{Type} ({remainingClip}/{ClipSize})]!");
-
-            AmmoType ammoType = ev.Firearm.AmmoType;
-
-            if (!ev.Player.Ammo.ContainsKey(ammoType.GetItemType()))
-            {
-                Log.Debug($"{nameof(Name)}.{nameof(OnInternalReloading)}: {ev.Player.Nickname} does not have ammo to reload this weapon.");
-                return;
-            }
-
-            byte amountToReload = (byte)Math.Min(ClipSize - remainingClip, ev.Player.Ammo[ammoType.GetItemType()]);
-
-            if (amountToReload <= 0)
-                return;
-
-            ev.Player.Connection.Send(new RequestMessage(ev.Firearm.Serial, RequestType.Reload));
-            ev.Player.ReferenceHub.playerEffectsController.GetEffect<Invisible>().Intensity = 0;
-
-            ev.Player.Ammo[ammoType.GetItemType()] -= amountToReload;
-            ev.Player.Inventory.SendAmmoNextFrame = true;
-
-            ev.Firearm.Ammo = (byte)(ev.Firearm.Ammo + amountToReload);
-
-            Log.Debug($"{ev.Player.Nickname} ({ev.Player.UserId}) [{ev.Player.Role}] reloaded a {Name} ({Id}) [{Type} ({ev.Firearm.Ammo}/{ClipSize})]!");
         }
 
         private void OnInternalShooting(ShootingEventArgs ev)
@@ -316,63 +263,20 @@ namespace Exiled.CustomItems.API.Features
             if (cooldownedPlayers.Contains(ev.Player))
             {
                 ev.IsAllowed = false;
+                ev.Player.ShowHint(string.Format(WeaponNotReady, FireCooldown));
                 Log.Debug($"Disallowed shot from cooldowned on {Name} player {ev.Player.Nickname}");
                 return;
             }
 
-            Firearm firearm = ev.Firearm;
-            if (ev.Item.Type != ItemType.GunShotgun && AmmoUsage > 1)
+            if (!AllowDoubleShot)
+                cooldownedPlayers.Add(ev.Player);
+
+            Timing.CallDelayed(FireCooldown, () =>
             {
-                if (firearm.Ammo < AmmoUsage)
-                {
-                    ev.IsAllowed = false;
-                    Log.Debug($"Disallowed shot from {Name} of player {ev.Player.Nickname}: not enough ammo ({firearm.Ammo})");
-                    return;
-                }
+                cooldownedPlayers.Remove(ev.Player);
+                Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
+            });
 
-                checked
-                {
-                    try
-                    {
-                        firearm.Ammo -= (byte)(AmmoUsage - 1);
-                    }
-                    catch (OverflowException e)
-                    {
-                        Log.Error($"Failed to procced shot with custom ammo usage due to ArithmeticOverflow:\n{e}");
-                        ev.IsAllowed = false;
-                        return;
-                    }
-                }
-            }
-
-            if (FireCooldown > 0 && ClipSize > 1)
-            {
-                const string toReturnKey = "toReturnAmmo";
-                if (!AllowDoubleShot)
-                    cooldownedPlayers.Add(ev.Player);
-                byte? remainingAmmo = firearm.Ammo != 0 ? (byte)(firearm.Ammo - 1) : null;
-                if (ev.Player.TryGetSessionVariable(toReturnKey, out byte remAmmo))
-                    ev.Player.SessionVariables[toReturnKey] = --remAmmo;
-                else if (remainingAmmo.HasValue)
-                    ev.Player.SessionVariables[toReturnKey] = remainingAmmo.Value;
-
-                firearm.Ammo = 1;
-                if (remainingAmmo.HasValue)
-                {
-                    Timing.CallDelayed(FireCooldown, () =>
-                    {
-                        if (!ev.Player.TryGetSessionVariable(toReturnKey, out byte toRet))
-                            return;
-
-                        cooldownedPlayers.Remove(ev.Player);
-                        firearm.Ammo = toRet;
-                        ev.Player.SessionVariables.Remove(toReturnKey);
-                        Log.Debug($"Cooldown of {Name} removed from player {ev.Player.Nickname}");
-                    });
-                }
-            }
-
-            ShotAudio?.PlayPreset(ev.Player.Transform);
             OnShooting(ev);
         }
 

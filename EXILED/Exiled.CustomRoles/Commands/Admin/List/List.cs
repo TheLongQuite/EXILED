@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="List.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="List.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -8,45 +8,29 @@
 namespace Exiled.CustomRoles.Commands.Admin.List
 {
     using System;
+    using System.Collections.Generic;
 
-    using CommandSystem;
+    using Exiled.API.Features;
 
     /// <summary>
     ///     The command to list all registered roles.
     /// </summary>
     internal sealed class List : ParentCommand
     {
-        private List()
-        {
-            LoadGeneratedCommands();
-        }
-
-        /// <summary>
-        ///     Gets the <see cref="List" /> command instance.
-        /// </summary>
-        public static List Instance { get; } = new();
-
         /// <inheritdoc />
         public override string Command { get; } = "list";
 
         /// <inheritdoc />
-        public override string[] Aliases { get; } = { "l" };
+        public override string[] Aliases { get; set; } = { "l" };
 
         /// <inheritdoc />
-        public override string Description { get; } = "Списки кастомных ролей.";
+        public override string Description { get; set; } = "Списки кастомных ролей.";
 
         /// <inheritdoc />
-        public override void LoadGeneratedCommands()
+        protected override IEnumerable<Type> CommandsToRegister()
         {
-            RegisterCommand(Registered.Instance);
-            RegisterCommand(InGame.Instance);
-        }
-
-        /// <inheritdoc />
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
-        {
-            response = "Доступные команды: registered, ingame.";
-            return false;
+            yield return typeof(Registered);
+            yield return typeof(InGame);
         }
     }
 }

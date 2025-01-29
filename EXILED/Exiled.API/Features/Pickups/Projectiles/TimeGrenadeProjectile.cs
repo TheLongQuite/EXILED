@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="TimeGrenadeProjectile.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="TimeGrenadeProjectile.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -81,7 +81,7 @@ namespace Exiled.API.Features.Pickups.Projectiles
         /// <summary>
         /// Immediately exploding the <see cref="TimeGrenadeProjectile"/>.
         /// </summary>
-        public void Explode()
+        public virtual void Explode()
         {
             Base.ServerFuseEnd();
             Base._alreadyDetonated = true;

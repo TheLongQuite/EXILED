@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="List.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="List.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -8,45 +8,29 @@
 namespace Exiled.CustomItems.Commands.List
 {
     using System;
+    using System.Collections.Generic;
 
-    using CommandSystem;
+    using Exiled.API.Features;
 
     /// <summary>
     /// The command to list all installed items.
     /// </summary>
     internal sealed class List : ParentCommand
     {
-        private List()
-        {
-            LoadGeneratedCommands();
-        }
-
-        /// <summary>
-        /// Gets the <see cref="Info"/> instance.
-        /// </summary>
-        public static List Instance { get; } = new();
-
         /// <inheritdoc/>
         public override string Command { get; } = "list";
 
         /// <inheritdoc/>
-        public override string[] Aliases { get; } = { "s", "l", "show", "sh" };
+        public override string[] Aliases { get; set; } = { "s", "l", "show", "sh" };
 
         /// <inheritdoc/>
-        public override string Description { get; } = "Gets a list of all currently registered custom items.";
+        public override string Description { get; set; } = "Gets a list of all currently registered custom items.";
 
         /// <inheritdoc/>
-        public override void LoadGeneratedCommands()
+        protected override IEnumerable<Type> CommandsToRegister()
         {
-            RegisterCommand(Registered.Instance);
-            RegisterCommand(Tracked.Instance);
-        }
-
-        /// <inheritdoc/>
-        protected override bool ExecuteParent(ArraySegment<string> arguments, ICommandSender sender, out string response)
-        {
-            response = $"Invalid subcommand! Available: registered, insideinventories";
-            return false;
+            yield return typeof(Registered);
+            yield return typeof(Tracked);
         }
     }
 }

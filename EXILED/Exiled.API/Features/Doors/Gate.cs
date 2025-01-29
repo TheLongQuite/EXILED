@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Gate.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Gate.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -41,7 +41,7 @@ namespace Exiled.API.Features.Doors
         public IEnumerable<Transform> PryPositions => Base.PryPositions;
 
         /// <summary>
-        /// Gets a value indicating whether or not the door is fully closed.
+        /// Gets a value indicating whether the door is fully closed.
         /// </summary>
         public override bool IsFullyClosed => base.IsFullyClosed && RemainingPryCooldown <= 0;
 
@@ -51,7 +51,7 @@ namespace Exiled.API.Features.Doors
         public override bool IsFullyOpen => base.IsFullyOpen || (Base is Timed173PryableDoor && ExactState is 0.5845918f);
 
         /// <summary>
-        /// Gets a value indicating whether or not the door is currently moving.
+        /// Gets a value indicating whether the door is currently moving.
         /// </summary>
         public override bool IsMoving => base.IsMoving || RemainingPryCooldown > 0;
 
@@ -78,7 +78,7 @@ namespace Exiled.API.Features.Doors
         /// </summary>
         /// <returns><see langword="true"/> if the door was able to be pried open.</returns>
         /// <param name="player"><see cref="Player"/> to perform pry gate.</param>
-        public bool TryPry(Player player = null) => Base.TryPryGate(player?.ReferenceHub);
+        public bool TryPry(Player player = null) => Base.TryPryGate((player ?? Server.Host).ReferenceHub);
 
         /// <summary>
         /// Returns the Door in a human-readable format.

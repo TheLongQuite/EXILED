@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Loader.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Loader.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -18,7 +18,6 @@ namespace Exiled.Loader
     using System.Security.Principal;
     using System.Threading;
 
-    using API.Enums;
     using API.Interfaces;
     using CommandSystem.Commands.Shared;
     using Exiled.API.Features;
@@ -26,7 +25,6 @@ namespace Exiled.Loader
     using Features.Configs;
     using Features.Configs.CustomConverters;
     using YamlDotNet.Serialization;
-    using YamlDotNet.Serialization.NodeDeserializers;
 
     /// <summary>
     /// Used to handle plugins.
@@ -385,10 +383,10 @@ namespace Exiled.Loader
             }
 
             foreach (Type type in abstractTypeDerives)
-                serializerBuilder.WithTagMapping($"!{type.Name}", type);
+                serializerBuilder.WithTagMapping($"!{type.FullName}", type);
 
             foreach (Type type in abstractTypeDerives)
-                deserializerBuilder.WithTagMapping($"!{type.Name}", type);
+                deserializerBuilder.WithTagMapping($"!{type.FullName}", type);
 
             Serializer = serializerBuilder.Build();
             Deserializer = deserializerBuilder.Build();

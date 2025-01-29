@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Disable.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Disable.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -19,11 +19,6 @@ namespace Exiled.Events.Commands.PluginManager
     /// </summary>
     public sealed class Disable : ICommand
     {
-        /// <summary>
-        /// Gets static instance of the <see cref="Disable"/> command.
-        /// </summary>
-        public static Disable Instance { get; } = new();
-
         /// <inheritdoc/>
         public string Command { get; } = "disable";
 
@@ -31,7 +26,7 @@ namespace Exiled.Events.Commands.PluginManager
         public string[] Aliases { get; } = { "ds", "dis" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Disable a plugin.";
+        public string Description { get; set; } = "Disable a plugin.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

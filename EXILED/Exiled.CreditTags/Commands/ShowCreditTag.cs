@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="ShowCreditTag.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="ShowCreditTag.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -26,7 +26,7 @@ namespace Exiled.CreditTags.Commands
         public string[] Aliases { get; } = new[] { "crtag", "et", "ct" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Shows your EXILED Credits tag, if available.";
+        public string Description { get; set; } = "Shows your EXILED Credits tag, if available.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

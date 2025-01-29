@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="UnloadingWeaponEventArgs.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="UnloadingWeaponEventArgs.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -20,26 +20,19 @@ namespace Exiled.Events.EventArgs.Player
         /// <summary>
         /// Initializes a new instance of the <see cref="UnloadingWeaponEventArgs" /> class.
         /// </summary>
-        /// <param name="player">
-        /// <inheritdoc cref="Player" />
-        /// </param>
         /// <param name="firearm">
         /// <inheritdoc cref="Firearm" />
         /// </param>
-        /// <param name="isAllowed">
-        /// <inheritdoc cref="IsAllowed" />
-        /// </param>
-        public UnloadingWeaponEventArgs(Player player, Firearm firearm, bool isAllowed = true)
+        public UnloadingWeaponEventArgs(InventorySystem.Items.Firearms.Firearm firearm)
         {
-            Firearm = firearm;
-            Player = player;
-            IsAllowed = isAllowed;
+            Firearm = Item.Get<Firearm>(firearm);
+            Player = Firearm.Owner;
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether or not the weapon can be unloaded.
+        /// Gets or sets a value indicating whether the weapon can be unloaded.
         /// </summary>
-        public bool IsAllowed { get; set; }
+        public bool IsAllowed { get; set; } = true;
 
         /// <summary>
         /// Gets the <see cref="API.Features.Items.Firearm" /> being unloaded.

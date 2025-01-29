@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="KickingEventArgs.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="KickingEventArgs.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -82,7 +82,7 @@ namespace Exiled.Events.EventArgs.Player
         public string FullMessage { get; set; }
 
         /// <summary>
-        ///     Gets or sets a value indicating whether or not action is taken against the target.
+        /// Gets or sets a value indicating whether action is taken against the target.
         /// </summary>
         public bool IsAllowed
         {
@@ -123,7 +123,7 @@ namespace Exiled.Events.EventArgs.Player
         }
 
         /// <summary>
-        ///     Logs the kick, anti-backdoor protection from malicious plugins.
+        /// Logs the kick, anti-backdoor protection from malicious plugins.
         /// </summary>
         /// <param name="assemblyName">The name of the calling assembly.</param>
         /// <param name="message">The message to be logged.</param>

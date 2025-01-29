@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="TranslationManager.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="TranslationManager.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -12,7 +12,6 @@ namespace Exiled.Loader
     using System.IO;
     using System.Linq;
 
-    using API.Enums;
     using API.Extensions;
     using API.Interfaces;
 
@@ -72,7 +71,7 @@ namespace Exiled.Loader
         /// Loads the translations of a plugin based on the actual distribution.
         /// </summary>
         /// <param name="plugin">The plugin which its translation has to be loaded.</param>
-        /// <param name="rawTranslations">The raw translations to check whether or not the plugin already has a translation config.</param>
+        /// <param name="rawTranslations">The raw translations to check whether the plugin already has a translation config.</param>
         /// <returns>The <see cref="ITranslation"/> of the desired plugin.</returns>
         public static ITranslation LoadTranslation(this IPlugin<IConfig> plugin, Dictionary<string, object> rawTranslations = null) =>
             plugin.LoadDefaultTranslation(rawTranslations);
@@ -87,7 +86,7 @@ namespace Exiled.Loader
         /// Saves default distribution translations.
         /// </summary>
         /// <param name="translations">The translations to be saved, already serialized in yaml format.</param>
-        /// <returns>Returns a value indicating whether the translations have been saved successfully or not.</returns>
+        /// <returns>Returns a value indicating whether the translations have been saved successfully.</returns>
         public static bool SaveDefaultTranslation(string translations)
         {
             try
@@ -109,7 +108,7 @@ namespace Exiled.Loader
         /// </summary>
         /// <param name="pluginPrefix">The prefix of the plugin which its translation is going to be saved.</param>
         /// <param name="translations">The translations to be saved, already serialized in yaml format.</param>
-        /// <returns>Returns a value indicating whether the translations have been saved successfully or not.</returns>
+        /// <returns>Returns a value indicating whether the translations have been saved successfully.</returns>
         public static bool SaveSeparatedTranslation(this string pluginPrefix, string translations)
         {
             string translationsPath = Paths.GetTranslationPath(pluginPrefix);
@@ -133,7 +132,7 @@ namespace Exiled.Loader
         /// Saves plugin translations.
         /// </summary>
         /// <param name="translations">The translations to be saved.</param>
-        /// <returns>Returns a value indicating whether the translations have been saved successfully or not.</returns>
+        /// <returns>Returns a value indicating whether the translations have been saved successfully.</returns>
         public static bool Save(SortedDictionary<string, ITranslation> translations)
         {
             try
@@ -173,7 +172,7 @@ namespace Exiled.Loader
         /// <summary>
         /// Clears the translations.
         /// </summary>
-        /// <returns>Returns a value indicating whether translations have been cleared successfully or not.</returns>
+        /// <returns>Returns a value indicating whether translations have been cleared successfully.</returns>
         public static bool Clear()
         {
             try
@@ -191,7 +190,7 @@ namespace Exiled.Loader
         /// Loads the translations of a plugin based on the default distribution.
         /// </summary>
         /// <param name="plugin">The plugin which its translation has to be loaded.</param>
-        /// <param name="rawTranslations">The raw translations to check whether or not the plugin already has a translation config.</param>
+        /// <param name="rawTranslations">The raw translations to check whether the plugin already has a translation config.</param>
         /// <returns>The <see cref="ITranslation"/> of the desired plugin.</returns>
         private static ITranslation LoadDefaultTranslation(this IPlugin<IConfig> plugin, Dictionary<string, object> rawTranslations)
         {

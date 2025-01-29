@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Show.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Show.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -26,11 +26,6 @@ namespace Exiled.Events.Commands.PluginManager
     /// </summary>
     public sealed class Show : ICommand
     {
-        /// <summary>
-        /// Gets static instance of the <see cref="Show"/> command.
-        /// </summary>
-        public static Show Instance { get; } = new();
-
         /// <inheritdoc/>
         public string Command { get; } = "show";
 
@@ -38,7 +33,7 @@ namespace Exiled.Events.Commands.PluginManager
         public string[] Aliases { get; } = { "shw", "sh" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Get all plugins, names, authors and versions";
+        public string Description { get; set; } = "Get all plugins, names, authors and versions";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

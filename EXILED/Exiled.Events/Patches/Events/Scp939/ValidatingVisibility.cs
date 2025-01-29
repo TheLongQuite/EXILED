@@ -1,6 +1,6 @@
-// -----------------------------------------------------------------------
-// <copyright file="ValidatingVisibility.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+﻿// -----------------------------------------------------------------------
+// <copyright file="ValidatingVisibility.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -51,8 +51,8 @@ namespace Exiled.Events.Patches.Events.Scp939
 
             newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.None, false));
 
-            offset = 2;
-            index = newInstructions.FindIndex(i => i.Calls(Method(typeof(HitboxIdentity), nameof(HitboxIdentity.IsEnemy), new[] { typeof(ReferenceHub), typeof(ReferenceHub) }))) + offset;
+            offset = 0;
+            index = newInstructions.FindIndex(i => i.LoadsConstant(1)) + offset;
 
             newInstructions.InsertRange(index, StaticCallEvent(generator, ev, ret, newInstructions[index], Scp939VisibilityState.SeenAsScp));
 

@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="ParentCommandExample.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="ParentCommandExample.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -74,7 +74,7 @@ namespace Exiled.Example.Commands
         public string[] Aliases { get; } = { "sbc" };
 
         /// <inheritdoc />
-        public string Description { get; } = "YOUR DESC";
+        public string Description { get; set; } = "YOUR DESC";
 
         /// <inheritdoc />
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

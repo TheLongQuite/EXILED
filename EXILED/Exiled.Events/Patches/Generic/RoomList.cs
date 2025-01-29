@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="RoomList.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="RoomList.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -37,14 +37,14 @@ namespace Exiled.Events.Patches.Generic
             int offset = -3;
             int index = newInstructions.FindIndex(i => i.Calls(Method(typeof(RoomIdUtils), nameof(RoomIdUtils.PositionToCoords)))) + offset;
 
-            // Room.CreateComponent(gameObject);
+            // Room.Get(gameObject).InternalCreate();
             newInstructions.InsertRange(
                 index,
                 new CodeInstruction[]
                 {
                     new CodeInstruction(OpCodes.Ldarg_0).MoveLabelsFrom(newInstructions[index]),
                     new(OpCodes.Callvirt, PropertyGetter(typeof(Component), nameof(Component.gameObject))),
-                    new(OpCodes.Call, Method(typeof(Room), nameof(Room.CreateComponent))),
+                    new(OpCodes.Callvirt, Method(typeof(Room), nameof(Room.CreateComponent))),
                 });
 
             for (int z = 0; z < newInstructions.Count; z++)

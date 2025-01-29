@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Reload.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Reload.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace Exiled.Permissions.Commands.Permissions
         public string[] Aliases { get; } = new[] { "rld" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Reloads all permissions";
+        public string Description { get; set; } = "Reloads all permissions";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

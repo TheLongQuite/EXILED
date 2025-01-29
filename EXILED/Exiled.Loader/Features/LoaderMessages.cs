@@ -1,14 +1,12 @@
 // -----------------------------------------------------------------------
-// <copyright file="LoaderMessages.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="LoaderMessages.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace Exiled.Loader.Features
 {
-    using System;
-
     /// <summary>
     /// A class that contains the different EXILED loader messages.
     /// </summary>

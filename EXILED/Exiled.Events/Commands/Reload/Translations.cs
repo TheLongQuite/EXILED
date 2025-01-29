@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Translations.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Translations.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -20,11 +20,6 @@ namespace Exiled.Events.Commands.Reload
     /// </summary>
     public class Translations : ICommand
     {
-        /// <summary>
-        /// Gets static instance of the <see cref="Translations"/> command.
-        /// </summary>
-        public static Translations Instance { get; } = new();
-
         /// <inheritdoc/>
         public string Command { get; } = "translations";
 
@@ -32,7 +27,7 @@ namespace Exiled.Events.Commands.Reload
         public string[] Aliases { get; } = Array.Empty<string>();
 
         /// <inheritdoc/>
-        public string Description { get; } = "Reload plugin translations.";
+        public string Description { get; set; } = "Reload plugin translations.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

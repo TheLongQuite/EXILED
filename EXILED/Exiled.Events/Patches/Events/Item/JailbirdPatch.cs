@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="JailbirdPatch.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="JailbirdPatch.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -88,7 +88,15 @@ namespace Exiled.Events.Patches.Events.Item
                     ChargingJailbirdEventArgs ev = new(instance.Owner, instance);
 
                     Item.OnChargingJailbird(ev);
-                    return true;
+
+                    if (ev.IsAllowed)
+                        return true;
+
+                    API.Features.Items.Item item = ev.Item;
+                    ev.Player.RemoveHeldItem(destroy: false);
+                    ev.Player.AddItem(item);
+
+                    return false;
                 }
 
                 default:

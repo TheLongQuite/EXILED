@@ -1,11 +1,13 @@
 // -----------------------------------------------------------------------
-// <copyright file="Chamber.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Chamber.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
+
 namespace Exiled.API.Features.Lockers
 {
+    using System;
     using System.Collections.Generic;
     using System.Diagnostics;
     using System.Linq;
@@ -36,6 +38,7 @@ namespace Exiled.API.Features.Lockers
         {
             Base = chamber;
             Locker = locker;
+            Id = (byte)Array.IndexOf(locker.Base.Chambers, chamber);
 
             Chambers.Add(chamber, this);
         }
@@ -58,6 +61,16 @@ namespace Exiled.API.Features.Lockers
 
         /// <inheritdoc/>
         public Quaternion Rotation => Base.transform.rotation;
+
+        /// <summary>
+        /// Gets the <see cref="Chamber"/> <see cref="UnityEngine.GameObject"/>.
+        /// </summary>
+        public GameObject GameObject => Base.gameObject;
+
+        /// <summary>
+        /// Gets the <see cref="Chamber"/> <see cref="UnityEngine.Transform"/>.
+        /// </summary>
+        public Transform Transform => Base.transform;
 
         /// <summary>
         /// Gets or sets all pickups that should be spawned when the door is initially opened.
@@ -139,7 +152,7 @@ namespace Exiled.API.Features.Lockers
         }
 
         /// <summary>
-        /// Gets or sets a value indicating whether or not items should be spawned as soon as they one chamber is opened.
+        /// Gets or sets a value indicating whether items should be spawned as soon as they one chamber is opened.
         /// </summary>
         public bool InitiallySpawn
         {
@@ -162,8 +175,17 @@ namespace Exiled.API.Features.Lockers
         public bool IsOpen
         {
             get => Base.IsOpen;
-            set => Base.SetDoor(value, Locker.Base._grantedBeep);
+            set
+            {
+                Base.SetDoor(value, null);
+                Locker.Base.RefreshOpenedSyncvar();
+            }
         }
+
+        /// <summary>
+        /// Gets the id of this chamber in <see cref="Locker"/>.
+        /// </summary>
+        public byte Id { get; }
 
         /// <summary>
         /// Gets the <see cref="Stopwatch"/> of current cooldown.

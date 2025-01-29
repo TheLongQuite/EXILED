@@ -1,69 +1,79 @@
 // -----------------------------------------------------------------------
-// <copyright file="Spawning.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Spawning.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace Exiled.Events.Patches.Events.Player
 {
+    using System.Collections.Generic;
     using System.Reflection;
+    using System.Reflection.Emit;
 
-    using API.Features;
+    using Exiled.API.Features;
+    using Exiled.API.Features.Pools;
+    using Exiled.Events.Attributes;
     using Exiled.Events.EventArgs.Player;
-
     using HarmonyLib;
+    using Mirror;
 
     using PlayerRoles;
     using PlayerRoles.FirstPersonControl;
     using PlayerRoles.FirstPersonControl.Spawnpoints;
-
     using UnityEngine;
 
     using static HarmonyLib.AccessTools;
 
     /// <summary>
-    /// Patches <see cref="RoleSpawnpointManager.Init"/> delegate.
+    /// Patches <see cref="RoleSpawnpointManager"/> delegate.
     /// Adds the <see cref="Handlers.Player.Spawning"/> event.
     /// Fix for spawning in void.
     /// </summary>
-    [HarmonyPatch]
+    [EventPatch(typeof(Handlers.Player), nameof(Handlers.Player.Spawning))]
+    [HarmonyPatch(typeof(RoleSpawnpointManager), nameof(RoleSpawnpointManager.SetPosition))]
     internal static class Spawning
     {
-        private static MethodInfo TargetMethod()
+        private static bool Prefix(ReferenceHub hub, PlayerRoleBase newRole)
         {
-            return Method(TypeByName("PlayerRoles.FirstPersonControl.Spawnpoints.RoleSpawnpointManager").GetNestedTypes(all)[1], "<Init>b__2_0");
-        }
-
-        private static bool Prefix(ReferenceHub hub, PlayerRoleBase prevRole, PlayerRoleBase newRole)
-        {
-            if (newRole.ServerSpawnReason == RoleChangeReason.Destroyed || !Player.TryGet(hub, out Player player))
-                return true;
-
-            Vector3 oldPosition = hub.transform.position;
-            float oldRotation = (prevRole as IFpcRole)?.FpcModule.MouseLook.CurrentVertical ?? 0;
-
-            if (newRole is IFpcRole fpcRole)
+            if (newRole is not IFpcRole fpcRole)
             {
-                if (newRole.ServerSpawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint) && fpcRole.SpawnpointHandler != null && fpcRole.SpawnpointHandler.TryGetSpawnpoint(out Vector3 position, out float horizontalRot))
-                {
-                    oldPosition = position;
-                    oldRotation = horizontalRot;
-                }
-
-                SpawningEventArgs ev = new(player, oldPosition, oldRotation, prevRole);
-
-                Handlers.Player.OnSpawning(ev);
-
-                player.Position = ev.Position;
-                fpcRole.FpcModule.MouseLook.CurrentHorizontal = ev.HorizontalRotation;
+                CallEventForNonFpc(hub, newRole);
+                return false;
             }
-            else
+
+            ISpawnpointHandler spawnpointHandler = fpcRole.SpawnpointHandler;
+
+            if (spawnpointHandler == null || !spawnpointHandler.TryGetSpawnpoint(out Vector3 position, out float horizontalRot) || !newRole.ServerSpawnFlags.HasFlag(RoleSpawnFlags.UseSpawnpoint))
             {
-                Handlers.Player.OnSpawning(new(player, oldPosition, oldRotation, prevRole));
+                position = hub.transform.position;
+                horizontalRot = fpcRole.FpcModule.MouseLook?.CurrentHorizontal ?? 0.0f;
+            }
+
+            Player player = Player.Get(hub);
+
+            SpawningEventArgs ev = new SpawningEventArgs(player, position, horizontalRot, newRole);
+            Handlers.Player.OnSpawning(ev);
+
+            hub.transform.position = ev.Position;
+            if (fpcRole.FpcModule.MouseLook != null)
+            {
+                fpcRole.FpcModule.MouseLook.CurrentHorizontal = ev.HorizontalRotation;
             }
 
             return false;
+        }
+
+        private static void CallEventForNonFpc(ReferenceHub hub, PlayerRoleBase newRole)
+        {
+            Player player = Player.Get(hub);
+            if (player == null)
+                return;
+            if (player.IsVerified || player.IsNPC)
+            {
+                SpawningEventArgs ev = new SpawningEventArgs(player, player.Position, 0.0f, newRole);
+                Handlers.Player.OnSpawning(ev);
+            }
         }
     }
 }

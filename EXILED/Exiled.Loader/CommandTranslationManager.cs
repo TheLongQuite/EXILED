@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="CommandTranslationManager.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="CommandTranslationManager.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -13,14 +13,9 @@ namespace Exiled.Loader
     using System.Linq;
     using System.Reflection;
 
-    using API.Enums;
-    using API.Extensions;
-    using API.Interfaces;
     using CommandSystem;
-    using Discord;
     using Exiled.API.Features;
     using Exiled.API.Features.Pools;
-    using MonoMod.Utils;
     using YamlDotNet.Core;
 
     /// <summary>
@@ -48,11 +43,7 @@ namespace Exiled.Loader
                 SortedDictionary<string, CommandTranslation> deserializedTranslations = new(StringComparer.Ordinal);
                 void LoadCommand(ICommand command)
                 {
-                    string commandName = command.GetType().FullName ?? "N/D";
-                    if (deserializedTranslations.ContainsKey(commandName))
-                    {
-                        return; // Так происходит, если команда есть в нескольких хэндлерах
-                    }
+                    string commandName = command.GetType().FullName!;
 
                     if (command is CommandHandler parentCommand)
                     {
@@ -60,10 +51,14 @@ namespace Exiled.Loader
                             LoadCommand(childCommand);
                     }
 
-                    deserializedTranslations.Add(commandName, command.LoadCommandTranslation(rawDeserializedTranslations));
+                    CommandTranslation translation = command.LoadCommandTranslation(rawDeserializedTranslations);
+                    if (deserializedTranslations.ContainsKey(commandName))
+                        return; // Так происходит, если команда представлена в нескольких инстанциях.
+
+                    deserializedTranslations.Add(commandName, translation);
                 }
 
-                foreach (ICommand command in Loader.Plugins.SelectMany(x => x.Commands.SelectMany(y => y.Value.Select(z => z.Value))))
+                foreach (ICommand command in Loader.Plugins.SelectMany(x => x.Commands.Select(y => y.Value.Item1)))
                     LoadCommand(command);
 
                 Log.Info("Plugin command translations loaded successfully!");

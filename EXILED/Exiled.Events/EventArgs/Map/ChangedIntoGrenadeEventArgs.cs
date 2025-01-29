@@ -1,14 +1,12 @@
 // -----------------------------------------------------------------------
-// <copyright file="ChangedIntoGrenadeEventArgs.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="ChangedIntoGrenadeEventArgs.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
 
 namespace Exiled.Events.EventArgs.Map
 {
-    using System;
-
     using Exiled.API.Features.Pickups;
     using Exiled.API.Features.Pickups.Projectiles;
     using Exiled.Events.EventArgs.Interfaces;
@@ -40,11 +38,5 @@ namespace Exiled.Events.EventArgs.Map
         /// </summary>
         // TODO: Make that TimedGrenadeProjectile
         public Projectile Projectile { get; }
-
-        /// <summary>
-        /// Gets or sets a value indicating how long the fuse of the changed grenade will be.
-        /// </summary>
-        [Obsolete("Use Projectile.Is(Projectile, out TimeGrenadeProjectile timeGrenadeProjectile) ? timeGrenadeProjectile.FuseTime : 0 instead of this", true)]
-        public double FuseTime { get; set; }
     }
 }

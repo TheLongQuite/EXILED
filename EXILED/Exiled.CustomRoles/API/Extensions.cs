@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Extensions.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Extensions.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -29,6 +29,16 @@ namespace Exiled.CustomRoles.API
         /// Gets a <see cref="Dictionary{TKey, TValue}"/> of all players that have custom role.
         /// </summary>
         internal static Dictionary<Player, CustomRole> InternalPlayerToCustomRoles { get; } = new();
+
+        /// <summary>
+        /// Gets a <see cref="Dictionary{TKey, TValue}"/> containing all temp cache-roles for setting position.
+        /// </summary>
+        internal static Dictionary<Player, CustomRole> ToChangeRolePlayers { get; } = new();
+
+        /// <summary>
+        /// Gets a <see cref="HashSet{TKey}"/> containing all players that should receive customrole inventory.
+        /// </summary>
+        internal static HashSet<Player> AssignInventoryPlayers { get; } = new();
 
         /// <summary>
         ///     Gets a <see cref="ReadOnlyCollection{T}" /> of the player's current custom roles.

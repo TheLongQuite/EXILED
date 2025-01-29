@@ -1,6 +1,6 @@
 // -----------------------------------------------------------------------
-// <copyright file="Remove.cs" company="Exiled Team">
-// Copyright (c) Exiled Team. All rights reserved.
+// <copyright file="Remove.cs" company="ExMod Team">
+// Copyright (c) ExMod Team. All rights reserved.
 // Licensed under the CC BY-SA 3.0 license.
 // </copyright>
 // -----------------------------------------------------------------------
@@ -25,7 +25,7 @@ namespace Exiled.Permissions.Commands.Permissions.Group
         public string[] Aliases { get; } = new[] { "rmv" };
 
         /// <inheritdoc/>
-        public string Description { get; } = "Removes a group from permission.";
+        public string Description { get; set; } = "Removes a group from permission.";
 
         /// <inheritdoc/>
         public bool Execute(ArraySegment<string> arguments, ICommandSender sender, out string response)

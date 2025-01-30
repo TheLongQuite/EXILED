@@ -39,16 +39,6 @@ namespace Exiled.API.Features.Core.UserSettings
             Base = (SSTextArea)base.Base;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TextInputSetting"/> class.
-        /// </summary>
-        /// <param name="settingBase">A <see cref="SSTextArea"/> instance.</param>
-        internal TextInputSetting(SSTextArea settingBase)
-            : base(settingBase)
-        {
-            Base = settingBase;
-        }
-
         /// <inheritdoc/>
         public new SSTextArea Base { get; }
 

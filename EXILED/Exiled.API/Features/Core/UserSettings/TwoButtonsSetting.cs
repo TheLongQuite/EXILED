@@ -31,16 +31,6 @@ namespace Exiled.API.Features.Core.UserSettings
             Base = (SSTwoButtonsSetting)base.Base;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="TwoButtonsSetting"/> class.
-        /// </summary>
-        /// <param name="settingBase">A <see cref="SSTwoButtonsSetting"/> instance.</param>
-        internal TwoButtonsSetting(SSTwoButtonsSetting settingBase)
-            : base(settingBase)
-        {
-            Base = settingBase;
-        }
-
         /// <inheritdoc/>
         public new SSTwoButtonsSetting Base { get; }
 

@@ -32,17 +32,6 @@ namespace Exiled.API.Features.Core.UserSettings
             Log.Info($"Добавляем новую настройку {ToString()}");
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="KeybindSetting"/> class.
-        /// </summary>
-        /// <param name="settingBase">A <see cref="SSKeybindSetting"/> instance.</param>
-        internal KeybindSetting(SSKeybindSetting settingBase)
-            : base(settingBase)
-        {
-            Base = settingBase;
-            Log.Info($"Добавляем новую настройку {ToString()}");
-        }
-
         /// <inheritdoc/>
         public new SSKeybindSetting Base { get; }
 

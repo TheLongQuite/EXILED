@@ -54,9 +54,6 @@ namespace Exiled.API.Features.Core.UserSettings
         internal SettingBase(ServerSpecificSettingBase settingBase)
         {
             Base = settingBase;
-            if (this is not HeaderSetting)
-                Settings.Add(settingBase.SettingId, this);
-
             UpdateSynced();
         }
 
@@ -130,39 +127,6 @@ namespace Exiled.API.Features.Core.UserSettings
             setting = (T)list.FirstOrDefault(x => x.Id == id);
             return setting != null;
         }
-
-        /// <summary>
-        /// Creates a new instance of this setting.
-        /// </summary>
-        /// <param name="settingBase">A <see cref="ServerSpecificSettingBase"/> instance.</param>
-        /// <returns>A new instance of this setting.</returns>
-        /// <remarks>
-        /// This method is used only to create a new instance of <see cref="SettingBase"/> from an existing <see cref="ServerSpecificSettingBase"/> instance.
-        /// New setting won't be synced with players.
-        /// </remarks>
-        public static SettingBase Create(ServerSpecificSettingBase settingBase) => settingBase switch
-        {
-            SSButton button => new ButtonSetting(button),
-            SSDropdownSetting dropdownSetting => new DropdownSetting(dropdownSetting),
-            SSTextArea textArea => new TextInputSetting(textArea),
-            SSGroupHeader header => new HeaderSetting(header),
-            SSKeybindSetting keybindSetting => new KeybindSetting(keybindSetting),
-            SSTwoButtonsSetting twoButtonsSetting => new TwoButtonsSetting(twoButtonsSetting),
-            _ => new SettingBase(settingBase)
-        };
-
-        /// <summary>
-        /// Creates a new instance of this setting.
-        /// </summary>
-        /// <param name="settingBase">A<see cref="ServerSpecificSettingBase"/> instance.</param>
-        /// <typeparam name="T">Type of the setting.</typeparam>
-        /// <returns>A new instance of this setting.</returns>
-        /// <remarks>
-        /// This method is used only to create a new instance of <see cref="SettingBase"/> from an existing <see cref="ServerSpecificSettingBase"/> instance.
-        /// New setting won't be synced with players.
-        /// </remarks>
-        public static T Create<T>(ServerSpecificSettingBase settingBase)
-            where T : SettingBase => (T)Create(settingBase);
 
         /// <summary>
         /// Send DefinedSettings to specified Player.
@@ -332,7 +296,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         public void UpdateSynced()
         {
-            if (!SyncedSettings.Add(this))
+            if (!SyncedSettings.Add(this) || this is HeaderSetting || !SyncedSettings.Add(Header))
                 return;
 
             ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(SyncedSettings).Select(x => x.Base).ToArray();

@@ -29,17 +29,6 @@ namespace Exiled.API.Features.Core.UserSettings
             Base.SetId(null, name);
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="HeaderSetting"/> class.
-        /// </summary>
-        /// <param name="settingBase">A <see cref="SSGroupHeader"/> instance.</param>
-        internal HeaderSetting(SSGroupHeader settingBase)
-            : base(settingBase)
-        {
-            Base = settingBase;
-            Base.SetId(null, settingBase.Label);
-        }
-
         /// <inheritdoc/>
         public new SSGroupHeader Base { get; }
 

@@ -41,16 +41,6 @@ namespace Exiled.API.Features.Core.UserSettings
             Base = (SSDropdownSetting)base.Base;
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="DropdownSetting"/> class.
-        /// </summary>
-        /// <param name="settingBase">A <see cref="SSDropdownSetting"/> instance.</param>
-        internal DropdownSetting(SSDropdownSetting settingBase)
-            : base(settingBase)
-        {
-            Base = settingBase;
-        }
-
         /// <inheritdoc/>
         public new SSDropdownSetting Base { get; }
 

@@ -29,7 +29,6 @@ namespace Exiled.API.Features.Core.UserSettings
             : base(new SSKeybindSetting(NextId++, label, suggested, preventInteractionOnGUI, hintDescription), header)
         {
             Base = (SSKeybindSetting)base.Base;
-            Log.Info($"Добавляем новую настройку {ToString()}");
         }
 
         /// <inheritdoc/>
@@ -88,6 +87,13 @@ namespace Exiled.API.Features.Core.UserSettings
                 HeaderName = headerName;
                 HeaderDescription = headerDescription;
                 HeaderPaddling = headerPaddling;
+            }
+
+            /// <summary>
+            /// Initializes a new instance of the <see cref="KeybindConfig"/> class.
+            /// </summary>
+            public KeybindConfig()
+            {
             }
 
             /// <summary>

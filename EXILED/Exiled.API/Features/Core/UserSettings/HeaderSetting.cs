@@ -66,6 +66,13 @@ namespace Exiled.API.Features.Core.UserSettings
             }
 
             /// <summary>
+            /// Initializes a new instance of the <see cref="HeaderConfig"/> class.
+            /// </summary>
+            public HeaderConfig()
+            {
+            }
+
+            /// <summary>
             /// Gets or sets HeaderName of a HeaderConfig.
             /// </summary>
             public string Name { get; set; }

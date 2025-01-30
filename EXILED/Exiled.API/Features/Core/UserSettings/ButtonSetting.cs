@@ -91,6 +91,13 @@ namespace Exiled.API.Features.Core.UserSettings
             }
 
             /// <summary>
+            /// Initializes a new instance of the <see cref="ButtonConfig"/> class.
+            /// </summary>
+            public ButtonConfig()
+            {
+            }
+
+            /// <summary>
             /// Gets or sets label of a ButtonConfig.
             /// </summary>
             public string Label { get; set; }

@@ -102,6 +102,13 @@ namespace Exiled.API.Features.Core.UserSettings
             }
 
             /// <summary>
+            /// Initializes a new instance of the <see cref="TextInputConfig"/> class.
+            /// </summary>
+            public TextInputConfig()
+            {
+            }
+
+            /// <summary>
             /// Gets or sets label of a TextInputConfig.
             /// </summary>
             public string Label { get; set; }

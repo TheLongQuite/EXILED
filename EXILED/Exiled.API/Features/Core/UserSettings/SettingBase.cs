@@ -54,7 +54,6 @@ namespace Exiled.API.Features.Core.UserSettings
         internal SettingBase(ServerSpecificSettingBase settingBase)
         {
             Base = settingBase;
-            UpdateSynced();
         }
 
         /// <summary>
@@ -296,9 +295,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         public void UpdateSynced()
         {
-            if (!SyncedSettings.Add(this) || this is HeaderSetting || !SyncedSettings.Add(Header))
+            if (!SyncedSettings.Add(this))
                 return;
 
+            SyncedSettings.Add(Header);
             ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(SyncedSettings).Select(x => x.Base).ToArray();
         }
 

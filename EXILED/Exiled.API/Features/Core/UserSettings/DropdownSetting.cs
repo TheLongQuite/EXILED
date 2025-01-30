@@ -134,6 +134,13 @@ namespace Exiled.API.Features.Core.UserSettings
             }
 
             /// <summary>
+            /// Initializes a new instance of the <see cref="DropdownConfig"/> class.
+            /// </summary>
+            public DropdownConfig()
+            {
+            }
+
+            /// <summary>
             /// Gets or sets label of a DropdownConfig.
             /// </summary>
             public string Label { get; set; }

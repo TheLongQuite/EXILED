@@ -54,7 +54,9 @@ namespace Exiled.API.Features.Core.UserSettings
         internal SettingBase(ServerSpecificSettingBase settingBase)
         {
             Base = settingBase;
-            Settings.Add(settingBase.SettingId, this);
+            if (this is not HeaderSetting)
+                Settings.Add(settingBase.SettingId, this);
+
             UpdateSynced();
         }
 

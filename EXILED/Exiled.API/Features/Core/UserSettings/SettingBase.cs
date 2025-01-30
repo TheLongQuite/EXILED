@@ -30,6 +30,11 @@ namespace Exiled.API.Features.Core.UserSettings
         public static readonly Dictionary<int, SettingBase> Settings = new();
 
         /// <summary>
+        /// A <see cref="HashSet{TValue}"/> that contains <see cref="SettingBase"/> that was ever Defined.
+        /// </summary>
+        public static readonly HashSet<SettingBase> SyncedSettings = new();
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SettingBase"/> class.
         /// </summary>
         /// <param name="settingBase">A <see cref="ServerSpecificSettingBase"/> instance.</param>
@@ -39,6 +44,7 @@ namespace Exiled.API.Features.Core.UserSettings
             Base = settingBase;
             Header = header;
             Settings.Add(settingBase.SettingId, this);
+            UpdateSynced();
         }
 
         /// <summary>
@@ -48,17 +54,8 @@ namespace Exiled.API.Features.Core.UserSettings
         internal SettingBase(ServerSpecificSettingBase settingBase)
         {
             Base = settingBase;
-
-            if (OriginalDefinition != null)
-            {
-                Header = OriginalDefinition.Header;
-                OnTriggered = OriginalDefinition.OnTriggered;
-                Label = OriginalDefinition.Label;
-                HintDescription = OriginalDefinition.HintDescription;
-                return;
-            }
-
             Settings.Add(settingBase.SettingId, this);
+            UpdateSynced();
         }
 
         /// <summary>
@@ -107,21 +104,10 @@ namespace Exiled.API.Features.Core.UserSettings
         public ServerSpecificSettingBase.UserResponseMode ResponseMode => Base.ResponseMode;
 
         /// <summary>
-        /// Gets the setting that was sent to players.
-        /// </summary>
-        /// <remarks>Can be <c>null</c> if this <see cref="SettingBase"/> is a prefab.</remarks>
-        public SettingBase OriginalDefinition => Settings.TryGetValue(Id, out SettingBase setting) ? setting : null;
-
-        /// <summary>
         /// Gets or sets the header of this setting.
         /// </summary>
         /// <remarks>Can be <c>null</c>.</remarks>
         public HeaderSetting Header { get; set; }
-
-        /// <summary>
-        /// Gets or sets the predicate for syncing this setting when a player joins.
-        /// </summary>
-        public Predicate<Player> SyncOnJoin { get; set; }
 
         /// <summary>
         /// Tries to get the setting with the specified id.
@@ -177,14 +163,27 @@ namespace Exiled.API.Features.Core.UserSettings
             where T : SettingBase => (T)Create(settingBase);
 
         /// <summary>
+        /// Send DefinedSettings to specified Player.
+        /// </summary>
+        /// <param name="player">A player which get settings.</param>
+        /// <param name="predicate">A requirement to meet.</param>
+        public static void SendToPlayer(Player player, Func<Player, bool> predicate = null)
+        {
+            if (predicate == null || predicate(player))
+                return;
+
+            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
+        }
+
+        /// <summary>
         /// Syncs setting with all players according to the specified predicate.
         /// </summary>
         /// <param name="collection">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void AddAndSendToAll(List<SettingBase> collection, Func<Player, bool> predicate = null)
+        public static void AddToAll(List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-                AddAndSendToPlayer(player, collection, predicate);
+                AddToPlayer(player, collection, predicate);
         }
 
         /// <summary>
@@ -192,10 +191,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <param name="setting">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void AddAndSendToAll(SettingBase setting, Func<Player, bool> predicate = null)
+        public static void AddToAll(SettingBase setting, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-                AddAndSendToPlayer(player, setting, predicate);
+                AddToPlayer(player, setting, predicate);
         }
 
         /// <summary>
@@ -204,7 +203,7 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="player">Target player.</param>
         /// <param name="setting">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void AddAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
+        public static void AddToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
             if (predicate != null && !predicate(player))
                 return;
@@ -219,9 +218,6 @@ namespace Exiled.API.Features.Core.UserSettings
                 list = new HashSet<SettingBase> { setting };
                 PlayerSettings.Add(player, list);
             }
-
-            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -230,23 +226,15 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="player">Target player.</param>
         /// <param name="collection">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void AddAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
+        public static void AddToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             if (predicate != null && !predicate(player))
                 return;
 
             if (PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
-            {
-                list = list.Concat(collection).ToHashSet();
-            }
+                PlayerSettings[player] = list.Concat(collection).ToHashSet();
             else
-            {
-                list = collection.ToHashSet();
-                PlayerSettings.Add(player, list);
-            }
-
-            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
+                PlayerSettings[player] = collection.ToHashSet();
         }
 
         /// <summary>
@@ -254,10 +242,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <param name="collection">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void RemoveAndSendToAll(List<SettingBase> collection, Func<Player, bool> predicate = null)
+        public static void RemoveFromAll(List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-                RemoveAndSendToPlayer(player, collection, predicate);
+                RemoveFromPlayer(player, collection, predicate);
         }
 
         /// <summary>
@@ -265,10 +253,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <param name="setting">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void RemoveAndSendToAll(SettingBase setting, Func<Player, bool> predicate = null)
+        public static void RemoveFromAll(SettingBase setting, Func<Player, bool> predicate = null)
         {
             foreach (Player player in Player.List)
-                RemoveAndSendToPlayer(player, setting, predicate);
+                RemoveFromPlayer(player, setting, predicate);
         }
 
         /// <summary>
@@ -277,14 +265,12 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="player">Target player.</param>
         /// <param name="collection">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void RemoveAndSendToPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
+        public static void RemoveFromPlayer(Player player, List<SettingBase> collection, Func<Player, bool> predicate = null)
         {
             if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
                 return;
 
             list.RemoveWhere(collection.Contains);
-            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -293,14 +279,12 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="player">Target player.</param>
         /// <param name="setting">A collection to send.</param>
         /// <param name="predicate">A requirement to meet.</param>
-        public static void RemoveAndSendToPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
+        public static void RemoveFromPlayer(Player player, SettingBase setting, Func<Player, bool> predicate = null)
         {
             if ((predicate != null && !predicate(player)) || !PlayerSettings.TryGetValue(player, out HashSet<SettingBase> list))
                 return;
 
             list.Remove(setting);
-            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(list).Select(x => x.Base).ToArray();
-            ServerSpecificSettingsSync.SendToPlayer(player.ReferenceHub);
         }
 
         /// <summary>
@@ -332,10 +316,24 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="settingBase"> fuck you man.</param>
         public static void OnRandomSettingTriggered(ReferenceHub referenceHub, ServerSpecificSettingBase settingBase)
         {
-            if (!Player.TryGet(referenceHub, out Player player) || !Settings.TryGetValue(settingBase.SettingId, out SettingBase setting))
+            if (settingBase is SSGroupHeader || !Player.TryGet(referenceHub, out Player player) ||
+                !Settings.TryGetValue(settingBase.SettingId, out SettingBase setting) ||
+                !PlayerSettings.TryGetValue(player, out HashSet<SettingBase> settingBases) ||
+                !settingBases.Contains(setting))
                 return;
 
             setting.OnTriggered?.Invoke(player, setting);
+        }
+
+        /// <summary>
+        /// Trying to add new setting to a SyncedSettings, if does so, creates new array and put it as DefinedSettings.
+        /// </summary>
+        public void UpdateSynced()
+        {
+            if (!SyncedSettings.Add(this))
+                return;
+
+            ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(SyncedSettings).Select(x => x.Base).ToArray();
         }
 
         /// <summary>

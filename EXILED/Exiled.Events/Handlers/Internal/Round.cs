@@ -120,8 +120,7 @@ namespace Exiled.Events.Handlers.Internal
         public static void OnVerified(VerifiedEventArgs ev)
         {
             RoleAssigner.CheckLateJoin(ev.Player.ReferenceHub, ClientInstanceMode.ReadyClient);
-
-            // TODO: SettingBase.AddAndSendToPlayer(ev.Player, SettingBase.Settings.Values.Where(x => x.SyncOnJoin(ev.Player)).ToList());
+            SettingBase.SendToPlayer(ev.Player);
 
             // TODO: Remove if this has been fixed for https://git.scpslgame.com/northwood-qa/scpsl-bug-reporting/-/issues/52
             foreach (Room room in Room.List.Where(current => current.AreLightsOff))

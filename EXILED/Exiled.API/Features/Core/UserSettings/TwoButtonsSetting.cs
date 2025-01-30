@@ -39,12 +39,6 @@ namespace Exiled.API.Features.Core.UserSettings
             : base(settingBase)
         {
             Base = settingBase;
-
-            if (OriginalDefinition != null && OriginalDefinition.Is(out TwoButtonsSetting setting))
-            {
-                FirstOption = setting.FirstOption;
-                SecondOption = setting.SecondOption;
-            }
         }
 
         /// <inheritdoc/>

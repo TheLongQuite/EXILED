@@ -18,7 +18,7 @@ namespace Exiled.API.Features.Core.UserSettings
     /// <summary>
     /// Represents a text input setting.
     /// </summary>
-    public class TextInputSetting : SettingBase, IWrapper<SSTextArea>
+    public class TextInputSetting : SettingBase, IWrapper<SSTextArea>, ISettingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TextInputSetting"/> class.
@@ -38,6 +38,11 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = (SSTextArea)base.Base;
         }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when this setting is triggered.
+        /// </summary>
+        public event Action<Player, TextInputSetting> OnTriggered;
 
         /// <inheritdoc/>
         public new SSTextArea Base { get; }
@@ -75,10 +80,19 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" /{FoldoutMode}/ *{Alignment}*";
 
+        /// <inheritdoc cref="ISettingHandler"/>>
+        public void Handle(Player player, SettingBase setting)
+        {
+            if (setting != this)
+                return;
+
+            OnTriggered?.Invoke(player, this);
+        }
+
         /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
-        public class TextInputConfig : IServerSpecificConfig
+        public class TextInputConfig : SettingConfig<TextInputSetting>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="TextInputConfig"/> class.
@@ -147,7 +161,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a TextInputSetting instanse.
             /// </summary>
             /// <returns>TextInputSetting.</returns>
-            public SettingBase Create() => new TextInputSetting(Label, FoldoutMode, TextAlignmentOptions, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public override TextInputSetting Create() => new(Label, FoldoutMode, TextAlignmentOptions, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

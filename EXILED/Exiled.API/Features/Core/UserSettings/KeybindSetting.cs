@@ -7,6 +7,8 @@
 
 namespace Exiled.API.Features.Core.UserSettings
 {
+    using System;
+
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
     using Interfaces;
@@ -15,7 +17,7 @@ namespace Exiled.API.Features.Core.UserSettings
     /// <summary>
     /// Represents a keybind setting.
     /// </summary>
-    public class KeybindSetting : SettingBase, IWrapper<SSKeybindSetting>
+    public class KeybindSetting : SettingBase, IWrapper<SSKeybindSetting>, ISettingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="KeybindSetting"/> class.
@@ -30,6 +32,11 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = (SSKeybindSetting)base.Base;
         }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when this setting is triggered.
+        /// </summary>
+        public event Action<Player, KeybindSetting> OnTriggered;
 
         /// <inheritdoc/>
         public new SSKeybindSetting Base { get; }
@@ -63,10 +70,19 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" /{Label}/ *{KeyCode}* +{PreventInteractionOnGUI}+";
 
+        /// <inheritdoc cref="ISettingHandler"/>>
+        public void Handle(Player player, SettingBase setting)
+        {
+            if (setting != this)
+                return;
+
+            OnTriggered?.Invoke(player, this);
+        }
+
         /// <summary>
         /// Represents a config for KeybindSetting.
         /// </summary>
-        public class KeybindConfig : IServerSpecificConfig
+        public class KeybindConfig : SettingConfig<KeybindSetting>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="KeybindConfig"/> class.
@@ -135,7 +151,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a KeybindSetting instanse.
             /// </summary>
             /// <returns>KeybindSetting.</returns>
-            public SettingBase Create() => new KeybindSetting(Label, KeyCode, PreventInteractionOnGUI, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public override KeybindSetting Create() => new(Label, KeyCode, PreventInteractionOnGUI, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

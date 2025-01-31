@@ -7,6 +7,8 @@
 
 namespace Exiled.API.Features.Core.UserSettings
 {
+    using System;
+
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
     using Interfaces;
@@ -14,7 +16,7 @@ namespace Exiled.API.Features.Core.UserSettings
     /// <summary>
     /// Represents a two-button setting.
     /// </summary>
-    public class TwoButtonsSetting : SettingBase, IWrapper<SSTwoButtonsSetting>
+    public class TwoButtonsSetting : SettingBase, IWrapper<SSTwoButtonsSetting>, ISettingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="TwoButtonsSetting"/> class.
@@ -30,6 +32,11 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = (SSTwoButtonsSetting)base.Base;
         }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when this setting is triggered.
+        /// </summary>
+        public event Action<Player, TwoButtonsSetting> OnTriggered;
 
         /// <inheritdoc/>
         public new SSTwoButtonsSetting Base { get; }
@@ -85,10 +92,19 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" /{FirstOption}/ *{SecondOption}* +{IsSecondDefault}+ '{IsFirst}'";
 
+        /// <inheritdoc cref="ISettingHandler"/>>
+        public void Handle(Player player, SettingBase setting)
+        {
+            if (setting != this)
+                return;
+
+            OnTriggered?.Invoke(player, this);
+        }
+
         /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
-        public class TwoButtonsConfig : IServerSpecificConfig
+        public class TwoButtonsConfig : SettingConfig<TwoButtonsSetting>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="TwoButtonsConfig"/> class.
@@ -164,7 +180,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a TwoButtonsSetting instanse.
             /// </summary>
             /// <returns>TwoButtonsSetting.</returns>
-            public SettingBase Create() => new TwoButtonsSetting(Label, FirstOption, SecondOption, DefaultIsSecond, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public override TwoButtonsSetting Create() => new(Label, FirstOption, SecondOption, DefaultIsSecond, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

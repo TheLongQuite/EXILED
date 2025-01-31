@@ -13,11 +13,12 @@ namespace Exiled.API.Features.Core.UserSettings
 
     using Exiled.API.Interfaces;
     using global::UserSettings.ServerSpecific;
+    using Interfaces;
 
     /// <summary>
     /// A base class for all Server Specific Settings.
     /// </summary>
-    public class SettingBase : TypeCastObject<SettingBase>, IWrapper<ServerSpecificSettingBase>
+    public abstract class SettingBase : TypeCastObject<SettingBase>, IWrapper<ServerSpecificSettingBase>
     {
         /// <summary>
         /// A <see cref="Dictionary{TKey,TValue}"/> that contains <see cref="SettingBase"/> that are currently with players.
@@ -55,11 +56,6 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = settingBase;
         }
-
-        /// <summary>
-        /// Gets or sets the action to be executed when this setting is triggered.
-        /// </summary>
-        public event Action<Player, SettingBase> OnTriggered;
 
         /// <summary>
         /// Gets or sets next Id to give.
@@ -281,13 +277,13 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <param name="settingBase"> fuck you man.</param>
         public static void OnRandomSettingTriggered(ReferenceHub referenceHub, ServerSpecificSettingBase settingBase)
         {
-            if (settingBase is SSGroupHeader || !Player.TryGet(referenceHub, out Player player) ||
+            if (!Player.TryGet(referenceHub, out Player player) ||
                 !Settings.TryGetValue(settingBase.SettingId, out SettingBase setting) ||
                 !PlayerSettings.TryGetValue(player, out HashSet<SettingBase> settingBases) ||
-                !settingBases.Contains(setting))
+                !settingBases.Contains(setting) || setting is not ISettingHandler handler)
                 return;
 
-            setting.OnTriggered?.Invoke(player, setting);
+            handler.Handle(player, setting);
         }
 
         /// <summary>
@@ -307,5 +303,18 @@ namespace Exiled.API.Features.Core.UserSettings
         /// </summary>
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => $"{Id} ({Label}) [{HintDescription}] {{{ResponseMode}}} ^{Header}^";
+
+                /// <summary>
+        /// Represents a config for TextInputSetting.
+        /// </summary>
+        public abstract class SettingConfig<TSetting>
+                    where TSetting : SettingBase
+        {
+            /// <summary>
+            /// Creates a TextInputSetting instanse.
+            /// </summary>
+            /// <returns>TextInputSetting.</returns>
+            public abstract TSetting Create();
+        }
     }
 }

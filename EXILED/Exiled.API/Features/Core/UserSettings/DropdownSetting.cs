@@ -18,7 +18,7 @@ namespace Exiled.API.Features.Core.UserSettings
     /// <summary>
     /// Represents a dropdown setting.
     /// </summary>
-    public class DropdownSetting : SettingBase, IWrapper<SSDropdownSetting>
+    public class DropdownSetting : SettingBase, IWrapper<SSDropdownSetting>, ISettingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="DropdownSetting"/> class.
@@ -40,6 +40,11 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = (SSDropdownSetting)base.Base;
         }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when this setting is triggered.
+        /// </summary>
+        public event Action<Player, DropdownSetting> OnTriggered;
 
         /// <inheritdoc/>
         public new SSDropdownSetting Base { get; }
@@ -104,10 +109,19 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" ={DefaultOptionIndex}= -{SelectedIndex}- /{string.Join(";", Options)}/";
 
+        /// <inheritdoc cref="ISettingHandler"/>>
+        public void Handle(Player player, SettingBase setting)
+        {
+            if (setting != this)
+                return;
+
+            OnTriggered?.Invoke(player, this);
+        }
+
         /// <summary>
         /// Represents a config for DropdownSetting.
         /// </summary>
-        public class DropdownConfig : IServerSpecificConfig
+        public class DropdownConfig : SettingConfig<DropdownSetting>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="DropdownConfig"/> class.
@@ -184,7 +198,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a DropdownSetting instanse.
             /// </summary>
             /// <returns>DropdownSetting.</returns>
-            public SettingBase Create() => new DropdownSetting(Label, Options, DefaultOptionIndex, DropdownEntryType, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public override DropdownSetting Create() => new(Label, Options, DefaultOptionIndex, DropdownEntryType, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

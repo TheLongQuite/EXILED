@@ -7,6 +7,7 @@
 
 namespace Exiled.API.Features.Core.UserSettings
 {
+    using System;
     using System.Diagnostics;
 
     using Exiled.API.Interfaces;
@@ -16,7 +17,7 @@ namespace Exiled.API.Features.Core.UserSettings
     /// <summary>
     /// Represents a button setting.
     /// </summary>
-    public class ButtonSetting : SettingBase, IWrapper<SSButton>
+    public class ButtonSetting : SettingBase, IWrapper<SSButton>, ISettingHandler
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="ButtonSetting"/> class.
@@ -31,6 +32,11 @@ namespace Exiled.API.Features.Core.UserSettings
         {
             Base = (SSButton)base.Base;
         }
+
+        /// <summary>
+        /// Gets or sets the action to be executed when this setting is triggered.
+        /// </summary>
+        public event Action<Player, ButtonSetting> OnTriggered;
 
         /// <inheritdoc/>
         public new SSButton Base { get; }
@@ -64,10 +70,19 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => base.ToString() + $" ={Text}= -{HoldTime}- /{LastPress}/";
 
+        /// <inheritdoc cref="ISettingHandler"/>>
+        public void Handle(Player player, SettingBase setting)
+        {
+            if (setting != this)
+                return;
+
+            OnTriggered?.Invoke(player, this);
+        }
+
         /// <summary>
         /// Represents a config for ButtonSetting.
         /// </summary>
-        public class ButtonConfig : IServerSpecificConfig
+        public class ButtonConfig : SettingConfig<ButtonSetting>
         {
             /// <summary>
             /// Initializes a new instance of the <see cref="ButtonConfig"/> class.
@@ -136,7 +151,7 @@ namespace Exiled.API.Features.Core.UserSettings
             /// Creates a ButtonSetting instanse.
             /// </summary>
             /// <returns>ButtonSetting.</returns>
-            public SettingBase Create() => new ButtonSetting(Label, ButtonText, HoldTime, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
+            public override ButtonSetting Create() => new(Label, ButtonText, HoldTime, HintDescription, HeaderName == null ? null : new HeaderSetting(HeaderName, HeaderDescription, HeaderPaddling));
         }
     }
 }

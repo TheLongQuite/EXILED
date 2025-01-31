@@ -294,7 +294,6 @@ namespace Exiled.API.Features.Core.UserSettings
             if (!SyncedSettings.Add(this))
                 return;
 
-            SyncedSettings.Add(Header);
             ServerSpecificSettingsSync.DefinedSettings = GroupByHeaders(SyncedSettings).Select(x => x.Base).ToArray();
         }
 

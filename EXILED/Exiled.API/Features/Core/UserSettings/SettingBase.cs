@@ -304,9 +304,10 @@ namespace Exiled.API.Features.Core.UserSettings
         /// <returns>A string in human-readable format.</returns>
         public override string ToString() => $"{Id} ({Label}) [{HintDescription}] {{{ResponseMode}}} ^{Header}^";
 
-                /// <summary>
+        /// <summary>
         /// Represents a config for TextInputSetting.
         /// </summary>
+        /// <typeparam name="TSetting">Penis.</typeparam>
         public abstract class SettingConfig<TSetting>
                     where TSetting : SettingBase
         {

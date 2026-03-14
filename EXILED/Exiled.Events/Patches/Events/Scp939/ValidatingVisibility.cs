@@ -62,23 +62,29 @@ internal class ValidatingVisibility
         index = newInstructions.FindIndex(lastTrackerIndex, i => i.opcode == OpCodes.Ldc_I4_1);
         newInstructions.InsertRange(index, DetonationCallEvent(generator, ev, returnFalse, newInstructions[index]));
 
-        // Block 5: before final ldloc.3 return — pre-check for SeenByLastTime
+        // Block 5: before final ldloc.3 return — pre-check for SeenByLastTime or NotSeen
         // last ldloc.3 (flag before ret)
         index = newInstructions.FindLastIndex(i => i.opcode == OpCodes.Ldloc_3);
 
-        Label skipEvent = generator.DefineLabel();
+        Label afterStateLoad = generator.DefineLabel();
 
         newInstructions.InsertRange(index, new CodeInstruction[]
             {
-                // if (!flag) skip event
-                new CodeInstruction(OpCodes.Ldloc_3).MoveLabelsFrom(newInstructions[index]),
-                new (OpCodes.Brfalse_S, skipEvent),
+                // state = NotSeen (default)
+                new CodeInstruction(OpCodes.Ldc_I4, (int)Scp939VisibilityState.NotSeen).MoveLabelsFrom(newInstructions[index]),
 
-                // state = SeenByLastTime
-                new (OpCodes.Ldc_I4, (int)Scp939VisibilityState.SeenByLastTime),
+                // if (!flag) goto afterStateLoad (keep NotSeen)
+                new(OpCodes.Ldloc_3),
+                new(OpCodes.Brfalse_S, afterStateLoad),
+
+                // flag is true, so state = SeenByLastTime
+                new(OpCodes.Pop),
+                new(OpCodes.Ldc_I4, (int)Scp939VisibilityState.SeenByLastTime),
+
+                // afterStateLoad: state is on stack, proceed to event
+                new CodeInstruction(OpCodes.Nop).WithLabels(afterStateLoad),
             }
-            .Concat(CallEvent(generator, ev, returnFalse))
-            .Append(new CodeInstruction(OpCodes.Nop).WithLabels(skipEvent)));
+            .Concat(CallEvent(generator, ev, returnFalse)));
 
         // Block 6: before writing to LastSeen dictionary → SeenByRange
         // last ldsfld LastSeen
@@ -128,11 +134,11 @@ internal class ValidatingVisibility
 
         // if (AlphaWarheadController.Detonated) goto isDetonated
         yield return new CodeInstruction(OpCodes.Call, PropertyGetter(typeof(AlphaWarheadController), nameof(AlphaWarheadController.Detonated))).MoveLabelsFrom(target);
-        yield return new (OpCodes.Brtrue_S, isDetonated);
+        yield return new(OpCodes.Brtrue_S, isDetonated);
 
         // state = SeenByLastTracker
-        yield return new (OpCodes.Ldc_I4, (int)Scp939VisibilityState.SeenByLastTracker);
-        yield return new (OpCodes.Br_S, afterStateLoad);
+        yield return new(OpCodes.Ldc_I4, (int)Scp939VisibilityState.SeenByLastTracker);
+        yield return new(OpCodes.Br_S, afterStateLoad);
 
         // isDetonated: state = SeenByDetonation
         yield return new CodeInstruction(OpCodes.Ldc_I4, (int)Scp939VisibilityState.SeenByDetonation).WithLabels(isDetonated);
@@ -160,45 +166,45 @@ internal class ValidatingVisibility
     /// <returns>The emitted <see cref="CodeInstruction"/>s.</returns>
     private static IEnumerable<CodeInstruction> CallEvent(ILGenerator generator, LocalBuilder ev, Label returnFalse)
     {
-        Label continueLabel = generator.DefineLabel();
+        Label setLastSeenLabel = generator.DefineLabel();
 
         // ...VisibilityState loaded in stack
         // ValidatingVisibilityEventArgs ev = new(state, scp939, target)
-        yield return new (OpCodes.Ldarg_0);
-        yield return new (OpCodes.Call, PropertyGetter(typeof(Scp939VisibilityController), nameof(Scp939VisibilityController.Owner)));
-        yield return new (OpCodes.Ldarg_1);
-        yield return new (OpCodes.Newobj, GetDeclaredConstructors(typeof(ValidatingVisibilityEventArgs))[0]);
-        yield return new (OpCodes.Dup);
-        yield return new (OpCodes.Stloc_S, ev.LocalIndex);
+        yield return new(OpCodes.Ldarg_0);
+        yield return new(OpCodes.Call, PropertyGetter(typeof(Scp939VisibilityController), nameof(Scp939VisibilityController.Owner)));
+        yield return new(OpCodes.Ldarg_1);
+        yield return new(OpCodes.Newobj, GetDeclaredConstructors(typeof(ValidatingVisibilityEventArgs))[0]);
+        yield return new(OpCodes.Dup);
+        yield return new(OpCodes.Stloc_S, ev.LocalIndex);
 
         // Scp939.OnValidatingVisibility(ev)
-        yield return new (OpCodes.Call, Method(typeof(Handlers.Scp939), nameof(Handlers.Scp939.OnValidatingVisibility)));
+        yield return new(OpCodes.Call, Method(typeof(Handlers.Scp939), nameof(Handlers.Scp939.OnValidatingVisibility)));
 
         // if (!ev.IsAllowed)
         //     return false;
-        yield return new (OpCodes.Ldloc_S, ev.LocalIndex);
-        yield return new (OpCodes.Callvirt, PropertyGetter(typeof(ValidatingVisibilityEventArgs), nameof(ValidatingVisibilityEventArgs.IsAllowed)));
-        yield return new (OpCodes.Brfalse_S, returnFalse);
+        yield return new(OpCodes.Ldloc_S, ev.LocalIndex);
+        yield return new(OpCodes.Callvirt, PropertyGetter(typeof(ValidatingVisibilityEventArgs), nameof(ValidatingVisibilityEventArgs.IsAllowed)));
+        yield return new(OpCodes.Brfalse_S, returnFalse);
 
         // if (ev.IsLateSeen)
         //     ValidatingVisibility.SetToLastSeen(target);
-        //     return true;
-        yield return new (OpCodes.Ldloc_S, ev.LocalIndex);
-        yield return new (OpCodes.Callvirt, PropertyGetter(typeof(ValidatingVisibilityEventArgs), nameof(ValidatingVisibilityEventArgs.IsLateSeen)));
-        yield return new (OpCodes.Brfalse_S, continueLabel);
+        yield return new(OpCodes.Ldloc_S, ev.LocalIndex);
+        yield return new(OpCodes.Callvirt, PropertyGetter(typeof(ValidatingVisibilityEventArgs), nameof(ValidatingVisibilityEventArgs.IsLateSeen)));
+        yield return new(OpCodes.Brfalse_S, setLastSeenLabel);
 
-        yield return new (OpCodes.Ldarg_1);
-        yield return new (OpCodes.Call, Method(typeof(ValidatingVisibility), nameof(SetToLastSeen)));
-        yield return new (OpCodes.Ldc_I4_1);
-        yield return new (OpCodes.Ret);
+        yield return new(OpCodes.Ldarg_1);
+        yield return new(OpCodes.Call, Method(typeof(ValidatingVisibility), nameof(SetToLastSeen)));
 
-        // continue:
-        yield return new CodeInstruction(OpCodes.Nop).WithLabels(continueLabel);
+        // return true
+        yield return new CodeInstruction(OpCodes.Ldc_I4_1).WithLabels(setLastSeenLabel);
+        yield return new(OpCodes.Ret);
     }
 
-    private static void SetToLastSeen(ReferenceHub target) =>
-        Scp939VisibilityController.LastSeen[target.netId] = new ()
+    private static void SetToLastSeen(ReferenceHub target)
+    {
+        Scp939VisibilityController.LastSeen[target.netId] = new Scp939VisibilityController.LastSeenInfo
         {
             Time = NetworkTime.time,
         };
+    }
 }
